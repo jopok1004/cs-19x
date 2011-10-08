@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sendfile"
+          
+          android:title="Send a file" />
+    <item android:id="@+id/receiveFile"
+     
+          android:title="Receive a file" />
+</menu>
