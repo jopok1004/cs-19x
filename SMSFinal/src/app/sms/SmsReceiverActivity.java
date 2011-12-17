@@ -1,38 +1,45 @@
 package app.sms;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.telephony.SmsManager;
+import android.telephony.*;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.*;
 
 public class SmsReceiverActivity extends Activity {
+	FileWriter fw;
+	BufferedWriter bw;
 	Boolean received=false;
+	Boolean initialR=false;
 	String phoneNo = new String();
 	Button btnSendConfirmation;
 	EditText txtPhoneNo;
 	SmsReceiver rcvd;
 	HashMap<Integer, String> al = new HashMap();
+	TelephonyManager Tel;
+	MyPhoneStateListener MyListener;
 	int size; //number of messages to be received
 	String fileT;
 	int messageSize = 10;
+	Time time = new Time();
+	long t1, t2, initial;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
@@ -50,6 +57,7 @@ public class SmsReceiverActivity extends Activity {
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
+
 				} else
 					Toast.makeText(getBaseContext(),
 							"Please enter phone number.", Toast.LENGTH_SHORT)
@@ -98,8 +106,22 @@ public class SmsReceiverActivity extends Activity {
 			if(received){
 				//do nothing
 			}else{
+				
 				int pn;
 				pn = intent.getIntExtra("packetNum", 1000);
+				
+				time.setToNow();
+				if(!initialR){
+					initial= time.toMillis(true);
+					initialR= true;
+				}
+				try {
+					bw.write(time.toString() + " : Message " +pn + " Received\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				al.put(intent.getIntExtra("packetNum", 1000), intent.getStringExtra("message").toString());
 				Toast.makeText(getBaseContext(), "Received Packet #"+pn, Toast.LENGTH_SHORT).show();
 				
@@ -107,24 +129,39 @@ public class SmsReceiverActivity extends Activity {
 				Log.i("SIZE", Integer.toString(size));
 				if (al.size() == size) {
 					try {
-
-						FileWriter fw = new FileWriter(new File(
+						time.setToNow();
+						t1= time.toMillis(true);
+						bw.write(time.toString() + " : Before write to file\n");
+						
+						FileWriter fw1 = new FileWriter(new File(
 								"/sdcard/decode.txt"));
 						for (int i = 0; i < size; i++) {
-							fw.write(al.get(i)+"\n");
-							
+							fw1.write(al.get(i)+"\n");
 						}
 						al.clear();
-						fw.close();
+						fw1.close();
 
 						Log.i("WRITING TO FILE", "FILEWRITER");
+						time.setToNow();
+						bw.write(time.toString() + " : Before decode\n");
 						
 						Base64FileDecoder.decodeFile("/sdcard/decode.txt", "/sdcard/file."+fileT+".gz");
 						File fl = new File("/sdcard/decode.txt");
 						fl.delete();
+						
+						time.setToNow();
+						bw.write(time.toString() + " : after decode and before unzip\n");
+						
 						compression.decompressGzip("/sdcard/file."+fileT+".gz");
 						fl = new File("/sdcard/file."+fileT+".gz");
 						fl.delete();
+						time.setToNow();
+						t2= time.toMillis(true);
+						
+						bw.write(time.toString() + " : after unzip\n ");
+						bw.write(initial-t2 + " : start of receiveing to before processing\n");
+						bw.write(t1-t2 + " : processing time\n");
+						bw.write(initial-t2 + " : start of receiveing to end of processing\n");
 						Log.i("DONE!!!","DONE");
 						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
 						sendSMS(phoneNo,"%&done");
@@ -274,4 +311,52 @@ public class SmsReceiverActivity extends Activity {
         }
         while ((t1 - t0) < (n * 1000));
     }
+	protected void onDestroy() {
+		try {
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onDestroy();
+	}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
+	}
+
+	/* Called when the application resumes */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+	}
+
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	/* Start the PhoneState listener */
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	private class MyPhoneStateListener extends PhoneStateListener {
+		/*
+		 * Get the Signal strength from the provider, each tiome there is an
+		 * update
+		 */
+		@Override
+		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+			super.onSignalStrengthsChanged(signalStrength);
+			time.setToNow();
+			try {
+				bw.write("Signal Strength" + time.toString() + ": "
+						+ String.valueOf(signalStrength.getGsmSignalStrength())
+						+ "\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+	};/* End of private Class */
+
+	
 }

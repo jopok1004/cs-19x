@@ -1,9 +1,6 @@
 package app.sms;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -47,7 +44,9 @@ public class SmsMessagingActivity extends Activity {
 	int packetSize; // total number of packets
 	int tracker = 0;
 	int sent = 0;
-
+	Boolean initialR=false;
+	Time time = new Time();
+	long t1, t2, initial;
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
 	String sub;
@@ -108,8 +107,7 @@ public class SmsMessagingActivity extends Activity {
 	}
 
 	public void onNewIntent(Intent intent) {
-		if ((intent.getStringExtra("start?").toString())
-				.equals("start sending")) {
+		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
 			try {
 				send10(intent.getStringExtra("phoneNum").toString());
@@ -146,7 +144,7 @@ public class SmsMessagingActivity extends Activity {
 						Log.e("-----NUM[i]-----", num[i]);
 						int j = Integer.parseInt(num[i]);
 						Log.e("RESEND LIST", num[i]);
-						sendSMS(phoneNo, "&% " + j + " " + packetList.get(j));
+						sendSMS(phoneNo, "&% " + i + " " + packetList.get(i));
 
 					}
 
@@ -164,7 +162,7 @@ public class SmsMessagingActivity extends Activity {
 		}
 	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
 			case CONTACT_PICKER_RESULT:
@@ -220,22 +218,23 @@ public class SmsMessagingActivity extends Activity {
 
 				txtFileName.setText(file.getName() + " "
 						+ Long.toString((file.length())));
-				Time time = new Time();
+				
 				time.setToNow();
-
+				t1 = time.toMillis(true);
 				try {
-					bw.write(time.toString() + "COMPRESSING\n");
-				} catch (IOException e1) {
+					bw.write(time.toString() + "before compression\n");
+				} catch (IOException e2) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e2.printStackTrace();
 				}
+				
 				
 				compression.compressGzip(
 						data.getExtras().getString("filePath"), data
 								.getExtras().getString("fileName"));
 				time.setToNow();
 				try {
-					bw.write(time.toString() + "DONE COMPRESSING\n");
+					bw.write(time.toString() + "after compression and before b64\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -250,7 +249,11 @@ public class SmsMessagingActivity extends Activity {
 							+ data.getExtras().getString("fileName") + ".gz",
 							data.getExtras().getString("filePath") + "/"
 									+ "encodedFile.txt");
+					time.setToNow();
+					t2= time.toMillis(true);
+					bw.write(time.toString() + "after b64\n");
 					Log.i("Base 64", "After Base 64");
+					
 					/*
 					 * BufferedReader reader; File fle = new
 					 * File(data.getExtras().getString("filePath") + "/"+
@@ -280,6 +283,10 @@ public class SmsMessagingActivity extends Activity {
 	}
 
 	private void send10(String phoneNumber) throws IOException {
+		if(!initialR){
+			initial= time.toMillis(true);
+			initialR= true;
+		}
 		String submessage = new String();
 		String headerBegin = new String();
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
