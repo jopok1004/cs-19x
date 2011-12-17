@@ -328,7 +328,7 @@ public class SmsReceiverActivity extends Activity {
 
 	/* Called when the application resumes */
 	@Override
-	protected void onResume() {
+	protected void onResume(){
 		super.onResume();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 	}
