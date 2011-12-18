@@ -79,7 +79,7 @@ public class SmsReceiverActivity extends Activity {
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
-					Debug.startMethodTracing("receiver1", 32000);
+					Debug.startMethodTracing("receiver1", 32000000);
 
 				} else
 					Toast.makeText(getBaseContext(),
@@ -268,6 +268,7 @@ public class SmsReceiverActivity extends Activity {
 //		}, new IntentFilter(DELIVERED));
 
 		SmsManager sms = SmsManager.getDefault();
+		Log.i("PHONE NUMBER", phoneNumber);
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
 
