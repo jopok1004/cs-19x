@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.PhoneStateListener;
@@ -49,6 +50,7 @@ public class SmsReceiverActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
+		Debug.startMethodTracing("receiver1");
 		file = new File("/sdcard/outputreceiver1.txt");
 		try {
 			fw = new FileWriter(file);
@@ -184,6 +186,7 @@ public class SmsReceiverActivity extends Activity {
 						Log.i("DONE!!!","DONE");
 						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
 						bw.close();
+						Debug.stopMethodTracing();
 						sendSMS(phoneNo,"%&done");
 						
 					} catch (IOException e) {
