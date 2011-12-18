@@ -183,6 +183,7 @@ public class SmsReceiverActivity extends Activity {
 						bw.write(initial-t2 + " : start of receiveing to end of processing\n");
 						Log.i("DONE!!!","DONE");
 						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
+						bw.close();
 						sendSMS(phoneNo,"%&done");
 						
 					} catch (IOException e) {
