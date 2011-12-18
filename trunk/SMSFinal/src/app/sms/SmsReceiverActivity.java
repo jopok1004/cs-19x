@@ -337,6 +337,7 @@ public class SmsReceiverActivity extends Activity {
     }
 	protected void onDestroy() {
 		try {
+			unregisterReceiver(rcvd);
 			bw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
