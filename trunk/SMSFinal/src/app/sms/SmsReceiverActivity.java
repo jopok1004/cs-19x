@@ -50,7 +50,8 @@ public class SmsReceiverActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
-		Debug.startMethodTracing("receiver1");
+		
+	
 		file = new File("/sdcard/outputreceiver1.txt");
 		try {
 			fw = new FileWriter(file);
@@ -78,6 +79,7 @@ public class SmsReceiverActivity extends Activity {
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
+					Debug.startMethodTracing("receiver1", 32000);
 
 				} else
 					Toast.makeText(getBaseContext(),
