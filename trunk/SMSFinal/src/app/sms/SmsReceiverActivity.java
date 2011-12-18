@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SmsReceiverActivity extends Activity {
+	File file;
 	FileWriter fw;
 	BufferedWriter bw;
 	Boolean received=false;
@@ -43,18 +44,29 @@ public class SmsReceiverActivity extends Activity {
 	int size; //number of messages to be received
 	String fileT;
 	int messageSize = 10;
-	Time time = new Time();
+	Time time ;
 	long t1, t2, initial;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
+		file = new File("/sdcard/outputreceiver1.txt");
+		try {
+			fw = new FileWriter(file);
+			bw = new BufferedWriter(fw);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		time= new Time();
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		Intent intent = getIntent();
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
 		txtPhoneNo = (EditText) findViewById(R.id.phoneNumberText);
-		MyListener = new MyPhoneStateListener();
-		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+		
 		btnSendConfirmation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				phoneNo = txtPhoneNo.getText().toString();
