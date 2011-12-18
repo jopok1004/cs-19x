@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -354,62 +355,62 @@ public class SmsMessagingActivity extends Activity {
 
 		PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
 				new Intent(DELIVERED), 0);
-
-		// ---when the SMS has been sent---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent arg1) {
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), "SMS sent",
-							Toast.LENGTH_SHORT).show();
-					if (SmsMessagingActivity.this.sen.equals("sending")) {
-						SmsMessagingActivity.this.sent++;
-						if (SmsMessagingActivity.this.sent == SmsMessagingActivity.this.packetSize) {
-							SmsMessagingActivity.this.dialog.cancel();
-							SmsMessagingActivity.this.dialog.dismiss();
-
-							Toast.makeText(getBaseContext(), "DONE SENDING",
-									Toast.LENGTH_SHORT).show();
-						}
-					}
-					break;
-				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Toast.makeText(getBaseContext(), "Generic failure",
-							Toast.LENGTH_SHORT).show();
-					break;
-				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					Toast.makeText(getBaseContext(), "No service",
-							Toast.LENGTH_SHORT).show();
-					break;
-				case SmsManager.RESULT_ERROR_NULL_PDU:
-					Toast.makeText(getBaseContext(), "Null PDU",
-							Toast.LENGTH_SHORT).show();
-					break;
-				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					Toast.makeText(getBaseContext(), "Radio off",
-							Toast.LENGTH_SHORT).show();
-					break;
-				}
-			}
-		}, new IntentFilter(SENT));
-
-		// ---when the SMS has been delivered---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent arg1) {
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), "SMS delivered",
-							Toast.LENGTH_SHORT).show();
-					break;
-				case Activity.RESULT_CANCELED:
-					Toast.makeText(getBaseContext(), "SMS not delivered",
-							Toast.LENGTH_SHORT).show();
-					break;
-				}
-			}
-		}, new IntentFilter(DELIVERED));
+//
+//		// ---when the SMS has been sent---
+//		registerReceiver(new BroadcastReceiver() {
+//			@Override
+//			public void onReceive(Context arg0, Intent arg1) {
+//				switch (getResultCode()) {
+//				case Activity.RESULT_OK:
+//					Toast.makeText(getBaseContext(), "SMS sent",
+//							Toast.LENGTH_SHORT).show();
+//					if (SmsMessagingActivity.this.sen.equals("sending")) {
+//						SmsMessagingActivity.this.sent++;
+//						if (SmsMessagingActivity.this.sent == SmsMessagingActivity.this.packetSize) {
+//							SmsMessagingActivity.this.dialog.cancel();
+//							SmsMessagingActivity.this.dialog.dismiss();
+//
+//							Toast.makeText(getBaseContext(), "DONE SENDING",
+//									Toast.LENGTH_SHORT).show();
+//						}
+//					}
+//					break;
+//				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+//					Toast.makeText(getBaseContext(), "Generic failure",
+//							Toast.LENGTH_SHORT).show();
+//					break;
+//				case SmsManager.RESULT_ERROR_NO_SERVICE:
+//					Toast.makeText(getBaseContext(), "No service",
+//							Toast.LENGTH_SHORT).show();
+//					break;
+//				case SmsManager.RESULT_ERROR_NULL_PDU:
+//					Toast.makeText(getBaseContext(), "Null PDU",
+//							Toast.LENGTH_SHORT).show();
+//					break;
+//				case SmsManager.RESULT_ERROR_RADIO_OFF:
+//					Toast.makeText(getBaseContext(), "Radio off",
+//							Toast.LENGTH_SHORT).show();
+//					break;
+//				}
+//			}
+//		}, new IntentFilter(SENT));
+//
+//		// ---when the SMS has been delivered---
+//		registerReceiver(new BroadcastReceiver() {
+//			@Override
+//			public void onReceive(Context arg0, Intent arg1) {
+//				switch (getResultCode()) {
+//				case Activity.RESULT_OK:
+//					Toast.makeText(getBaseContext(), "SMS delivered",
+//							Toast.LENGTH_SHORT).show();
+//					break;
+//				case Activity.RESULT_CANCELED:
+//					Toast.makeText(getBaseContext(), "SMS not delivered",
+//							Toast.LENGTH_SHORT).show();
+//					break;
+//				}
+//			}
+//		}, new IntentFilter(DELIVERED));
 
 		SmsManager sms = SmsManager.getDefault();
 		try {
@@ -480,4 +481,7 @@ public class SmsMessagingActivity extends Activity {
 		}
 		super.onDestroy();
 	}
+	
+	
 }
+
