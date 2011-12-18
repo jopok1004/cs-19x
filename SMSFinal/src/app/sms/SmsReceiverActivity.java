@@ -186,6 +186,7 @@ public class SmsReceiverActivity extends Activity {
 						Log.i("DONE!!!","DONE");
 						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
 						bw.close();
+						this.finish();
 						Debug.stopMethodTracing();
 						sendSMS(phoneNo,"%&done");
 						
