@@ -186,9 +186,10 @@ public class SmsReceiverActivity extends Activity {
 						Log.i("DONE!!!","DONE");
 						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
 						bw.close();
-						this.finish();
+						
 						Debug.stopMethodTracing();
 						sendSMS(phoneNo,"%&done");
+						this.finish();
 						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -337,7 +338,7 @@ public class SmsReceiverActivity extends Activity {
     }
 	protected void onDestroy() {
 		try {
-			unregisterReceiver(rcvd);
+			//unregisterReceiver(rcvd);
 			bw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
