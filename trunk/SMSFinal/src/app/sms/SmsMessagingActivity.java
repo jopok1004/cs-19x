@@ -123,6 +123,7 @@ public class SmsMessagingActivity extends Activity {
 			try {
 				bw.close();
 				Debug.stopMethodTracing();
+				this.finish();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
