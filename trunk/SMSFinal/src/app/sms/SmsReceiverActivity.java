@@ -4,24 +4,29 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.telephony.*;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
+import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 public class SmsReceiverActivity extends Activity {
 	FileWriter fw;
@@ -47,7 +52,9 @@ public class SmsReceiverActivity extends Activity {
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
 		txtPhoneNo = (EditText) findViewById(R.id.phoneNumberText);
-
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		btnSendConfirmation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				phoneNo = txtPhoneNo.getText().toString();
