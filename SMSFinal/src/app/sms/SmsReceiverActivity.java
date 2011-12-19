@@ -80,6 +80,7 @@ public class SmsReceiverActivity extends Activity {
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
 					Debug.startMethodTracing("receiver1", 32000000);
+					btnSendConfirmation.setClickable(false);
 
 				} else
 					Toast.makeText(getBaseContext(),

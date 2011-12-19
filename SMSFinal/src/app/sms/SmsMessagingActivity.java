@@ -97,6 +97,7 @@ public class SmsMessagingActivity extends Activity {
 				if (phoneNo.length() > 0 && message.length() > 0) {
 					sendSMS(phoneNo, message);
 					sendSMS(phoneNo, "%& sendFile " + packetSize + " " + sub);
+					btnSendSMS.setClickable(false);
 				} else
 					Toast.makeText(getBaseContext(),
 							"Please enter both phone number and message.",
