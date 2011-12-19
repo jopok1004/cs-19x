@@ -31,8 +31,8 @@ import android.widget.Toast;
 
 public class SmsReceiverActivity extends Activity {
 	File file;
-	FileWriter fw=null;
-	BufferedWriter bw=null;
+	FileWriter fw = null;
+	BufferedWriter bw = null;
 	Boolean received = false;
 	Boolean initialR = false;
 	String phoneNo = new String();
@@ -47,6 +47,7 @@ public class SmsReceiverActivity extends Activity {
 	int messageSize = 10;
 	Time time;
 	long t1, t2, initial;
+	long last, current;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -118,14 +119,17 @@ public class SmsReceiverActivity extends Activity {
 					Log.i("resend", resend);
 					okay = false;
 				}
-				if(al.size()<currentp) {
-					for(int k = 0; k<currentp-1;k++) {
-						if(!al.containsKey(k)) {
-							resend = resend + k + " ";
-							Log.i("if not containskey", "checking for missing packets");
-							Log.i("resend", resend);
-							okay = false;
-						}
+
+			}
+			if (al.size() < currentp) {
+				for (int k = 0; k < currentp - 1; k++) {
+					if (!al.containsKey(k)) {
+						resend = resend + k + " ";
+						Log.i("if not containskey",
+								"checking for missing packets");
+						
+						Log.i("resend", resend);
+						okay = false;
 					}
 				}
 			}
@@ -294,7 +298,7 @@ public class SmsReceiverActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		Log.i("PHONE NUMBER", phoneNumber);
-		Log.i("MESSAGE",message);
+		Log.i("MESSAGE", message);
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
 

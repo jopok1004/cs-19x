@@ -39,8 +39,8 @@ public class SmsMessagingActivity extends Activity {
 	SmsReceiver rcvd;
 	File selectedFile;
 	File outputfile;
-	FileWriter fw;
-	BufferedWriter bw;
+	FileWriter fw=null;
+	BufferedWriter bw=null;
 	final int testnum = 1;
 	int packetSize; // total number of packets
 	int tracker = 0;

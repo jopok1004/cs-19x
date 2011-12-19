@@ -17,7 +17,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		// ---get the SMS message passed in---
 		Bundle bundle = intent.getExtras();
 		SmsMessage[] msgs = null;
-
+		
 		if (bundle != null) {
 			// ---retrieve the SMS message received---
 			Object[] pdus = (Object[]) bundle.get("pdus");
