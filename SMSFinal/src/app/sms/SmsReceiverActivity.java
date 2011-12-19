@@ -284,6 +284,7 @@ public class SmsReceiverActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		Log.i("PHONE NUMBER", phoneNumber);
+		Log.i("MESSAGE",message);
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
 
