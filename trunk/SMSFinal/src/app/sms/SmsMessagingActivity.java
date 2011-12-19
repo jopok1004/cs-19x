@@ -124,6 +124,7 @@ public class SmsMessagingActivity extends Activity {
 			Toast.makeText(getBaseContext(), "Done Sending", Toast.LENGTH_SHORT);
 			try {
 				bw.close();
+				fw.close();
 				Debug.stopMethodTracing();
 				this.finish();
 			} catch (IOException e) {

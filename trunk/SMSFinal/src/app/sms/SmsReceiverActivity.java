@@ -189,6 +189,7 @@ public class SmsReceiverActivity extends Activity {
 						Log.i("DONE!!!","DONE");
 						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
 						bw.close();
+						fw.close();
 						
 						Debug.stopMethodTracing();
 						sendSMS(phoneNo,"%&done");
@@ -375,6 +376,7 @@ public class SmsReceiverActivity extends Activity {
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 			super.onSignalStrengthsChanged(signalStrength);
 			time.setToNow();
+			
 			try {
 				bw.write("Signal Strength" + time.toString() + ": "
 						+ String.valueOf(signalStrength.getGsmSignalStrength())
