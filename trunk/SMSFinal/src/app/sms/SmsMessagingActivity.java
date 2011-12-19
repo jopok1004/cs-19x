@@ -161,7 +161,8 @@ public class SmsMessagingActivity extends Activity {
 						Log.e("-----NUM[i]-----", num[i]);
 						int j = Integer.parseInt(num[i]);
 						Log.e("RESEND LIST", num[i]);
-						sendSMS(phoneNo, "&% " + i + " " + packetList.get(i));
+						sendSMS(phoneNo, "&% " + j + " " + packetList.get(j));
+						Log.i("RESENT", packetList.get(j));
 
 					}
 
