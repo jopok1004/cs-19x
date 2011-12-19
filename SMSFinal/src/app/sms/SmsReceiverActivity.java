@@ -52,14 +52,7 @@ public class SmsReceiverActivity extends Activity {
 		setContentView(R.layout.receiver);
 		
 	
-		file = new File("/sdcard/outputreceiver1.txt");
-		try {
-			fw = new FileWriter(file);
-			bw = new BufferedWriter(fw);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		
 		time= new Time();
 		MyListener = new MyPhoneStateListener();
@@ -81,7 +74,15 @@ public class SmsReceiverActivity extends Activity {
 							Toast.LENGTH_SHORT).show();
 					Debug.startMethodTracing("receiver1", 32000000);
 					btnSendConfirmation.setClickable(false);
-
+					
+					file = new File("/sdcard/outputreceiver1.txt");
+					try {
+						fw = new FileWriter(file);
+						bw = new BufferedWriter(fw);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else
 					Toast.makeText(getBaseContext(),
 							"Please enter phone number.", Toast.LENGTH_SHORT)
@@ -112,7 +113,7 @@ public class SmsReceiverActivity extends Activity {
 			int currentp;
 			currentp = Integer.parseInt(intent.getStringExtra("tracker"));
 			resend = "%&resend ";
-			for(int i=(currentp%10); i>=0; i--){
+			for(int i=(currentp%10); i>=0&&currentp<size; i--){
 				if(al.containsKey(currentp-i-1) == false){
 					resend = resend + (currentp-i-1) + " ";
 					Log.i("if not containskey","checking for missing packets");
