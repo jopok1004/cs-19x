@@ -31,10 +31,10 @@ import android.widget.Toast;
 
 public class SmsReceiverActivity extends Activity {
 	File file;
-	FileWriter fw;
-	BufferedWriter bw;
-	Boolean received=false;
-	Boolean initialR=false;
+	FileWriter fw=null;
+	BufferedWriter bw=null;
+	Boolean received = false;
+	Boolean initialR = false;
 	String phoneNo = new String();
 	Button btnSendConfirmation;
 	EditText txtPhoneNo;
@@ -42,19 +42,17 @@ public class SmsReceiverActivity extends Activity {
 	HashMap<Integer, String> al = new HashMap();
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
-	int size; //number of messages to be received
+	int size; // number of messages to be received
 	String fileT;
 	int messageSize = 10;
-	Time time ;
+	Time time;
 	long t1, t2, initial;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
-		
-	
-		
-		
-		time= new Time();
+
+		time = new Time();
 		MyListener = new MyPhoneStateListener();
 		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
@@ -62,7 +60,7 @@ public class SmsReceiverActivity extends Activity {
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
 		txtPhoneNo = (EditText) findViewById(R.id.phoneNumberText);
-		
+
 		btnSendConfirmation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				phoneNo = txtPhoneNo.getText().toString();
@@ -74,7 +72,7 @@ public class SmsReceiverActivity extends Activity {
 							Toast.LENGTH_SHORT).show();
 					Debug.startMethodTracing("receiver1", 32000000);
 					btnSendConfirmation.setClickable(false);
-					
+
 					file = new File("/sdcard/outputreceiver1.txt");
 					try {
 						fw = new FileWriter(file);
@@ -90,79 +88,83 @@ public class SmsReceiverActivity extends Activity {
 			}
 		});
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
-			Log.i("GETCONFIRM","GETCONFIRM");
-			size = intent.getIntExtra("size",10);
+			Log.i("GETCONFIRM", "GETCONFIRM");
+			size = intent.getIntExtra("size", 10);
 			fileT = intent.getStringExtra("fileType");
-			
+
 		}
 	}
 
 	public void onNewIntent(Intent intent) {
-		Log.i("INTENT",intent.getStringExtra("start?").toString());
+		Log.i("INTENT", intent.getStringExtra("start?").toString());
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
-			Log.i("GETCONFIRM","GETCONFIRM");
-			size = intent.getIntExtra("size",10);
+			Log.i("GETCONFIRM", "GETCONFIRM");
+			size = intent.getIntExtra("size", 10);
 			fileT = intent.getStringExtra("fileType");
-			
+
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("check10")) {
-			Boolean okay=true;
-			Log.i("check10","check for missing packets");
+			Boolean okay = true;
+			Log.i("check10", "check for missing packets");
 			waiting(30);
-			String resend= "";
+			String resend = "";
 			int currentp;
 			currentp = Integer.parseInt(intent.getStringExtra("tracker"));
 			resend = "%&resend ";
-			for(int i=(currentp%10); i>=0&&currentp<size; i--){
-				if(al.containsKey(currentp-i-1) == false){
-					resend = resend + (currentp-i-1) + " ";
-					Log.i("if not containskey","checking for missing packets");
-					Log.i("resend",resend);
-					okay=false;
+			for (int i = (currentp % 10); i >= 0 && currentp < size; i--) {
+				if (al.containsKey(currentp - i - 1) == false) {
+					resend = resend + (currentp - i - 1) + " ";
+					Log.i("if not containskey", "checking for missing packets");
+					Log.i("resend", resend);
+					okay = false;
 				}
 			}
-			if(okay==true){
+			if (okay == true) {
 				sendSMS(phoneNo, "%&resend none");
-			}else{
-				sendSMS(phoneNo,resend);
+			} else {
+				sendSMS(phoneNo, resend);
 			}
-			
+
 		}
-		if ((intent.getStringExtra("start?").toString()).equals("start receiving")) {
-			if(received){
-				//do nothing
-			}else{
-				
+		if ((intent.getStringExtra("start?").toString())
+				.equals("start receiving")) {
+			if (received) {
+				// do nothing
+			} else {
+
 				int pn;
 				pn = intent.getIntExtra("packetNum", 1000);
-				
+
 				time.setToNow();
-				if(!initialR){
-					initial= time.toMillis(true);
-					initialR= true;
+				if (!initialR) {
+					initial = time.toMillis(true);
+					initialR = true;
 				}
 				try {
-					bw.write(time.toString() + " : Message " +pn + " Received\n");
+					bw.write(time.toString() + " : Message " + pn
+							+ " Received\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
-				al.put(intent.getIntExtra("packetNum", 1000), intent.getStringExtra("message").toString());
-				Toast.makeText(getBaseContext(), "Received Packet #"+pn, Toast.LENGTH_SHORT).show();
-				
+
+				al.put(intent.getIntExtra("packetNum", 1000), intent
+						.getStringExtra("message").toString());
+				Toast.makeText(getBaseContext(), "Received Packet #" + pn,
+						Toast.LENGTH_SHORT).show();
+
 				Log.i("AL SIZE", Integer.toString(al.size()));
 				Log.i("SIZE", Integer.toString(size));
 				if (al.size() == size) {
 					try {
 						time.setToNow();
-						t1= time.toMillis(true);
+						t1 = time.toMillis(true);
 						bw.write(time.toString() + " : Before write to file\n");
-						
+
 						FileWriter fw1 = new FileWriter(new File(
 								"/sdcard/decode.txt"));
 						for (int i = 0; i < size; i++) {
-							fw1.write(al.get(i)+"\n");
+							fw1.write(al.get(i) + "\n");
 						}
 						al.clear();
 						fw1.close();
@@ -170,42 +172,50 @@ public class SmsReceiverActivity extends Activity {
 						Log.i("WRITING TO FILE", "FILEWRITER");
 						time.setToNow();
 						bw.write(time.toString() + " : Before decode\n");
-						
-						Base64FileDecoder.decodeFile("/sdcard/decode.txt", "/sdcard/file."+fileT+".gz");
+
+						Base64FileDecoder.decodeFile("/sdcard/decode.txt",
+								"/sdcard/file." + fileT + ".gz");
 						File fl = new File("/sdcard/decode.txt");
 						fl.delete();
-						
+
 						time.setToNow();
-						bw.write(time.toString() + " : after decode and before unzip\n");
-						
-						compression.decompressGzip("/sdcard/file."+fileT+".gz");
-						fl = new File("/sdcard/file."+fileT+".gz");
+						bw.write(time.toString()
+								+ " : after decode and before unzip\n");
+
+						compression.decompressGzip("/sdcard/file." + fileT
+								+ ".gz");
+						fl = new File("/sdcard/file." + fileT + ".gz");
 						fl.delete();
 						time.setToNow();
-						t2= time.toMillis(true);
-						
+						t2 = time.toMillis(true);
+
 						bw.write(time.toString() + " : after unzip\n ");
-						bw.write(initial-t2 + " : start of receiveing to before processing\n");
-						bw.write(t1-t2 + " : processing time\n");
-						bw.write(initial-t2 + " : start of receiveing to end of processing\n");
-						Log.i("DONE!!!","DONE");
-						Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
+						bw.write(initial
+								- t2
+								+ " : start of receiveing to before processing\n");
+						bw.write(t1 - t2 + " : processing time\n");
+						bw.write(initial
+								- t2
+								+ " : start of receiveing to end of processing\n");
+						Log.i("DONE!!!", "DONE");
+						Toast.makeText(getBaseContext(),
+								"File Received. Check your SD Card",
+								Toast.LENGTH_LONG).show();
 						bw.close();
 						fw.close();
-						
+
 						Debug.stopMethodTracing();
-						sendSMS(phoneNo,"%&done");
+						sendSMS(phoneNo, "%&done");
 						this.finish();
-						
+
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					received=true;
+					received = true;
 				}
 			}
-			
-			
+
 		}
 	}
 
@@ -214,62 +224,63 @@ public class SmsReceiverActivity extends Activity {
 	private void sendSMS(String phoneNumber, String message) {
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
-		
-		if(message.equals("%&done")){
-			Toast.makeText(SmsReceiverActivity.this, "File Received. Check your SD Card", Toast.LENGTH_LONG);
+
+		if (message.equals("%&done")) {
+			Toast.makeText(SmsReceiverActivity.this,
+					"File Received. Check your SD Card", Toast.LENGTH_LONG);
 		}
 		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(
 				SENT), 0);
 
 		PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
 				new Intent(DELIVERED), 0);
-			
-//		// ---when the SMS has been sent---
-//		registerReceiver(new BroadcastReceiver() {
-//			@Override
-//			public void onReceive(Context arg0, Intent arg1) {
-//				switch (getResultCode()) {
-//				case Activity.RESULT_OK:
-//					
-//					Toast.makeText(getBaseContext(), "SMS sent",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-//					Toast.makeText(getBaseContext(), "Generic failure",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				case SmsManager.RESULT_ERROR_NO_SERVICE:
-//					Toast.makeText(getBaseContext(), "No service",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				case SmsManager.RESULT_ERROR_NULL_PDU:
-//					Toast.makeText(getBaseContext(), "Null PDU",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				case SmsManager.RESULT_ERROR_RADIO_OFF:
-//					Toast.makeText(getBaseContext(), "Radio off",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				}
-//			}
-//		}, new IntentFilter(SENT));
-//
-//		// ---when the SMS has been delivered---
-//		registerReceiver(new BroadcastReceiver() {
-//			@Override
-//			public void onReceive(Context arg0, Intent arg1) {
-//				switch (getResultCode()) {
-//				case Activity.RESULT_OK:
-//					Toast.makeText(getBaseContext(), "SMS delivered",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				case Activity.RESULT_CANCELED:
-//					Toast.makeText(getBaseContext(), "SMS not delivered",
-//							Toast.LENGTH_SHORT).show();
-//					break;
-//				}
-//			}
-//		}, new IntentFilter(DELIVERED));
+
+		// // ---when the SMS has been sent---
+		// registerReceiver(new BroadcastReceiver() {
+		// @Override
+		// public void onReceive(Context arg0, Intent arg1) {
+		// switch (getResultCode()) {
+		// case Activity.RESULT_OK:
+		//
+		// Toast.makeText(getBaseContext(), "SMS sent",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+		// Toast.makeText(getBaseContext(), "Generic failure",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// case SmsManager.RESULT_ERROR_NO_SERVICE:
+		// Toast.makeText(getBaseContext(), "No service",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// case SmsManager.RESULT_ERROR_NULL_PDU:
+		// Toast.makeText(getBaseContext(), "Null PDU",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// case SmsManager.RESULT_ERROR_RADIO_OFF:
+		// Toast.makeText(getBaseContext(), "Radio off",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// }
+		// }
+		// }, new IntentFilter(SENT));
+		//
+		// // ---when the SMS has been delivered---
+		// registerReceiver(new BroadcastReceiver() {
+		// @Override
+		// public void onReceive(Context arg0, Intent arg1) {
+		// switch (getResultCode()) {
+		// case Activity.RESULT_OK:
+		// Toast.makeText(getBaseContext(), "SMS delivered",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// case Activity.RESULT_CANCELED:
+		// Toast.makeText(getBaseContext(), "SMS not delivered",
+		// Toast.LENGTH_SHORT).show();
+		// break;
+		// }
+		// }
+		// }, new IntentFilter(DELIVERED));
 
 		SmsManager sms = SmsManager.getDefault();
 		Log.i("PHONE NUMBER", phoneNumber);
@@ -334,18 +345,19 @@ public class SmsReceiverActivity extends Activity {
 			Log.w("chloe", "Warning: activity result not ok");
 		}
 	}
-	public static void waiting (int n){
-        long t0, t1;
-        t0 =  System.currentTimeMillis();
-        Log.i("INSIDE WAITING", Integer.toString(n));
-        do{
-            t1 = System.currentTimeMillis();
-        }
-        while ((t1 - t0) < (n * 1000));
-    }
+
+	public static void waiting(int n) {
+		long t0, t1;
+		t0 = System.currentTimeMillis();
+		Log.i("INSIDE WAITING", Integer.toString(n));
+		do {
+			t1 = System.currentTimeMillis();
+		} while ((t1 - t0) < (n * 1000));
+	}
+
 	protected void onDestroy() {
 		try {
-			//unregisterReceiver(rcvd);
+			// unregisterReceiver(rcvd);
 			bw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -353,6 +365,7 @@ public class SmsReceiverActivity extends Activity {
 		}
 		super.onDestroy();
 	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -361,7 +374,7 @@ public class SmsReceiverActivity extends Activity {
 
 	/* Called when the application resumes */
 	@Override
-	protected void onResume(){
+	protected void onResume() {
 		super.onResume();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 	}
@@ -378,19 +391,19 @@ public class SmsReceiverActivity extends Activity {
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 			super.onSignalStrengthsChanged(signalStrength);
 			time.setToNow();
-			
-			try {
-				bw.write("Signal Strength" + time.toString() + ": "
-						+ String.valueOf(signalStrength.getGsmSignalStrength())
-						+ "\n");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (fw != null && bw != null) {
+				try {
+					bw.write("Signal Strength"
+							+ time.toString()
+							+ ": "
+							+ String.valueOf(signalStrength
+									.getGsmSignalStrength()) + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-
 		}
-
 	};/* End of private Class */
 
-	
 }
