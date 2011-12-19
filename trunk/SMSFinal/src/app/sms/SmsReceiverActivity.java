@@ -118,6 +118,16 @@ public class SmsReceiverActivity extends Activity {
 					Log.i("resend", resend);
 					okay = false;
 				}
+				if(al.size()<currentp) {
+					for(int k = 0; k<currentp-1;k++) {
+						if(!al.containsKey(k)) {
+							resend = resend + (currentp - i - 1) + " ";
+							Log.i("if not containskey", "checking for missing packets");
+							Log.i("resend", resend);
+							okay = false;
+						}
+					}
+				}
 			}
 			if (okay == true) {
 				sendSMS(phoneNo, "%&resend none");
