@@ -98,6 +98,8 @@ public class SmsMessagingActivity extends Activity {
 					sendSMS(phoneNo, message);
 					sendSMS(phoneNo, "%& sendFile " + packetSize + " " + sub);
 					btnSendSMS.setClickable(false);
+					btnSendSMS.setVisibility(Button.INVISIBLE);
+					
 				} else
 					Toast.makeText(getBaseContext(),
 							"Please enter both phone number and message.",

@@ -116,6 +116,7 @@ public class SmsReceiverActivity extends Activity {
 				if(al.containsKey(currentp-i-1) == false){
 					resend = resend + (currentp-i-1) + " ";
 					Log.i("if not containskey","checking for missing packets");
+					Log.i("resend",resend);
 					okay=false;
 				}
 			}
