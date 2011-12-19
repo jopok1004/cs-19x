@@ -61,7 +61,7 @@ public class SmsMessagingActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Debug.startMethodTracing("sender");
+		Debug.startMethodTracing("sender",32000000);
 		outputfile = new File("/sdcard/output" + testnum + ".txt");
 		try {
 			fw = new FileWriter(outputfile);
