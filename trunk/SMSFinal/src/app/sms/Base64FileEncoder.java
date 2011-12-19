@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class Base64FileEncoder {
 	static ArrayList<String> packetlist = new ArrayList<String>();
 	public static ArrayList<String> encodeFile (String inputFileName, String outputFileName) throws IOException {
+		packetlist.clear();
 		BufferedInputStream in = null;
 		BufferedWriter out = null;
 		try {
