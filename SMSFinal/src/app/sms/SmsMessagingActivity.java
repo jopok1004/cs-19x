@@ -122,6 +122,17 @@ public class SmsMessagingActivity extends Activity {
 				.equals("done receiving")) {
 
 			Toast.makeText(getBaseContext(), "Done Sending", Toast.LENGTH_SHORT);
+			
+			time.setToNow();
+			try {
+				bw.write(t1- time.toMillis(true) + " : total time\n");
+				bw.write(t1-t2 + " : processing time\n");
+				bw.write(initial-t2 + " : sending time\n");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
 			try {
 				bw.close();
 				fw.close();
