@@ -71,7 +71,7 @@ public class MmsReceiverActivity extends Activity {
 		setContentView(R.layout.receiver);
 		// TRIAL
 		Intent intent = this.getIntent();
-		Log.i("NEWINTENT","NEW INTENT "+intent.getStringExtra("start?"));
+		Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
 			Log.i("RECEIVED SMS", "RECEIVED SMS");
 			phoneNum = intent.getStringExtra("phoneNum");
@@ -81,7 +81,7 @@ public class MmsReceiverActivity extends Activity {
 			end = intent.getIntExtra("end", 0);
 			Log.i("end", Integer.toString(end));
 			size = end - initial;
-			Log.i("size", "SIZE: "+Integer.toString(size));
+			Log.i("size", "SIZE: " + Integer.toString(size));
 
 			fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
@@ -116,7 +116,7 @@ public class MmsReceiverActivity extends Activity {
 	}
 
 	public void onNewIntent(Intent intent) {
-		Log.i("NEWINTENT","NEW INTENT "+intent.getStringExtra("start?"));
+		Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
 			Log.i("RECEIVED SMS", "RECEIVED SMS");
 			phoneNum = intent.getStringExtra("phoneNum");
@@ -126,7 +126,7 @@ public class MmsReceiverActivity extends Activity {
 			end = intent.getIntExtra("end", 0);
 			Log.i("end", Integer.toString(end));
 			size = end - initial;
-			Log.i("size", "SIZE: "+Integer.toString(size));
+			Log.i("size", "SIZE: " + Integer.toString(size));
 			fileName = intent.getStringExtra("filename");
 			Log.i("fileName", fileName);
 			fileType = intent.getStringExtra("filetype");
@@ -256,7 +256,7 @@ public class MmsReceiverActivity extends Activity {
 													int pNum = Integer
 															.parseInt(packets2[0]);
 													al.put(pNum, packets2[1]);
-													if(al.size()==size) {
+													if (al.size() == size) {
 														receiveFile();
 													}
 												}
@@ -280,11 +280,9 @@ public class MmsReceiverActivity extends Activity {
 		for (int i = 0; i < al.size(); i++) {
 			bw.write(al.get(i) + "\n");
 		}
-		
 
-		
 	}
-	
+
 	public void receiveFile() {
 		if (al.size() == size) {
 			try {
@@ -303,8 +301,8 @@ public class MmsReceiverActivity extends Activity {
 
 				Base64FileDecoder.decodeFile("/sdcard/decode.txt",
 						"/sdcard/file." + fileType + ".gz");
-				//File fl = new File("/sdcard/decode.txt");
-				//fl.delete();
+				// File fl = new File("/sdcard/decode.txt");
+				// fl.delete();
 				compression.decompressGzip("/sdcard/file." + fileType + ".gz");
 				File fl = new File("/sdcard/file." + fileType + ".gz");
 				fl.delete();
@@ -319,7 +317,7 @@ public class MmsReceiverActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			// sreceived=true;
 		}
 	}
