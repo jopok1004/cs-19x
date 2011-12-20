@@ -100,7 +100,7 @@ public class MmsReceiverActivity extends Activity {
 	}
 
 	public void onNewIntent(Intent intent) {
-
+		Log.i("NEWINTENT","NEW INTENT "+intent.getStringExtra("start?"));
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
 			Log.i("RECEIVED SMS", "RECEIVED SMS");
 			phoneNum = intent.getStringExtra("phoneNum");
@@ -110,7 +110,7 @@ public class MmsReceiverActivity extends Activity {
 			end = intent.getIntExtra("end", 0);
 			Log.i("end", Integer.toString(end));
 			size = end - initial;
-			Log.i("size", Integer.toString(size));
+			Log.i("size", "SIZE: "+Integer.toString(size));
 			fileName = intent.getStringExtra("filename");
 			Log.i("fileName", fileName);
 			fileType = intent.getStringExtra("filetype");
