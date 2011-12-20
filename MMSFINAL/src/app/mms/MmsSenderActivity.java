@@ -66,12 +66,6 @@ public class MmsSenderActivity extends Activity {
 					}											// startindex
 																					// endindex
 																					// filename
-					try {
-						mms(phoneNo);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 				} else
 					Toast.makeText(getBaseContext(),
 							"Please enter phone number.", Toast.LENGTH_SHORT)
