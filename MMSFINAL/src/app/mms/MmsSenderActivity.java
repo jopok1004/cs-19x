@@ -58,6 +58,7 @@ public class MmsSenderActivity extends Activity {
 				if (phoneNo.length() > 0) {
 					Log.i("sendFile", "Ready to send file");
 					sendSMS(phoneNo, "%&sendViaMms 0 " + packetSize + " " + sub); // %&sendViaMms
+					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
 						Log.i("SENDING MMS", "SENDING MMS");
 						mms(phoneNo);
