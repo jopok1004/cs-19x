@@ -53,13 +53,8 @@ public class SmsReceiver extends BroadcastReceiver
 //                
 //                i.putExtra("initial", Integer.parseInt(tokens[0]));
 //                i.putExtra("end", Integer.parseInt(tokens[1]));
-//                
-//                tokens = tokens[2].split(".");
-//                for(int j=0;j<tokens.length;j++) {
-//                	Log.i("TOKEN2 "+j,tokens[j]);
-//                }
-//                i.putExtra("filename", tokens[0]);
-//                i.putExtra("filetype", tokens[1]);
+
+//                i.putExtra("filetype", tokens[2]);
 //                context.startActivity(i);
 //            }
   
