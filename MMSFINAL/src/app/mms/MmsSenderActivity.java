@@ -57,7 +57,12 @@ public class MmsSenderActivity extends Activity {
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
 					Log.i("sendFile", "Ready to send file");
-					sendSMS(phoneNo, "%&sendViaMms 0 " + packetSize + " " + sub); // %&sendViaMms
+					String temp= "";
+					//temp= "%&sendViaMms 0 " + packetSize + " " + sub;
+					temp= "%&sendViaMms";
+					Log.i("temp", temp);
+					sendSMS(phoneNo, temp); // %&sendViaMms
+					sendSMS(phoneNo, "MESSAGE"); // %&sendViaMms
 					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
 						Log.i("SENDING MMS", "SENDING MMS");
@@ -282,5 +287,6 @@ public class MmsSenderActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+		Log.i("sms sent", "after sms sending");
 	}
 }
