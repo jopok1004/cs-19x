@@ -61,8 +61,8 @@ public class MmsSenderActivity extends Activity {
 					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
 						Log.i("SENDING MMS", "SENDING MMS");
-						mms(phoneNo);
-					} catch (IOException e1) {
+						//mms(phoneNo);
+					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}											// startindex
