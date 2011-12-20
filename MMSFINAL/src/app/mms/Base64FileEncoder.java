@@ -15,6 +15,7 @@ public class Base64FileEncoder {
 	public static ArrayList<String> encodeFile (String inputFileName, String outputFileName) throws IOException {
 		BufferedInputStream in = null;
 		BufferedWriter out = null;
+		packetlist.clear();
 		try {
 		   in = new BufferedInputStream(new FileInputStream(inputFileName));
 		   out = new BufferedWriter(new FileWriter(outputFileName));
