@@ -208,8 +208,10 @@ public class MmsReceiverActivity extends Activity {
 										Log.i("PACKETS",packets[j]);
 										if (packets[j] != null) {
 											packets2 = packets[j].split(" ");
-											int pNum = Integer.parseInt(packets2[0]);
-											al.put(pNum, packets2[1]);
+											Log.i("packets2[0]",packets2[0]);
+											Log.i("packets2[1]",packets2[1]);
+//											int pNum = Integer.parseInt(packets2[0]);
+//											al.put(pNum, packets2[1]);
 										}
 
 									}
