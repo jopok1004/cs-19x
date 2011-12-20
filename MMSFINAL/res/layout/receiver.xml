@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:text="Confirm that you want to receive a file" />
+	<TableRow
+
+		android:id="@+id/tableRow1"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentLeft="true"
+		android:layout_marginLeft="5dp"
+		android:layout_marginTop="14dp"
+		android:layout_marginRight="5dp">
+		<RelativeLayout
+			android:id="@+id/relativeLayout2"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent">
+			<EditText
+				android:id="@+id/phoneNumberText"
+				android:layout_toLeftOf="@+id/browseContactsButton"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+				<requestFocus></requestFocus>
+			</EditText>
+			<Button
+				android:text="Browse Contacts"
+				android:gravity="right"
+				android:id="@+id/browseContactsButton"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_alignParentRight="true"
+				android:onClick="doLaunchContactPicker"></Button>
+		</RelativeLayout>
+
+	</TableRow>
+	<Button
+		android:text="Send"
+		android:layout_width="156dp"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginRight="5dp"
+		android:id="@+id/btnSendConfirmation" android:layout_gravity="right"></Button>
+
+</LinearLayout>

@@ -1,0 +1,221 @@
+package app.mms;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+
+public class MmsReceiverActivity extends Activity {
+	File file = new File("/sdcard/mmscolumns.txt");
+	FileWriter fw = null;
+	BufferedWriter bw = null;
+	HashMap<Integer, String> al = new HashMap<Integer, String>();
+
+	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
+
+	Uri mmsInURI = Uri.parse("content://mms-sms");
+
+	ContentObserver mmsObserver = new ContentObserver(null) {
+	    @Override
+	    public void onChange(boolean selfChange) {
+
+	        Thread mmsNotify = new Thread(){
+	            @Override
+	            public void run() {
+	                Intent mIntent = new Intent(MMSMON_RECEIVED_MMS);
+	                sendBroadcast(mIntent);
+	                super.run();
+	            }
+	        };
+	        mmsNotify.start();
+	        super.onChange(selfChange);
+	        //try here
+	        
+	        Log.i("MMS Received","MMS RECEIVED HAHA");
+            try {
+				Log.i("SEARCHING", "SEARCHING MMS AGAIN");
+				checkMMSMessages();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        //end try
+	        
+	    }
+	};
+	
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.receiver);
+// TRIAL
+		
+		 BroadcastReceiver mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
+		        @Override
+		        public void onReceive(Context context, Intent intent) {
+		            
+		            Log.i("MMS Received","MMS RECEIVED HAHA");
+		            try {
+						Log.i("SEARCHING", "SEARCHING MMS AGAIN");
+						checkMMSMessages();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
+		    };
+
+		    IntentFilter mIntentFilter = new IntentFilter();
+		    mIntentFilter.addAction(MMSMON_RECEIVED_MMS);
+
+		    registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
+
+		    getApplicationContext().getContentResolver().registerContentObserver(mmsInURI, true, mmsObserver);
+		    getApplicationContext().getContentResolver().notifyChange(mmsInURI, mmsObserver);
+		// end TRIAL
+		
+	}
+
+	public void onNewIntent(Intent intent) {
+		if ((intent.getStringExtra("start?")).equals("start searching")) {
+
+		}
+		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
+			
+		}
+	}
+
+	private void checkMMSMessages() throws IOException {
+
+		String[] coloumns = null;
+		String[] values = null;
+		ArrayList<Integer> mid = new ArrayList<Integer>();
+		fw = new FileWriter(file);
+
+		bw = new BufferedWriter(fw);
+
+		Cursor curPdu = this.getApplicationContext().getContentResolver()
+				.query(Uri.parse("content://mms"), null, null, null, null);
+
+		bw.write("TABLE 1\n");
+		for (int i = 0; i < curPdu.getColumnCount(); i++) {
+			bw.write("column " + i + ": " + curPdu.getColumnName(i));
+			bw.write("\n");
+
+		}
+		if (curPdu.moveToNext()) {
+			String id = curPdu.getString(curPdu.getColumnIndex("_id"));
+
+			String thread_id = curPdu.getString(curPdu.getColumnIndex("thread_id"));
+			String subject = curPdu.getString(curPdu.getColumnIndex("sub"));
+			String date = curPdu.getString(curPdu.getColumnIndex("date"));
+			String selectionAddr = new String("msg_id = '" + id + "'");
+			Uri uriAddr = Uri.parse("content://mms/" + id + "/addr");
+			Cursor curAddr = this.getApplicationContext().getContentResolver().query(uriAddr, null, null, null, null);
+
+			bw.write("TABLE 2\n");
+			for (int i = 0; i < curAddr.getColumnCount(); i++) {
+				bw.write("column " + i + ": " + curAddr.getColumnName(i));
+				bw.write("\n");
+
+			}
+			if (curAddr.moveToNext()) {
+				String contact_id = curAddr.getString(curAddr.getColumnIndex("contact_id"));
+				String address = curAddr.getString(curAddr.getColumnIndex("address"));
+				String selectionPart = new String("mid = '" + id + "'");
+
+				Cursor curPart = this.getApplicationContext().getContentResolver().query(Uri.parse("content://mms/inbox"), null, null,null, null);
+
+				bw.write("TABLE 3\n");
+				for (int i = 0; i < curPart.getColumnCount(); i++) {
+					bw.write("column " + i + ": " + curPart.getColumnName(i));
+					bw.write("\n");
+				}
+
+				bw.write("SUBJECTS " + curPart.getCount());
+				curPart.moveToFirst();
+				for (int i = 0; i < curPart.getCount(); i++) {
+					bw.write("Subject " + i + ": "
+							+ curPart.getString(curPart.getColumnIndex("sub"))
+							+ "MESSAGE ID"
+							+ curPart.getInt(curPart.getColumnIndex("_id")));
+					bw.write("\n");
+
+					// add to List the mid of the MMS that is currently in the
+					// inbox
+					mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
+
+					curPart.moveToNext();
+				}
+
+				for (int i = 0; i < mid.size(); i++) {
+					bw.write("MID: " + mid.get(i) + "\n");
+				}
+				curPart.moveToFirst();
+
+				curPart = this.getApplicationContext().getContentResolver().query(Uri.parse("content://mms/part"), null, null, null, null);
+				bw.write("CURPART TEXT\n");
+
+
+				if (curPart.moveToFirst()) {
+					do {
+						coloumns = curPart.getColumnNames();
+
+						if (values == null)
+							values = new String[coloumns.length];
+
+
+						// just get the TEXT part
+						for (int i = 0; i < mid.size(); i++) {
+
+							int[] packetNumber = new int[100];
+							String[] packets;
+							String[] packets2;
+
+							if (curPart.getInt(curPart.getColumnIndex("mid")) == mid.get(i)) {
+								String text = curPart.getString(curPart.getColumnIndex("text"));
+								if (text.startsWith("&%")) {
+									packets = text.split("&% ");
+									bw.write("MID: " + mid.get(i) + "\tTEXT:"+ text + "\n");
+									for (int j = 0; j < packets.length; j++) {
+										bw.write("packet " + j + ": "+ packets[j] + "\n");
+										Log.i("PACKETS",packets[j]);
+										if (packets[j] != null) {
+											packets2 = packets[j].split(" ");
+											int pNum = Integer.parseInt(packets2[0]);
+											al.put(pNum, packets2[1]);
+										}
+
+									}
+								}
+							}
+
+						}
+
+					} while (curPart.moveToNext());
+				}
+			}
+		}
+		
+		bw.write("\n\n----AL-----\n\n");
+		for(int i=0;i<al.size();i++) {
+			bw.write(al.get(i)+"\n");
+		}
+		bw.close();
+	}
+}
