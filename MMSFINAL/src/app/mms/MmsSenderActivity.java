@@ -61,7 +61,7 @@ public class MmsSenderActivity extends Activity {
 					//temp= "%&sendViaMms 0 " + packetSize + " " + sub;
 					temp= "%&sendViaMms";
 					Log.i("temp", temp);
-					sendSMS(phoneNo, temp); // %&sendViaMms
+					sendSMS(phoneNo, "SENDVIAMMS"); // %&sendViaMms
 					sendSMS(phoneNo, "MESSAGE"); // %&sendViaMms
 					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
