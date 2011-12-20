@@ -231,10 +231,10 @@ public class MmsReceiverActivity extends Activity {
 		if (al.size() == size) {
 			try {
 
-				FileWriter fw = new FileWriter(new File(
+				FileWriter fw1 = new FileWriter(new File(
 						"/sdcard/decode.txt"));
 				for (int i = 0; i < size; i++) {
-					fw.write(al.get(i)+"\n");
+					fw1.write(al.get(i)+"\n");
 					
 				}
 				al.clear();
