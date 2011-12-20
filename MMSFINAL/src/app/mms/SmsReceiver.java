@@ -39,24 +39,23 @@ public class SmsReceiver extends BroadcastReceiver
             }
             
             //RECEIVER SIDE
-//            if(msgs[0].getMessageBody().toString().startsWith("%&sendViaMms")){
-//            	Intent i = new Intent(context, MmsReceiverActivity.class);
-//            	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
-//                i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
-//                i.putExtra("start?","startMmsReceive");
-//                i.putExtra("phoneNum",msgs[0].getOriginatingAddress().toString());
-//                String sub = msgs[0].getMessageBody().substring(13);
-//                String tokens[] = sub.split(" ");
-//                for(int j=0;j<tokens.length;j++) {
-//                	Log.i("TOKEN "+j,tokens[j]);
-//                }
-//                
-//                i.putExtra("initial", Integer.parseInt(tokens[0]));
-//                i.putExtra("end", Integer.parseInt(tokens[1]));
-
-//                i.putExtra("filetype", tokens[2]);
-//                context.startActivity(i);
-//            }
+            if(msgs[0].getMessageBody().toString().startsWith("SENDVIAMMS")){
+            	Intent i = new Intent(context, MmsReceiverActivity.class);
+            	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
+                i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
+                i.putExtra("start?","startMmsReceive");
+                i.putExtra("phoneNum",msgs[0].getOriginatingAddress().toString());
+                String sub = msgs[0].getMessageBody().substring(13);
+                String tokens[] = sub.split(" ");
+                for(int j=0;j<tokens.length;j++) {
+                	Log.i("TOKEN "+j,tokens[j]);
+                }
+                
+                i.putExtra("initial", Integer.parseInt(tokens[0]));
+                i.putExtra("end", Integer.parseInt(tokens[1]));
+                i.putExtra("filetype", tokens[2]);
+                context.startActivity(i);
+            }
   
             
             
