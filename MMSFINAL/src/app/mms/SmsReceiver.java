@@ -45,7 +45,20 @@ public class SmsReceiver extends BroadcastReceiver
                 i.putExtra("start?","startMmsReceive");
                 i.putExtra("phoneNum",msgs[0].getOriginatingAddress().toString());
                 String sub = msgs[0].getMessageBody().substring(13);
-                i.putExtra("gettokens", sub);
+                String tokens[] = sub.split(" ");
+                for(int j=0;j<tokens.length;j++) {
+                	Log.i("TOKEN "+j,tokens[j]);
+                }
+                
+                i.putExtra("initial", Integer.parseInt(tokens[0]));
+                i.putExtra("end", Integer.parseInt(tokens[1]));
+                
+                tokens = tokens[2].split(".");
+                for(int j=0;j<tokens.length;j++) {
+                	Log.i("TOKEN2 "+j,tokens[j]);
+                }
+                i.putExtra("filename", tokens[0]);
+                i.putExtra("filetype", tokens[1]);
                 context.startActivity(i);
             }
   

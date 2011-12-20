@@ -17,13 +17,20 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.Toast;
 
 public class MmsReceiverActivity extends Activity {
 	File file = new File("/sdcard/mmscolumns.txt");
 	FileWriter fw = null;
 	BufferedWriter bw = null;
 	HashMap<Integer, String> al = new HashMap<Integer, String>();
+	String phoneNum;
+	String fileType;
+	String fileName;
+	int initial;
+	int end;
+	int size;
+	
 
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
 
@@ -92,10 +99,14 @@ public class MmsReceiverActivity extends Activity {
 	}
 
 	public void onNewIntent(Intent intent) {
-		if ((intent.getStringExtra("start?")).equals("start searching")) {
-
-		}
+		
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
+			phoneNum = intent.getStringExtra("phoneNum");
+			initial = intent.getIntExtra("initial", 0);
+			end = intent.getIntExtra("end", 0);
+			size = end-initial;
+			fileName = intent.getStringExtra("filename");
+			fileType = intent.getStringExtra("filetype");
 			
 		}
 	}
@@ -215,6 +226,37 @@ public class MmsReceiverActivity extends Activity {
 		bw.write("\n\n----AL-----\n\n");
 		for(int i=0;i<al.size();i++) {
 			bw.write(al.get(i)+"\n");
+		}
+		
+		if (al.size() == size) {
+			try {
+
+				FileWriter fw = new FileWriter(new File(
+						"/sdcard/decode.txt"));
+				for (int i = 0; i < size; i++) {
+					fw.write(al.get(i)+"\n");
+					
+				}
+				al.clear();
+				fw.close();
+
+				Log.i("WRITING TO FILE", "FILEWRITER");
+				
+				Base64FileDecoder.decodeFile("/sdcard/decode.txt", "/sdcard/file."+fileType+".gz");
+				File fl = new File("/sdcard/decode.txt");
+				fl.delete();
+				compression.decompressGzip("/sdcard/file."+fileType+".gz");
+				fl = new File("/sdcard/file."+fileType+".gz");
+				fl.delete();
+				Log.i("DONE!!!","DONE");
+				Toast.makeText(getBaseContext(), "File Received. Check your SD Card", Toast.LENGTH_LONG).show();
+			
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//sreceived=true;
 		}
 		bw.close();
 	}
