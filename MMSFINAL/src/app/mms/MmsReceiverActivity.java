@@ -70,7 +70,23 @@ public class MmsReceiverActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 		// TRIAL
+		Intent intent = this.getIntent();
+		Log.i("NEWINTENT","NEW INTENT "+intent.getStringExtra("start?"));
+		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
+			Log.i("RECEIVED SMS", "RECEIVED SMS");
+			phoneNum = intent.getStringExtra("phoneNum");
+			Log.i("Phone num", phoneNum);
+			initial = intent.getIntExtra("initial", 0);
+			Log.i("initial", Integer.toString(initial));
+			end = intent.getIntExtra("end", 0);
+			Log.i("end", Integer.toString(end));
+			size = end - initial;
+			Log.i("size", "SIZE: "+Integer.toString(size));
 
+			fileType = intent.getStringExtra("filetype");
+			Log.i("fileType", fileType);
+
+		}
 		BroadcastReceiver mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -240,6 +256,9 @@ public class MmsReceiverActivity extends Activity {
 													int pNum = Integer
 															.parseInt(packets2[0]);
 													al.put(pNum, packets2[1]);
+													if(al.size()==size) {
+														receiveFile();
+													}
 												}
 
 											}
@@ -261,7 +280,12 @@ public class MmsReceiverActivity extends Activity {
 		for (int i = 0; i < al.size(); i++) {
 			bw.write(al.get(i) + "\n");
 		}
+		
 
+		
+	}
+	
+	public void receiveFile() {
 		if (al.size() == size) {
 			try {
 
@@ -279,23 +303,24 @@ public class MmsReceiverActivity extends Activity {
 
 				Base64FileDecoder.decodeFile("/sdcard/decode.txt",
 						"/sdcard/file." + fileType + ".gz");
-				File fl = new File("/sdcard/decode.txt");
+				//File fl = new File("/sdcard/decode.txt");
 				//fl.delete();
 				compression.decompressGzip("/sdcard/file." + fileType + ".gz");
-				fl = new File("/sdcard/file." + fileType + ".gz");
+				File fl = new File("/sdcard/file." + fileType + ".gz");
 				fl.delete();
 				bw.close();
 				Log.i("DONE!!!", "DONE");
 				Toast.makeText(getBaseContext(),
 						"File Received. Check your SD Card", Toast.LENGTH_LONG)
 						.show();
+				this.finish();
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 			// sreceived=true;
 		}
-		
 	}
 }
