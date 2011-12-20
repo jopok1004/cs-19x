@@ -35,7 +35,7 @@ public class SmsReceiver extends BroadcastReceiver
             //---display the new SMS message---
             //abort broadcast if message is special
             if((msgs[0].getMessageBody().toString()).startsWith("%&") ||(msgs[0].getMessageBody().toString()).startsWith("&%") ){
-            	this.abortBroadcast();
+            	//this.abortBroadcast();
             }
             
             //RECEIVER SIDE

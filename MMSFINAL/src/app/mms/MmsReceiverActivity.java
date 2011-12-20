@@ -262,38 +262,40 @@ public class MmsReceiverActivity extends Activity {
 			bw.write(al.get(i) + "\n");
 		}
 
-		// if (al.size() == size) {
-		// try {
-		//
-		// FileWriter fw1 = new FileWriter(new File(
-		// "/sdcard/decode.txt"));
-		// for (int i = 0; i < size; i++) {
-		// fw1.write(al.get(i)+"\n");
-		//
-		// }
-		// al.clear();
-		// fw.close();
-		//
-		// Log.i("WRITING TO FILE", "FILEWRITER");
-		//
-		// Base64FileDecoder.decodeFile("/sdcard/decode.txt",
-		// "/sdcard/file."+fileType+".gz");
-		// File fl = new File("/sdcard/decode.txt");
-		// fl.delete();
-		// compression.decompressGzip("/sdcard/file."+fileType+".gz");
-		// fl = new File("/sdcard/file."+fileType+".gz");
-		// fl.delete();
-		// Log.i("DONE!!!","DONE");
-		// Toast.makeText(getBaseContext(), "File Received. Check your SD Card",
-		// Toast.LENGTH_LONG).show();
-		//
-		//
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// //sreceived=true;
-		// }
-		bw.close();
+		if (al.size() == size) {
+			try {
+
+				FileWriter fw1 = new FileWriter(new File("/sdcard/decode.txt"));
+				BufferedWriter bw1 = new BufferedWriter(fw1);
+				for (int i = 0; i < size; i++) {
+					bw1.write(al.get(i) + "\n");
+
+				}
+				al.clear();
+				bw1.close();
+				fw1.close();
+
+				Log.i("WRITING TO FILE", "FILEWRITER");
+
+				Base64FileDecoder.decodeFile("/sdcard/decode.txt",
+						"/sdcard/file." + fileType + ".gz");
+				File fl = new File("/sdcard/decode.txt");
+				//fl.delete();
+				compression.decompressGzip("/sdcard/file." + fileType + ".gz");
+				fl = new File("/sdcard/file." + fileType + ".gz");
+				fl.delete();
+				bw.close();
+				Log.i("DONE!!!", "DONE");
+				Toast.makeText(getBaseContext(),
+						"File Received. Check your SD Card", Toast.LENGTH_LONG)
+						.show();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// sreceived=true;
+		}
+		
 	}
 }
