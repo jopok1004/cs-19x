@@ -41,6 +41,7 @@ public class SmsReceiver extends BroadcastReceiver
             //RECEIVER SIDE
             if(msgs[0].getMessageBody().toString().startsWith("%&sendViaMms")){
             	Intent i = new Intent(context, MmsReceiverActivity.class);
+            	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
                 i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
                 i.putExtra("start?","startMmsReceive");
                 i.putExtra("phoneNum",msgs[0].getOriginatingAddress().toString());
