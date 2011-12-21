@@ -42,9 +42,10 @@ public class SmsSenderActivity extends Activity {
 	FileWriter fw=null;
 	BufferedWriter bw=null;
 	final int testnum = 1;
-	int packetSize; // total number of packets
+	int packetCount; // total number of packets
 	int tracker = 0;
 	int sent = 0;
+	int indexLimit;
 	Boolean initialR=false;
 	Time time = new Time();
 	long t1, t2, initial;
@@ -96,7 +97,7 @@ public class SmsSenderActivity extends Activity {
 				String message = txtMessage.getText().toString();
 				if (phoneNo.length() > 0 && message.length() > 0) {
 					sendSMS(phoneNo, message);
-					sendSMS(phoneNo, "%& sendFile " + packetSize + " " + sub);
+					sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub);
 					btnSendSMS.setClickable(false);
 					btnSendSMS.setVisibility(Button.INVISIBLE);
 					
@@ -109,12 +110,16 @@ public class SmsSenderActivity extends Activity {
 		});
 
 	}
-
+	public void sms(String phoneNum, int startIndex, int endIndex) throws IOException{
+		tracker = startIndex;
+		indexLimit = endIndex;
+		send10(phoneNum);
+	}
 	public void onNewIntent(Intent intent) {
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
 			try {
-				send10(intent.getStringExtra("phoneNum").toString());
+				sms(intent.getStringExtra("phoneNum").toString(), 0, packetCount);	
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -273,7 +278,7 @@ public class SmsSenderActivity extends Activity {
 					Log.i("Base 64", "After Base 64");
 					
 
-					packetSize = packetList.size();
+					packetCount = packetList.size();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -298,13 +303,13 @@ public class SmsSenderActivity extends Activity {
 		dialog.setMessage("Sending SMS...");
 		dialog.setCancelable(false);
 		dialog.setProgress(0);
-		dialog.setMax(packetSize);
+		dialog.setMax(indexLimit);
 		Log.i("send10", "I AM AT send10");
 		dialog.show();
 
 		// dialog.show(SmsMessagingActivity.this, "Sending SMS", "Please Wait");
 		sen = "sending";
-		for (int counter = 0; counter < 10 && tracker < packetSize; counter++) {
+		for (int counter = 0; counter < 10 && tracker < indexLimit; counter++) {
 			Log.i("send10", "inside send10 for loop");
 			headerBegin = "&% " + tracker + " ";
 			submessage = headerBegin + packetList.get(tracker);
