@@ -39,7 +39,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// SENDER SIDE
 			if (msgs[0].getMessageBody().toString().equals("%&start")) {
-				Intent i = new Intent(context, SmsMessagingActivity.class);
+				Intent i = new Intent(context, SmsSenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
 				i.putExtra("start?", "start sending");
@@ -49,7 +49,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			}
 			if (msgs[0].getMessageBody().toString().startsWith("%&done")) {
-				Intent i = new Intent(context, SmsMessagingActivity.class);
+				Intent i = new Intent(context, SmsSenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
 				i.putExtra("start?", "done receiving");
@@ -59,7 +59,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			}
 			if (msgs[0].getMessageBody().toString().startsWith("%&resend")) {
-				Intent i = new Intent(context, SmsMessagingActivity.class);
+				Intent i = new Intent(context, SmsSenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
 				i.putExtra("start?", "sendAgain");

@@ -18,7 +18,7 @@ public class FileSmsWelcome extends Activity {
 		
 		sendBt.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent intent = new Intent(FileSmsWelcome.this, SmsMessagingActivity.class);
+				Intent intent = new Intent(FileSmsWelcome.this, SmsSenderActivity.class);
 				intent.putExtra("start?", "no");
 				startActivity(intent);
 			}
