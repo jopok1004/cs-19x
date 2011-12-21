@@ -47,6 +47,7 @@ public class SmsSenderActivity extends Activity {
 	int sent = 0;
 	int indexLimit;
 	Boolean initialR=false;
+	Boolean check10Received;
 	Time time = new Time();
 	long t1, t2, initial;
 	TelephonyManager Tel;
@@ -151,6 +152,7 @@ public class SmsSenderActivity extends Activity {
 			}
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("sendAgain")) {
+			check10Received= true;
 			Log.i("sendAgain", "inside sendAgain");
 			String resend = intent.getStringExtra("resendPackets");
 			if (resend.equals("none")) {
@@ -320,10 +322,22 @@ public class SmsSenderActivity extends Activity {
 			waiting(3);
 
 		}
+		check10Received= false;
 		sendSMS(phoneNumber, "%&check10 " + tracker);
 		Log.i("After send tracker", "tracker" + tracker);
-	
-
+		long t0, t1;
+		t0 = System.currentTimeMillis();
+		do {
+			t1 = System.currentTimeMillis();
+		} while ((t1 - t0) < (60 * 1000) && check10Received==false);
+		if(check10Received){
+			//do nothing
+		}else{
+			Log.i("resend check10", "tracker" + tracker);
+			sendSMS(phoneNumber, "%&check10 " + tracker);
+			//resend check10
+		}
+		//wait for 60seconds
 		dialog.cancel();
 
 	}
