@@ -354,6 +354,8 @@ public class SmsSenderActivity extends Activity {
 	class waitThread2 extends Thread {
 	    // This method is called when the thread runs
 	    public void run() {
+	    	
+	    	Thread.currentThread().interrupt();
 	    	long t0, t1;
 			t0 = System.currentTimeMillis();
 			do {
@@ -368,6 +370,29 @@ public class SmsSenderActivity extends Activity {
 			}
 			Thread thread3 = new waitThread();
 		    thread3.start();
+		    
+	    }
+	}
+	class waitThread3 extends Thread {
+	    // This method is called when the thread runs
+	    public void run() {
+	    	
+	    	Thread.currentThread().interrupt();
+	    	long t0, t1;
+			t0 = System.currentTimeMillis();
+			do {
+				t1 = System.currentTimeMillis();
+			} while ((t1 - t0) < (90 * 1000) && check10Received==false); //wait for 90seconds
+			if(check10Received){
+				//do nothing
+			}else{
+				Log.i("resend check10", "tracker" + tracker);
+				sendSMS(phoneNo, "%&check10 " + tracker);
+				//resend check10
+			}
+			Thread thread2 = new waitThread();
+		    thread2.start();
+		    
 	    }
 	}
 	public void doLaunchContactPicker(View view) {
