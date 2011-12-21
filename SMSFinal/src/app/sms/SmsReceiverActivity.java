@@ -78,6 +78,7 @@ public class SmsReceiverActivity extends Activity {
 					try {
 						fw = new FileWriter(file);
 						bw = new BufferedWriter(fw);
+						Log.i("SUCCESSFUL", "MADE FW AND BW");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -113,7 +114,7 @@ public class SmsReceiverActivity extends Activity {
 			currentp = Integer.parseInt(intent.getStringExtra("tracker"));
 			resend = "%&resend ";
 			for (int i = (currentp % 10); i >= 0 && currentp < size; i--) {
-				if (al.containsKey(currentp - i - 1) == false) {
+				if (al.containsKey(currentp - i - 1) == false && received ==false) {
 					resend = resend + (currentp - i - 1) + " ";
 					Log.i("if not containskey", "checking for missing packets");
 					Log.i("resend", resend);
