@@ -329,7 +329,7 @@ public class SmsSenderActivity extends Activity {
 		t0 = System.currentTimeMillis();
 		do {
 			t1 = System.currentTimeMillis();
-		} while ((t1 - t0) < (60 * 1000) && check10Received==false);
+		} while ((t1 - t0) < (90 * 1000) && check10Received==false); //wait for 90seconds
 		if(check10Received){
 			//do nothing
 		}else{
@@ -337,7 +337,7 @@ public class SmsSenderActivity extends Activity {
 			sendSMS(phoneNumber, "%&check10 " + tracker);
 			//resend check10
 		}
-		//wait for 60seconds
+		
 		dialog.cancel();
 
 	}
