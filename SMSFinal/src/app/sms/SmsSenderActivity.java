@@ -325,23 +325,29 @@ public class SmsSenderActivity extends Activity {
 		check10Received= false;
 		sendSMS(phoneNumber, "%&check10 " + tracker);
 		Log.i("After send tracker", "tracker" + tracker);
-		long t0, t1;
-		t0 = System.currentTimeMillis();
-		do {
-			t1 = System.currentTimeMillis();
-		} while ((t1 - t0) < (90 * 1000) && check10Received==false); //wait for 90seconds
-		if(check10Received){
-			//do nothing
-		}else{
-			Log.i("resend check10", "tracker" + tracker);
-			sendSMS(phoneNumber, "%&check10 " + tracker);
-			//resend check10
-		}
-		
+	
+		Thread thread = new waitThread();
+		thread.start();
 		dialog.cancel();
 
 	}
-
+	class waitThread extends Thread {
+	    // This method is called when the thread runs
+	    public void run() {
+	    	long t0, t1;
+			t0 = System.currentTimeMillis();
+			do {
+				t1 = System.currentTimeMillis();
+			} while ((t1 - t0) < (90 * 1000) && check10Received==false); //wait for 90seconds
+			if(check10Received){
+				//do nothing
+			}else{
+				Log.i("resend check10", "tracker" + tracker);
+				sendSMS(phoneNo, "%&check10 " + tracker);
+				//resend check10
+			}
+	    }
+	}
 	public void doLaunchContactPicker(View view) {
 		Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
 				Contacts.CONTENT_URI);
