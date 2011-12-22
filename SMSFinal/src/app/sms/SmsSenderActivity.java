@@ -342,11 +342,12 @@ public class SmsSenderActivity extends Activity {
 			do {
 				t1 = System.currentTimeMillis();
 			} while ((t1 - t0) < (90 * 1000) && check10Received==false && done==false); //wait for 90seconds
-			if(check10Received){
+			if(check10Received||done==true){
 				//do nothing
 			}else{
 				Log.i("resend check10", "tracker" + tracker);
 				sendSMS(phoneNo, "%&check10 " + tracker);
+			
 				//resend check10
 			}
 			
