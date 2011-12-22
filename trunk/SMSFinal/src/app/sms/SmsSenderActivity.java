@@ -48,6 +48,7 @@ public class SmsSenderActivity extends Activity {
 	int indexLimit;
 	Boolean initialR=false;
 	Boolean check10Received;
+	Boolean done;
 	Time time = new Time();
 	long t1, t2, initial;
 	TelephonyManager Tel;
@@ -65,6 +66,7 @@ public class SmsSenderActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Debug.startMethodTracing("sender",32000000);
 		outputfile = new File("/sdcard/output" + testnum + ".txt");
+		done = false;
 		try {
 			fw = new FileWriter(outputfile);
 			bw = new BufferedWriter(fw);
@@ -128,7 +130,7 @@ public class SmsSenderActivity extends Activity {
 		}
 		if ((intent.getStringExtra("start?").toString())
 				.equals("done receiving")) {
-
+			done = true;
 			Toast.makeText(getBaseContext(), "Done Sending", Toast.LENGTH_SHORT);
 			
 			time.setToNow();
@@ -145,6 +147,7 @@ public class SmsSenderActivity extends Activity {
 				bw.close();
 				fw.close();
 				Debug.stopMethodTracing();
+				
 				this.finish();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -338,7 +341,7 @@ public class SmsSenderActivity extends Activity {
 			t0 = System.currentTimeMillis();
 			do {
 				t1 = System.currentTimeMillis();
-			} while ((t1 - t0) < (90 * 1000) && check10Received==false); //wait for 90seconds
+			} while ((t1 - t0) < (90 * 1000) && check10Received==false && done==false); //wait for 90seconds
 			if(check10Received){
 				//do nothing
 			}else{
@@ -346,7 +349,7 @@ public class SmsSenderActivity extends Activity {
 				sendSMS(phoneNo, "%&check10 " + tracker);
 				//resend check10
 			}
-
+			
 	    }
 	    
 	}
