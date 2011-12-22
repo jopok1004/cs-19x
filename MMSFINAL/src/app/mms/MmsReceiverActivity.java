@@ -127,8 +127,7 @@ public class MmsReceiverActivity extends Activity {
 			Log.i("end", Integer.toString(end));
 			size = end - initial;
 			Log.i("size", "SIZE: " + Integer.toString(size));
-			fileName = intent.getStringExtra("filename");
-			Log.i("fileName", fileName);
+
 			fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
 
