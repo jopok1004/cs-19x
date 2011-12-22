@@ -11,7 +11,8 @@ import android.widget.Toast;
 public class SmsReceiver extends BroadcastReceiver {
 
 	String str = "";
-
+	Boolean done = false;
+	int sizeT;
 	public void onReceive(Context context, Intent intent) {
 
 		// ---get the SMS message passed in---
