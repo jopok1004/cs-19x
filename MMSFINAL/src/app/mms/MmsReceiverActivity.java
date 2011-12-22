@@ -307,7 +307,7 @@ public class MmsReceiverActivity extends Activity {
 				fl.delete();
 				bw.close();
 				Log.i("DONE!!!", "DONE");
-				Toast.makeText(getBaseContext(),
+				Toast.makeText(getApplicationContext(),
 						"File Received. Check your SD Card", Toast.LENGTH_LONG)
 						.show();
 				this.finish();
@@ -319,5 +319,14 @@ public class MmsReceiverActivity extends Activity {
 
 			// sreceived=true;
 		}
+	}
+	public void onDestroy() {
+		try {
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onDestroy();
 	}
 }
