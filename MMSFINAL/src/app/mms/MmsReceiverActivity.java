@@ -127,7 +127,8 @@ public class MmsReceiverActivity extends Activity {
 			Log.i("end", Integer.toString(end));
 			size = end - initial;
 			Log.i("size", "SIZE: " + Integer.toString(size));
-
+			
+			
 			fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
 
@@ -200,6 +201,7 @@ public class MmsReceiverActivity extends Activity {
 
 					// add to List the mid of the MMS that is currently in the
 					// inbox
+					
 					mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
 
 					curPart.moveToNext();
@@ -254,9 +256,11 @@ public class MmsReceiverActivity extends Activity {
 															packets2[1]);
 													int pNum = Integer
 															.parseInt(packets2[0]);
+													Log.i("pNum","pNum: "+pNum);
+													Log.i("packet",packets2[1]);
 													al.put(pNum, packets2[1]);
 													if (al.size() == size) {
-														receiveFile();
+														//receiveFile();
 													}
 												}
 
@@ -272,14 +276,16 @@ public class MmsReceiverActivity extends Activity {
 
 					} while (curPart.moveToNext());
 				}
+				curPart.close();
 			}
+			curAddr.close();
 		}
-
+		
 		bw.write("\n\n----AL-----\n\n");
 		for (int i = 0; i < al.size(); i++) {
 			bw.write(al.get(i) + "\n");
 		}
-
+		curPdu.close();
 	}
 
 	public void receiveFile() {
@@ -307,7 +313,7 @@ public class MmsReceiverActivity extends Activity {
 				fl.delete();
 				bw.close();
 				Log.i("DONE!!!", "DONE");
-				Toast.makeText(getApplicationContext(),
+				Toast.makeText(getBaseContext(),
 						"File Received. Check your SD Card", Toast.LENGTH_LONG)
 						.show();
 				this.finish();
@@ -319,14 +325,5 @@ public class MmsReceiverActivity extends Activity {
 
 			// sreceived=true;
 		}
-	}
-	public void onDestroy() {
-		try {
-			bw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		super.onDestroy();
 	}
 }
