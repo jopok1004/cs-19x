@@ -17,6 +17,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ public class MmsReceiverActivity extends Activity {
 	int end;
 	int size;
 	int alsize = 0;
+	boolean started = false;
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
 
 	Uri mmsInURI = Uri.parse("content://mms-sms");
@@ -69,13 +71,18 @@ public class MmsReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		// getContentResolver().delete(Uri.parse("content://mms"), null, null);
+		if(started == false){
+			Debug.startMethodTracing("mmsreceiver");
+			started =true;
+		}
+		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 		// TRIAL
 		Intent intent = this.getIntent();
 		Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
+			
 			Log.i("RECEIVED SMS", "RECEIVED SMS");
 			phoneNum = intent.getStringExtra("phoneNum");
 			Log.i("Phone num", phoneNum);
@@ -239,7 +246,6 @@ public class MmsReceiverActivity extends Activity {
 					if (tempalsize != alsize) {
 						Log.i("MMS", "NARECEIVE KO NA SI MMS");
 						sendSMS(phoneNum, "&%mmsreceived");
-
 					}
 				}
 
@@ -284,7 +290,7 @@ public class MmsReceiverActivity extends Activity {
 				bw.close();
 
 				Log.i("DONE!!!", "DONE");
-
+				Debug.stopMethodTracing();
 				this.finish();
 
 			} catch (IOException e) {

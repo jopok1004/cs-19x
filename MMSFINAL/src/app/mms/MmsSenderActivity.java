@@ -16,6 +16,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
@@ -40,6 +41,7 @@ public class MmsSenderActivity extends Activity {
 	String sen = "";
 	String sub;
 	ProgressDialog dialog;
+	boolean started = false;
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
 	ArrayList<String> packetList = new ArrayList<String>();
@@ -47,6 +49,10 @@ public class MmsSenderActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if(started==false){
+			Debug.startMethodTracing("mmssender");
+			started=true;
+		}
 		random = new Random();
 		
 		super.onCreate(savedInstanceState);
