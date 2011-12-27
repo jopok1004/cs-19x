@@ -296,7 +296,7 @@ public class MmsReceiverActivity extends Activity {
 				FileWriter fw2 = new FileWriter(new File("/sdcard/decode.txt"));
 				BufferedWriter bw2 = new BufferedWriter(fw2);
 				for (int i = 0; i < size; i++) {
-					bw1.write(al.get(i) + "\n");
+					bw2.write(al.get(i) + "\n");
 
 				}
 				al.clear();
