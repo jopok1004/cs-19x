@@ -33,7 +33,9 @@ public class MmsSenderActivity extends Activity {
 	File selectedFile;
 	int packetSize;
 	int sent = 0;
-	
+	Random random = null;
+	String subject;
+	int randomNum;
 	String sen = "";
 	String sub;
 	ProgressDialog dialog;
@@ -44,6 +46,7 @@ public class MmsSenderActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		random = new Random();
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -54,7 +57,7 @@ public class MmsSenderActivity extends Activity {
 
 		btnSendMMS.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				
+				randomNum = random.nextInt(1000);
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
 					Log.i("sendFile", "Ready to send file");
@@ -62,7 +65,7 @@ public class MmsSenderActivity extends Activity {
 					//temp= "%&sendViaMms 0 " + packetSize + " " + sub;
 					temp= "%&sendViaMms";
 					Log.i("temp", temp);
-					sendSMS(phoneNo, "SENDVIAMMS"+" 0 "+packetSize+" "+sub); // %&sendViaMms
+					sendSMS(phoneNo, "SENDVIAMMS"+" 0 "+packetSize+" "+sub+" "+randomNum); // %&sendViaMms
 					sendSMS(phoneNo, "MESSAGE"); // %&sendViaMms
 					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
@@ -103,7 +106,7 @@ public class MmsSenderActivity extends Activity {
 				}
 				Log.i("parser", "before mms sending");
 				sendMMS(phoneNum, msg);
-				waiting(30);
+				waiting(180);
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -223,7 +226,7 @@ public class MmsSenderActivity extends Activity {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.putExtra("sms_body", message);
 		intent.putExtra("address", phoneNumber);
-		intent.putExtra("subject", "mms");
+		intent.putExtra("subject", "mms"+randomNum);
 		intent.setType("image/*");
 		intent.setClassName("com.android.mms",
 				"com.android.mms.ui.ComposeMessageActivity");
