@@ -62,7 +62,7 @@ public class MmsSenderActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		time = new Time();
-		File fl = new File("outputsender.txt");
+		File fl = new File("/sdcard/outputsender.txt");
 		try {
 			fw = new FileWriter(fl);
 			bw = new BufferedWriter(fw);
