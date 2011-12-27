@@ -59,11 +59,11 @@ public class SmsReceiver extends BroadcastReceiver
             }
   
             //SENDER SIDE
-            if(msgs[0].getMessageBody().toString().startsWith("&%received")){
+            if(msgs[0].getMessageBody().toString().startsWith("&%mmsreceived")){
             	this.abortBroadcast();
             	Intent i = new Intent(context,MmsSenderActivity.class);
             	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
-            	i.putExtra("start?","startMmsReceive");
+            	i.putExtra("start?","sendAnotherMms");
             	context.startActivity(i);
             }
             

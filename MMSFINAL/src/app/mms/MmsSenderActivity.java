@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MmsSenderActivity extends Activity {
+	int tracker = 0;
 	String phoneNo = new String();
 	Button btnSendMMS;
 	EditText txtPhoneNo;
@@ -70,7 +71,7 @@ public class MmsSenderActivity extends Activity {
 					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
 						Log.i("SENDING MMS", "SENDING MMS");
-						mms(phoneNo);
+						send1mms(phoneNo);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -84,9 +85,18 @@ public class MmsSenderActivity extends Activity {
 			}
 		});
 	}
-
-	private void mms(String phoneNum) throws IOException {
-		int tracker = 0;
+	public void onNewIntent(Intent intent) {
+		if ((intent.getStringExtra("start?").toString()).equals("sendAnotherMms")) {
+			try {
+				send1mms(phoneNo);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	private void send1mms(String phoneNum) throws IOException {
+		
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		dialog.setMessage("Sending MMS...");
 		dialog.setCancelable(false);
@@ -95,19 +105,18 @@ public class MmsSenderActivity extends Activity {
 		try {
 			// dialog.show(Mms2Activity.this, "Sending SMS", "Please Wait");
 			// 1024b * 300kb = 307200/160 char = 1920 packets
-			for (; tracker < packetSize;) {
+			
 
-				String msg = "";
-				for (int i = 0; i < 100 && tracker < packetSize; i++) {
-					msg = msg + "&% " + tracker + " " + packetList.get(tracker)
-							+ "\n";
-					tracker++;
-					Log.i("SUBMESSAGE", msg);
-				}
-				Log.i("parser", "before mms sending");
-				sendMMS(phoneNum, msg);
-				waiting(180);
+			String msg = "";
+			for (int i = 0; i < 100 && tracker < packetSize; i++) {
+				msg = msg + "&% " + tracker + " " + packetList.get(tracker)+ "\n";
+				tracker++;
+				Log.i("SUBMESSAGE", msg);
 			}
+			Log.i("parser", "before mms sending");
+			sendMMS(phoneNum, msg);
+			//waiting(180);
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,7 +144,7 @@ public class MmsSenderActivity extends Activity {
 					Uri result = data.getData();
 					Log.v("Contact Picker",
 							"Got a contact result: " + result.toString());
-					
+
 					// get the contact id from the Uri
 					String id = result.getLastPathSegment();
 
@@ -231,6 +240,7 @@ public class MmsSenderActivity extends Activity {
 		intent.setClassName("com.android.mms",
 				"com.android.mms.ui.ComposeMessageActivity");
 		startActivity(intent);
+		
 	}
 
 	private void sendSMS(String phoneNumber, String message) {

@@ -238,7 +238,7 @@ public class MmsReceiverActivity extends Activity {
 					alsize = al.size();
 					if (tempalsize != alsize) {
 
-						sendSMS(phoneNum, "&%received");
+						sendSMS(phoneNum, "&%mmsreceived");
 
 					}
 				}
