@@ -18,14 +18,22 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Debug;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
 public class MmsReceiverActivity extends Activity {
 	File file = new File("/sdcard/mmscolumns.txt");
+	File fileoutput = new File("/sdcard/outputreceiver.txt");
 	FileWriter fw = null;
+	FileWriter fw1 = null;
 	BufferedWriter bw = null;
+	BufferedWriter bw1=null;
+	
 	HashMap<Integer, String> al = new HashMap<Integer, String>();
 	String phoneNum;
 	String fileType;
@@ -35,6 +43,9 @@ public class MmsReceiverActivity extends Activity {
 	int size;
 	int alsize = 0;
 	boolean started = false;
+	TelephonyManager Tel;
+	MyPhoneStateListener MyListener;
+	Time time;
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
 
 	Uri mmsInURI = Uri.parse("content://mms-sms");
@@ -71,10 +82,21 @@ public class MmsReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		time = new Time();
 		if(started == false){
 			Debug.startMethodTracing("mmsreceiver");
 			started =true;
 		}
+		try {
+			fw1 = new FileWriter(fileoutput);
+			bw1 = new BufferedWriter(fw1);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
@@ -206,6 +228,8 @@ public class MmsReceiverActivity extends Activity {
 
 					if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
 							.get(i)) {
+						time.setToNow();
+						bw1.write(time.toString() + " : packet num:"+al.size()+"\n");
 						String text = curPart.getString(curPart
 								.getColumnIndex("text"));
 						if (text != null) {
@@ -265,30 +289,47 @@ public class MmsReceiverActivity extends Activity {
 	}
 
 	public void receiveFile() {
+		long t1, t2;
 		if (al.size() == size) {
 			try {
 
-				FileWriter fw1 = new FileWriter(new File("/sdcard/decode.txt"));
-				BufferedWriter bw1 = new BufferedWriter(fw1);
+				FileWriter fw2 = new FileWriter(new File("/sdcard/decode.txt"));
+				BufferedWriter bw2 = new BufferedWriter(fw2);
 				for (int i = 0; i < size; i++) {
 					bw1.write(al.get(i) + "\n");
 
 				}
 				al.clear();
-				bw1.close();
-				fw1.close();
+				bw2.close();
+				fw2.close();
 
 				Log.i("WRITING TO FILE", "FILEWRITER");
-
+				time.setToNow();
+				t1 = time.toMillis(true);
 				Base64FileDecoder.decodeFile("/sdcard/decode.txt",
 						"/sdcard/file." + fileType + ".gz");
+				time.setToNow();
+				t2 = time.toMillis(true);
+				bw1.write("Decoding T2-T1: "+(t2-t1)+"\n");
+				
+				time.setToNow();
+				bw1.write(time.toString()
+						+ " : after decode and before unzip\n");
+
 				// File fl = new File("/sdcard/decode.txt");
 				// fl.delete();
+				time.setToNow();
+				t1 = time.toMillis(true);
 				compression.decompressGzip("/sdcard/file." + fileType + ".gz");
+				time.setToNow();
+				t2 = time.toMillis(true);
+				bw1.write("Decompressing T2-T1: "+(t2-t1)+"\n");
+				bw1.write(time.toString()
+						+ " : after decode and before unzip\n");
 				File fl = new File("/sdcard/file." + fileType + ".gz");
 				fl.delete();
-				bw.close();
-
+				bw1.close();
+				fw1.close();
 				Log.i("DONE!!!", "DONE");
 				Debug.stopMethodTracing();
 				this.finish();
@@ -362,4 +403,42 @@ public class MmsReceiverActivity extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		Log.i("sms sent", "after sms sending");
 	}
+	protected void onPause() {
+		super.onPause();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
+	}
+
+	/* Called when the application resumes */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+	}
+
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	/* Start the PhoneState listener */
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	private class MyPhoneStateListener extends PhoneStateListener {
+		/*
+		 * Get the Signal strength from the provider, each tiome there is an
+		 * update
+		 */
+		@Override
+		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+			super.onSignalStrengthsChanged(signalStrength);
+			time.setToNow();
+			if (fw1 != null && bw1 != null) {
+				try {
+					bw1.write("Signal Strength"
+							+ time.toString()
+							+ ": "
+							+ String.valueOf(signalStrength
+									.getGsmSignalStrength()) + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	};/* End of private Class */
 }

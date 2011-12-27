@@ -1,7 +1,9 @@
 package app.mms;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -19,7 +21,11 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +48,12 @@ public class MmsSenderActivity extends Activity {
 	String sub;
 	ProgressDialog dialog;
 	boolean started = false;
+	FileWriter fw = null;
+	BufferedWriter bw = null;
+	TelephonyManager Tel;
+	MyPhoneStateListener MyListener;
+	Time time;
+	long t1, t2;
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
 	ArrayList<String> packetList = new ArrayList<String>();
@@ -49,6 +61,14 @@ public class MmsSenderActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		File fl = new File("outputsender.txt");
+		try {
+			fw = new FileWriter(fl);
+			bw = new BufferedWriter(fw);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if(started==false){
 			Debug.startMethodTracing("mmssender");
 			started=true;
@@ -57,6 +77,9 @@ public class MmsSenderActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		dialog = new ProgressDialog(MmsSenderActivity.this);
 		btnSendMMS = (Button) findViewById(R.id.btnSendMMS);
 		txtPhoneNo = (EditText) findViewById(R.id.phoneNumberText);
@@ -196,11 +219,34 @@ public class MmsSenderActivity extends Activity {
 
 				txtFileName.setText(file.getName() + " "
 						+ Long.toString((file.length())));
-
+				time.setToNow();
+				t1 = time.toMillis(true);
+				try {
+					bw.write(time.toString() + "before compression\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				compression.compressGzip(
 						data.getExtras().getString("filePath"), data
 								.getExtras().getString("fileName"));
+				time.setToNow();
+				t2 = time.toMillis(true);
+				try {
+					bw.write(time.toString() + "after compression and before b64\n");
+					bw.write("COMPRESSION TIME : T2-T1: "+(t2-t1)+"\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				Log.i("Base 64", "Before Base 64");
+				t1 = time.toMillis(true);
+				try {
+					bw.write(time.toString() + "before base 64\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				try {
 					Log.i("FILE", data.getExtras().getString("filePath") + "/"
 							+ data.getExtras().getString("fileName") + ".gz");
@@ -215,6 +261,15 @@ public class MmsSenderActivity extends Activity {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
+				time.setToNow();
+				t2 = time.toMillis(true);
+				try {
+					bw.write(time.toString() + "after base 64\n");
+					bw.write("ENCODING TIME : T2-T1: "+(t2-t1)+"\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 
 				break;
@@ -309,4 +364,42 @@ public class MmsSenderActivity extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		Log.i("sms sent", "after sms sending");
 	}
+	protected void onPause() {
+		super.onPause();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
+	}
+
+	/* Called when the application resumes */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+	}
+
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	/* Start the PhoneState listener */
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	private class MyPhoneStateListener extends PhoneStateListener {
+		/*
+		 * Get the Signal strength from the provider, each tiome there is an
+		 * update
+		 */
+		@Override
+		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+			super.onSignalStrengthsChanged(signalStrength);
+			time.setToNow();
+			if (fw != null && bw != null) {
+				try {
+					bw.write("Signal Strength"
+							+ time.toString()
+							+ ": "
+							+ String.valueOf(signalStrength
+									.getGsmSignalStrength()) + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	};/* End of private Class */
 }
