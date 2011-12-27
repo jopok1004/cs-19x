@@ -135,7 +135,7 @@ public class MmsSenderActivity extends Activity {
 					Uri result = data.getData();
 					Log.v("Contact Picker",
 							"Got a contact result: " + result.toString());
-
+					
 					// get the contact id from the Uri
 					String id = result.getLastPathSegment();
 
