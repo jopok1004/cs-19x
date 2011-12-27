@@ -237,7 +237,7 @@ public class MmsReceiverActivity extends Activity {
 					}
 					alsize = al.size();
 					if (tempalsize != alsize) {
-
+						Log.i("MMS", "NARECEIVE KO NA SI MMS");
 						sendSMS(phoneNum, "&%mmsreceived");
 
 					}
