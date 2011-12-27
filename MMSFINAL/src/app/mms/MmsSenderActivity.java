@@ -78,7 +78,7 @@ public class MmsSenderActivity extends Activity {
 																					// endindex
 																					// filename
 				} else
-					Toast.makeText(getBaseContext(),
+					Toast.makeText(getApplicationContext(),
 							"Please enter phone number.", Toast.LENGTH_SHORT)
 							.show();
 			}
@@ -249,23 +249,23 @@ public class MmsSenderActivity extends Activity {
 			public void onReceive(Context arg0, Intent arg1) {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), "SMS sent",
+					Toast.makeText(getApplicationContext(), "SMS sent",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Toast.makeText(getBaseContext(), "Generic failure",
+					Toast.makeText(getApplicationContext(), "Generic failure",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					Toast.makeText(getBaseContext(), "No service",
+					Toast.makeText(getApplicationContext(), "No service",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_NULL_PDU:
-					Toast.makeText(getBaseContext(), "Null PDU",
+					Toast.makeText(getApplicationContext(), "Null PDU",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					Toast.makeText(getBaseContext(), "Radio off",
+					Toast.makeText(getApplicationContext(), "Radio off",
 							Toast.LENGTH_SHORT).show();
 					break;
 				}
@@ -278,11 +278,11 @@ public class MmsSenderActivity extends Activity {
 			public void onReceive(Context arg0, Intent arg1) {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), "SMS delivered",
+					Toast.makeText(getApplicationContext(), "SMS delivered",
 							Toast.LENGTH_SHORT).show();
 					break;
 				case Activity.RESULT_CANCELED:
-					Toast.makeText(getBaseContext(), "SMS not delivered",
+					Toast.makeText(getApplicationContext(), "SMS not delivered",
 							Toast.LENGTH_SHORT).show();
 					break;
 				}

@@ -67,6 +67,7 @@ public class MmsReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		getContentResolver().delete(Uri.parse("content://mms"),null,null);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 		// TRIAL
@@ -127,8 +128,7 @@ public class MmsReceiverActivity extends Activity {
 			Log.i("end", Integer.toString(end));
 			size = end - initial;
 			Log.i("size", "SIZE: " + Integer.toString(size));
-			
-			
+
 			fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
 
@@ -144,148 +144,104 @@ public class MmsReceiverActivity extends Activity {
 
 		bw = new BufferedWriter(fw);
 
-		Cursor curPdu = this.getApplicationContext().getContentResolver()
-				.query(Uri.parse("content://mms"), null, null, null, null);
+		Cursor curPart = this
+				.getApplicationContext()
+				.getContentResolver()
+				.query(Uri.parse("content://mms/inbox"), null, null, null, null);
 
-		bw.write("TABLE 1\n");
-		for (int i = 0; i < curPdu.getColumnCount(); i++) {
-			bw.write("column " + i + ": " + curPdu.getColumnName(i));
+		bw.write("TABLE 3\n");
+		for (int i = 0; i < curPart.getColumnCount(); i++) {
+			bw.write("column " + i + ": " + curPart.getColumnName(i));
+			bw.write("\n");
+		}
+
+		bw.write("SUBJECTS " + curPart.getCount());
+		curPart.moveToFirst();
+		for (int i = 0; i < curPart.getCount(); i++) {
+			bw.write("Subject " + i + ": "
+					+ curPart.getString(curPart.getColumnIndex("sub"))
+					+ "MESSAGE ID"
+					+ curPart.getInt(curPart.getColumnIndex("_id")));
 			bw.write("\n");
 
+			// add to List the mid of the MMS that is currently in the
+			// inbox
+
+			mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
+
+			curPart.moveToNext();
 		}
-		if (curPdu.moveToNext()) {
-			String id = curPdu.getString(curPdu.getColumnIndex("_id"));
 
-			String thread_id = curPdu.getString(curPdu
-					.getColumnIndex("thread_id"));
-			String subject = curPdu.getString(curPdu.getColumnIndex("sub"));
-			String date = curPdu.getString(curPdu.getColumnIndex("date"));
-			String selectionAddr = new String("msg_id = '" + id + "'");
-			Uri uriAddr = Uri.parse("content://mms/" + id + "/addr");
-			Cursor curAddr = this.getApplicationContext().getContentResolver()
-					.query(uriAddr, null, null, null, null);
+		for (int i = 0; i < mid.size(); i++) {
+			bw.write("MID: " + mid.get(i) + "\n");
+		}
+		curPart.moveToFirst();
 
-			bw.write("TABLE 2\n");
-			for (int i = 0; i < curAddr.getColumnCount(); i++) {
-				bw.write("column " + i + ": " + curAddr.getColumnName(i));
-				bw.write("\n");
+		curPart = this.getApplicationContext().getContentResolver()
+				.query(Uri.parse("content://mms/part"), null, null, null, null);
+		bw.write("CURPART TEXT\n");
 
-			}
-			if (curAddr.moveToNext()) {
-				String contact_id = curAddr.getString(curAddr
-						.getColumnIndex("contact_id"));
-				String address = curAddr.getString(curAddr
-						.getColumnIndex("address"));
-				String selectionPart = new String("mid = '" + id + "'");
+		if (curPart.moveToFirst()) {
+			do {
+				coloumns = curPart.getColumnNames();
 
-				Cursor curPart = this
-						.getApplicationContext()
-						.getContentResolver()
-						.query(Uri.parse("content://mms/inbox"), null, null,
-								null, null);
+				if (values == null)
+					values = new String[coloumns.length];
 
-				bw.write("TABLE 3\n");
-				for (int i = 0; i < curPart.getColumnCount(); i++) {
-					bw.write("column " + i + ": " + curPart.getColumnName(i));
-					bw.write("\n");
-				}
-
-				bw.write("SUBJECTS " + curPart.getCount());
-				curPart.moveToFirst();
-				for (int i = 0; i < curPart.getCount(); i++) {
-					bw.write("Subject " + i + ": "
-							+ curPart.getString(curPart.getColumnIndex("sub"))
-							+ "MESSAGE ID"
-							+ curPart.getInt(curPart.getColumnIndex("_id")));
-					bw.write("\n");
-
-					// add to List the mid of the MMS that is currently in the
-					// inbox
-					
-					mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
-
-					curPart.moveToNext();
-				}
-
+				// just get the TEXT part
 				for (int i = 0; i < mid.size(); i++) {
-					bw.write("MID: " + mid.get(i) + "\n");
-				}
-				curPart.moveToFirst();
 
-				curPart = this
-						.getApplicationContext()
-						.getContentResolver()
-						.query(Uri.parse("content://mms/part"), null, null,
-								null, null);
-				bw.write("CURPART TEXT\n");
+					int[] packetNumber = new int[100];
+					String[] packets;
+					String[] packets2;
 
-				if (curPart.moveToFirst()) {
-					do {
-						coloumns = curPart.getColumnNames();
-
-						if (values == null)
-							values = new String[coloumns.length];
-
-						// just get the TEXT part
-						for (int i = 0; i < mid.size(); i++) {
-
-							int[] packetNumber = new int[100];
-							String[] packets;
-							String[] packets2;
-
-							if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
-									.get(i)) {
-								String text = curPart.getString(curPart
-										.getColumnIndex("text"));
-								if (text != null) {
-									if (text.startsWith("&%")) {
-										packets = text.split("&% ");
-										bw.write("MID: " + mid.get(i)
-												+ "\tTEXT:" + text + "\n");
-										for (int j = 0; j < packets.length; j++) {
-											bw.write("packet " + j + ": "
-													+ packets[j] + "\n");
-											Log.i("PACKETS", packets[j]);
-											if (packets[j] != null) {
-												packets2 = packets[j]
-														.split(" ");
-												if (!packets2[0].equals("")) {
-													Log.i("packets2[0]",
-															packets2[0]);
-													Log.i("packets2[1]",
-															packets2[1]);
-													int pNum = Integer
-															.parseInt(packets2[0]);
-													Log.i("pNum","pNum: "+pNum);
-													Log.i("packet",packets2[1]);
-													al.put(pNum, packets2[1]);
-													if (al.size() == size) {
-														//receiveFile();
-													}
-												}
-
+					if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
+							.get(i)) {
+						String text = curPart.getString(curPart
+								.getColumnIndex("text"));
+						if (text != null) {
+							if (text.startsWith("&%")) {
+								packets = text.split("&% ");
+								//bw.write("MID: " + mid.get(i) + "\tTEXT:"
+								//		+ text + "\n");
+								for (int j = 0; j < packets.length; j++) {
+								//	bw.write("packet " + j + ": " + packets[j]
+								//			+ "\n");
+									Log.i("PACKETS", packets[j]);
+									if (packets[j] != null) {
+										packets2 = packets[j].split(" ");
+										if (!packets2[0].equals("")) {
+											Log.i("packets2[0]", packets2[0]);
+											Log.i("packets2[1]", packets2[1]);
+											int pNum = Integer
+													.parseInt(packets2[0]);
+											Log.i("pNum", "pNum: " + pNum);
+											Log.i("packet", packets2[1]);
+											al.put(pNum, packets2[1]);
+											if (al.size() == size) {
+												receiveFile();
 											}
-
 										}
+
 									}
+
 								}
-
 							}
-
 						}
 
-					} while (curPart.moveToNext());
+					}
+
 				}
-				curPart.close();
-			}
-			curAddr.close();
+
+			} while (curPart.moveToNext());
 		}
-		
+		curPart.close();
+
 		bw.write("\n\n----AL-----\n\n");
 		for (int i = 0; i < al.size(); i++) {
 			bw.write(al.get(i) + "\n");
 		}
-		curPdu.close();
+		
 	}
 
 	public void receiveFile() {
@@ -313,7 +269,7 @@ public class MmsReceiverActivity extends Activity {
 				fl.delete();
 				bw.close();
 				Log.i("DONE!!!", "DONE");
-				Toast.makeText(getBaseContext(),
+				Toast.makeText(getApplicationContext(),
 						"File Received. Check your SD Card", Toast.LENGTH_LONG)
 						.show();
 				this.finish();
