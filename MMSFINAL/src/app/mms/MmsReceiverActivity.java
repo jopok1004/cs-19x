@@ -34,7 +34,7 @@ public class MmsReceiverActivity extends Activity {
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
 
 	Uri mmsInURI = Uri.parse("content://mms-sms");
-
+	BroadcastReceiver mmsMonitorBroadcastReceiver;
 	ContentObserver mmsObserver = new ContentObserver(null) {
 		@Override
 		public void onChange(boolean selfChange) {
@@ -88,7 +88,7 @@ public class MmsReceiverActivity extends Activity {
 			Log.i("fileType", fileType);
 
 		}
-		BroadcastReceiver mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
+		mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 
@@ -218,6 +218,7 @@ public class MmsReceiverActivity extends Activity {
 											Log.i("pNum", "pNum: " + pNum);
 											Log.i("packet", packets2[1]);
 											al.put(pNum, packets2[1]);
+											Log.i("AL SIZE","AL SIZE: "+al.size());
 											if (al.size() == size) {
 												receiveFile();
 											}
@@ -236,14 +237,14 @@ public class MmsReceiverActivity extends Activity {
 			} while (curPart.moveToNext());
 		}
 		curPart.close();
-
-		bw.write("\n\n----AL-----\n\n");
-		for (int i = 0; i < al.size(); i++) {
-			bw.write(al.get(i) + "\n");
-		}
+		
+		
 		
 	}
-
+	public void onDestroy(){
+		unregisterReceiver(mmsMonitorBroadcastReceiver);
+		super.onDestroy();
+	}
 	public void receiveFile() {
 		if (al.size() == size) {
 			try {
@@ -268,10 +269,9 @@ public class MmsReceiverActivity extends Activity {
 				File fl = new File("/sdcard/file." + fileType + ".gz");
 				fl.delete();
 				bw.close();
+			
 				Log.i("DONE!!!", "DONE");
-				Toast.makeText(getApplicationContext(),
-						"File Received. Check your SD Card", Toast.LENGTH_LONG)
-						.show();
+				
 				this.finish();
 
 			} catch (IOException e) {
@@ -282,4 +282,6 @@ public class MmsReceiverActivity extends Activity {
 			// sreceived=true;
 		}
 	}
+	
+	
 }
