@@ -69,7 +69,7 @@ public class MmsReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		//getContentResolver().delete(Uri.parse("content://mms"), null, null);
+		// getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 		// TRIAL
@@ -237,14 +237,20 @@ public class MmsReceiverActivity extends Activity {
 					}
 					alsize = al.size();
 					if (tempalsize != alsize) {
+
 						sendSMS(phoneNum, "&%received");
+
 					}
 				}
 
 			} while (curPart.moveToNext());
 		}
 		curPart.close();
+		for (int k = 0; k < mid.size(); k++) {
+			getContentResolver().delete(
+					Uri.parse("content://mms/inbox/" + mid.get(k)), null, null);
 
+		}
 	}
 
 	public void onDestroy() {
