@@ -69,7 +69,7 @@ public class MmsReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		getContentResolver().delete(Uri.parse("content://mms"),null,null);
+		//getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 		// TRIAL
@@ -194,7 +194,6 @@ public class MmsReceiverActivity extends Activity {
 				// just get the TEXT part
 				for (int i = 0; i < mid.size(); i++) {
 
-					
 					String[] packets;
 					String[] packets2;
 
@@ -205,11 +204,12 @@ public class MmsReceiverActivity extends Activity {
 						if (text != null) {
 							if (text.startsWith("&%")) {
 								packets = text.split("&% ");
-								//bw.write("MID: " + mid.get(i) + "\tTEXT:"
-								//		+ text + "\n");
+								// bw.write("MID: " + mid.get(i) + "\tTEXT:"
+								// + text + "\n");
 								for (int j = 0; j < packets.length; j++) {
-								//	bw.write("packet " + j + ": " + packets[j]
-								//			+ "\n");
+									// bw.write("packet " + j + ": " +
+									// packets[j]
+									// + "\n");
 									Log.i("PACKETS", packets[j]);
 									if (packets[j] != null) {
 										packets2 = packets[j].split(" ");
@@ -221,7 +221,8 @@ public class MmsReceiverActivity extends Activity {
 											Log.i("pNum", "pNum: " + pNum);
 											Log.i("packet", packets2[1]);
 											al.put(pNum, packets2[1]);
-											Log.i("AL SIZE","AL SIZE: "+al.size());
+											Log.i("AL SIZE",
+													"AL SIZE: " + al.size());
 											if (al.size() == size) {
 												receiveFile();
 											}
@@ -235,22 +236,22 @@ public class MmsReceiverActivity extends Activity {
 
 					}
 					alsize = al.size();
-					if(tempalsize!=alsize){
-						sendSMS(phoneNum,"&%received");
+					if (tempalsize != alsize) {
+						sendSMS(phoneNum, "&%received");
 					}
 				}
 
 			} while (curPart.moveToNext());
 		}
 		curPart.close();
-		
-		
-		
+
 	}
-	public void onDestroy(){
+
+	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		super.onDestroy();
 	}
+
 	public void receiveFile() {
 		if (al.size() == size) {
 			try {
@@ -275,9 +276,9 @@ public class MmsReceiverActivity extends Activity {
 				File fl = new File("/sdcard/file." + fileType + ".gz");
 				fl.delete();
 				bw.close();
-			
+
 				Log.i("DONE!!!", "DONE");
-				
+
 				this.finish();
 
 			} catch (IOException e) {
@@ -288,7 +289,7 @@ public class MmsReceiverActivity extends Activity {
 			// sreceived=true;
 		}
 	}
-	
+
 	private void sendSMS(String phoneNumber, String message) {
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
@@ -338,8 +339,8 @@ public class MmsReceiverActivity extends Activity {
 							Toast.LENGTH_SHORT).show();
 					break;
 				case Activity.RESULT_CANCELED:
-					Toast.makeText(getApplicationContext(), "SMS not delivered",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+							"SMS not delivered", Toast.LENGTH_SHORT).show();
 					break;
 				}
 			}
