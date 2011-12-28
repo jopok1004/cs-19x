@@ -334,6 +334,7 @@ public class MmsReceiverActivity extends Activity {
 				fw1.close();
 				al.clear();
 				Log.i("DONE!!!", "DONE");
+				sendSMS(phoneNum,"&%done");
 				Debug.stopMethodTracing();
 				this.finish();
 

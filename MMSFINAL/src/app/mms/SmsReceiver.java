@@ -66,6 +66,13 @@ public class SmsReceiver extends BroadcastReceiver
             	i.putExtra("start?","sendAnotherMms");
             	context.startActivity(i);
             }
+            if(msgs[0].getMessageBody().toString().startsWith("&%done")){
+            	this.abortBroadcast();
+            	Intent i = new Intent(context,MmsSenderActivity.class);
+            	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
+            	i.putExtra("start?","done");
+            	context.startActivity(i);
+            }
             
         }                         
     }

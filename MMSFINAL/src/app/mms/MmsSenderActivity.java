@@ -127,6 +127,9 @@ public class MmsSenderActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
+		if ((intent.getStringExtra("start?").toString()).equals("done")) {
+			this.finish();
+		}
 	}
 	private void send1mms(String phoneNum) throws IOException {
 		
@@ -409,4 +412,16 @@ public class MmsSenderActivity extends Activity {
 			}
 		}
 	};/* End of private Class */
+	
+	public void onDestroy(){
+		try {
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Debug.stopMethodTracing();
+		super.onDestroy();
+		
+	}
 }
