@@ -325,7 +325,8 @@ public class MmsReceiverActivity extends Activity {
 				t2 = time.toMillis(true);
 				bw1.write("Decompressing T2-T1: "+(t2-t1)+"\n");
 				bw1.write(time.toString()
-						+ " : after decode and before unzip\n");
+						+ " : after decompress\n");
+				bw1.write("After Decompression: T2-T1: "+(t2-t1));
 				File fl = new File("/sdcard/file." + fileType + ".gz");
 				fl.delete();
 				bw1.close();
