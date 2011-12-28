@@ -99,6 +99,7 @@ public class MmsReceiverActivity extends Activity {
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
+		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		setContentView(R.layout.receiver);
 		// TRIAL
 		Intent intent = this.getIntent();
@@ -331,6 +332,7 @@ public class MmsReceiverActivity extends Activity {
 				fl.delete();
 				bw1.close();
 				fw1.close();
+				al.clear();
 				Log.i("DONE!!!", "DONE");
 				Debug.stopMethodTracing();
 				this.finish();
