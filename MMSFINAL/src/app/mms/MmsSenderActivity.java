@@ -118,7 +118,10 @@ public class MmsSenderActivity extends Activity {
 	public void onNewIntent(Intent intent) {
 		if ((intent.getStringExtra("start?").toString()).equals("sendAnotherMms")) {
 			try {
-				send1mms(phoneNo);
+				if(tracker<packetSize){
+					send1mms(phoneNo);
+				}
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
