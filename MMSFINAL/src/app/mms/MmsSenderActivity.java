@@ -121,14 +121,14 @@ public class MmsSenderActivity extends Activity {
 				if(tracker<packetSize){
 					send1mms(phoneNo);
 				}
+				else{
+					this.finish();
+				}
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		if ((intent.getStringExtra("start?").toString()).equals("done")) {
-			this.finish();
 		}
 	}
 	private void send1mms(String phoneNum) throws IOException {
