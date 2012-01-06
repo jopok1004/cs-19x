@@ -18,7 +18,7 @@ public class CombinedActivity extends Activity {
 		sendBt.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent(CombinedActivity.this,
-						SenderActivity.class);
+						SenderWelcome.class);
 				intent.putExtra("start?", "no");
 				startActivity(intent);
 			}
