@@ -12,7 +12,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Choose number of messages to be sent via each channel"
+        android:text="Choose maximum number of messages to be sent via each channel"
         android:textSize="17sp" />
 
     <TableLayout
@@ -76,5 +76,14 @@
                 android:layout_height="wrap_content" />
         </TableRow>
     </TableLayout>
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tableLayout1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Next" />
 
 </RelativeLayout>
