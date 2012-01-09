@@ -280,13 +280,7 @@ public class MmsReceiverActivity extends Activity {
 					}
 					
 				} while (curPart.moveToNext());
-				alsize = al.size();
-				if (tempalsize != alsize) {
-					Log.i("MMS", "NARECEIVE KO NA SI MMS");
-					sendSMS(phoneNum, "&%mmsreceived");
-					getContentResolver().delete(Uri.parse("content://mms"),
-							null, null);
-				}
+				
 			}
 			curPart.close();
 			// for (int k = 0; k < mid.size(); k++) {
@@ -294,7 +288,15 @@ public class MmsReceiverActivity extends Activity {
 			// Uri.parse("content://mms/inbox/" + mid.get(k)), null, null);
 			//
 			// }
+			alsize = al.size();
+			if (tempalsize != alsize) {
+				Log.i("MMS", "NARECEIVE KO NA SI MMS");
+				sendSMS(phoneNum, "&%mmsreceived");
+				getContentResolver().delete(Uri.parse("content://mms"),
+						null, null);
+			}
 		}
+		
 	}
 
 	public void onDestroy() {
