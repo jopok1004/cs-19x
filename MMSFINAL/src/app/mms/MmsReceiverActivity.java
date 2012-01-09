@@ -319,7 +319,7 @@ public class MmsReceiverActivity extends Activity {
 						bw2.write(al.get(i) + "\n");
 
 					}
-					al.clear();
+					
 					bw2.close();
 					fw2.close();
 
