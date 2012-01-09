@@ -130,6 +130,9 @@ public class MmsSenderActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
+		if((intent.getStringExtra("start?").toString()).equals("done")){
+			this.finish();
+		}
 	}
 	private void send1mms(String phoneNum) throws IOException {
 		
