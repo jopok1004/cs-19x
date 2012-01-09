@@ -56,6 +56,7 @@ public class MmsSenderActivity extends Activity {
 	long t1, t2;
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
+	private static final int SEND_MMS = 1003;
 	ArrayList<String> packetList = new ArrayList<String>();
 
 	/** Called when the activity is first created. */
@@ -70,12 +71,12 @@ public class MmsSenderActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(started==false){
+		if (started == false) {
 			Debug.startMethodTracing("mmssender");
-			started=true;
+			started = true;
 		}
 		random = new Random();
-		
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		MyListener = new MyPhoneStateListener();
@@ -92,11 +93,12 @@ public class MmsSenderActivity extends Activity {
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
 					Log.i("sendFile", "Ready to send file");
-					String temp= "";
-					//temp= "%&sendViaMms 0 " + packetSize + " " + sub;
-					temp= "%&sendViaMms";
+					String temp = "";
+					// temp= "%&sendViaMms 0 " + packetSize + " " + sub;
+					temp = "%&sendViaMms";
 					Log.i("temp", temp);
-					sendSMS(phoneNo, "SENDVIAMMS"+" 0 "+packetSize+" "+sub+" "+randomNum); // %&sendViaMms
+					sendSMS(phoneNo, "SENDVIAMMS" + " 0 " + packetSize + " "
+							+ sub + " " + randomNum); // %&sendViaMms
 					sendSMS(phoneNo, "MESSAGE"); // %&sendViaMms
 					Log.i("FINISHED", "DONE SENDING SMS");
 					try {
@@ -105,9 +107,9 @@ public class MmsSenderActivity extends Activity {
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}											// startindex
-																					// endindex
-																					// filename
+					} // startindex
+						// endindex
+						// filename
 				} else
 					Toast.makeText(getApplicationContext(),
 							"Please enter phone number.", Toast.LENGTH_SHORT)
@@ -115,27 +117,29 @@ public class MmsSenderActivity extends Activity {
 			}
 		});
 	}
+
 	public void onNewIntent(Intent intent) {
-		if ((intent.getStringExtra("start?").toString()).equals("sendAnotherMms")) {
+		if ((intent.getStringExtra("start?").toString())
+				.equals("sendAnotherMms")) {
 			try {
-				if(tracker<packetSize){
+				if (tracker < packetSize) {
 					send1mms(phoneNo);
-				}
-				else{
+				} else {
 					this.finish();
 				}
-				
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		if((intent.getStringExtra("start?").toString()).equals("done")){
+		if ((intent.getStringExtra("start?").toString()).equals("done")) {
 			this.finish();
 		}
 	}
+
 	private void send1mms(String phoneNum) throws IOException {
-		
+
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		dialog.setMessage("Sending MMS...");
 		dialog.setCancelable(false);
@@ -144,18 +148,25 @@ public class MmsSenderActivity extends Activity {
 		try {
 			// dialog.show(Mms2Activity.this, "Sending SMS", "Please Wait");
 			// 1024b * 300kb = 307200/160 char = 1920 packets
-			
 
 			String msg = "";
 			for (int i = 0; i < 100 && tracker < packetSize; i++) {
-				msg = msg + "&% " + tracker + " " + packetList.get(tracker)+ "\n";
+				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
+						+ "\n";
 				tracker++;
 				Log.i("SUBMESSAGE", msg);
 			}
 			Log.i("parser", "before mms sending");
+			time.setToNow();
+			try {
+				bw.write(time.toString() + "before Messaging app\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			sendMMS(phoneNum, msg);
-			//waiting(180);
-			
+			// waiting(180);
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -243,8 +254,9 @@ public class MmsSenderActivity extends Activity {
 				time.setToNow();
 				t2 = time.toMillis(true);
 				try {
-					bw.write(time.toString() + "after compression and before b64\n");
-					bw.write("COMPRESSION TIME : T2-T1: "+(t2-t1)+"\n");
+					bw.write(time.toString()
+							+ "after compression and before b64\n");
+					bw.write("COMPRESSION TIME : T2-T1: " + (t2 - t1) + "\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -276,12 +288,24 @@ public class MmsSenderActivity extends Activity {
 				t2 = time.toMillis(true);
 				try {
 					bw.write(time.toString() + "after base 64\n");
-					bw.write("ENCODING TIME : T2-T1: "+(t2-t1)+"\n");
+					bw.write("ENCODING TIME : T2-T1: " + (t2 - t1) + "\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
+				break;
+				
+			case SEND_MMS:
+				time.setToNow();
+				try {
+					bw.write(time.toString() + "after Messaging app\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
 				break;
 			}
 
@@ -306,12 +330,12 @@ public class MmsSenderActivity extends Activity {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.putExtra("sms_body", message);
 		intent.putExtra("address", phoneNumber);
-		intent.putExtra("subject", "mms"+randomNum);
+		intent.putExtra("subject", "mms" + randomNum);
 		intent.setType("image/*");
 		intent.setClassName("com.android.mms",
 				"com.android.mms.ui.ComposeMessageActivity");
-		startActivity(intent);
-		
+		startActivityForResult(intent, SEND_MMS);
+
 	}
 
 	private void sendSMS(String phoneNumber, String message) {
@@ -363,8 +387,8 @@ public class MmsSenderActivity extends Activity {
 							Toast.LENGTH_SHORT).show();
 					break;
 				case Activity.RESULT_CANCELED:
-					Toast.makeText(getApplicationContext(), "SMS not delivered",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+							"SMS not delivered", Toast.LENGTH_SHORT).show();
 					break;
 				}
 			}
@@ -374,6 +398,7 @@ public class MmsSenderActivity extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		Log.i("sms sent", "after sms sending");
 	}
+
 	protected void onPause() {
 		super.onPause();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
@@ -397,7 +422,7 @@ public class MmsSenderActivity extends Activity {
 		@Override
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 			super.onSignalStrengthsChanged(signalStrength);
-			if(time!=null){
+			if (time != null) {
 				time.setToNow();
 			}
 			time.setToNow();
@@ -415,8 +440,8 @@ public class MmsSenderActivity extends Activity {
 			}
 		}
 	};/* End of private Class */
-	
-	public void onDestroy(){
+
+	public void onDestroy() {
 		try {
 			bw.close();
 		} catch (IOException e) {
@@ -425,6 +450,6 @@ public class MmsSenderActivity extends Activity {
 		}
 		Debug.stopMethodTracing();
 		super.onDestroy();
-		
+
 	}
 }
