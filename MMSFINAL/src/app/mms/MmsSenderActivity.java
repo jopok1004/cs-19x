@@ -124,8 +124,6 @@ public class MmsSenderActivity extends Activity {
 			try {
 				if (tracker < packetSize) {
 					send1mms(phoneNo);
-				} else {
-					this.finish();
 				}
 
 			} catch (IOException e) {

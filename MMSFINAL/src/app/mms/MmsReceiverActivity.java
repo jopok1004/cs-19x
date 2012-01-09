@@ -278,14 +278,15 @@ public class MmsReceiverActivity extends Activity {
 						}
 
 					}
-					alsize = al.size();
-					if (tempalsize != alsize) {
-						Log.i("MMS", "NARECEIVE KO NA SI MMS");
-						sendSMS(phoneNum, "&%mmsreceived");
-						getContentResolver().delete(Uri.parse("content://mms"),
-								null, null);
-					}
+					
 				} while (curPart.moveToNext());
+				alsize = al.size();
+				if (tempalsize != alsize) {
+					Log.i("MMS", "NARECEIVE KO NA SI MMS");
+					sendSMS(phoneNum, "&%mmsreceived");
+					getContentResolver().delete(Uri.parse("content://mms"),
+							null, null);
+				}
 			}
 			curPart.close();
 			// for (int k = 0; k < mid.size(); k++) {
