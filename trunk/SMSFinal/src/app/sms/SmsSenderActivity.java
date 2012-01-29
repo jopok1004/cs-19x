@@ -30,6 +30,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SmsSenderActivity extends Activity {
+	File logfile, logfile1;
+	FileWriter fw = null, fw1 = null;
+	BufferedWriter bw = null, bw1 = null;
 	String phoneNo = new String();
 	Button btnSendSMS;
 	EditText txtPhoneNo;
@@ -38,14 +41,11 @@ public class SmsSenderActivity extends Activity {
 	EditText rcvdMessage;
 	SmsReceiver rcvd;
 	File selectedFile;
-	File outputfile;
-	FileWriter fw=null;
-	BufferedWriter bw=null;
-	final int testnum = 1;
 	int packetCount; // total number of packets
 	int tracker = 0;
 	int sent = 0;
 	int indexLimit;
+	int totalresends = 0;
 	Boolean initialR=false;
 	Boolean check10Received;
 	Boolean done;
@@ -65,11 +65,14 @@ public class SmsSenderActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Debug.startMethodTracing("sender",32000000);
-		outputfile = new File("/sdcard/output" + testnum + ".txt");
+		logfile = new File("/sdcard/smsSenderLog.txt");
+		logfile1 = new File("/sdcard/smsSenderSignal.txt");
 		done = false;
 		try {
-			fw = new FileWriter(outputfile);
+			fw = new FileWriter(logfile);
 			bw = new BufferedWriter(fw);
+			fw1 = new FileWriter(logfile1);
+			bw1 = new BufferedWriter(fw1);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -118,7 +121,7 @@ public class SmsSenderActivity extends Activity {
 		indexLimit = endIndex;
 		send10(phoneNum);
 	}
-	public void onNewIntent(Intent intent) {
+	public void onNewIntent(Intent intent){
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
 			try {
@@ -135,6 +138,7 @@ public class SmsSenderActivity extends Activity {
 			
 			time.setToNow();
 			try {
+				bw.write(time.toString() + " Total Resends " + totalresends);
 				bw.write(t1- time.toMillis(true) + " : total time\n");
 				bw.write(t1-t2 + " : processing time\n");
 				bw.write(initial-t2 + " : sending time\n");
@@ -170,10 +174,18 @@ public class SmsSenderActivity extends Activity {
 							|| !num[i].equals("\n")) {
 						Log.e("-----NUM[i]-----", num[i]);
 						int j = Integer.parseInt(num[i]);
+						time.setToNow();
+						try {
+							bw.write(time.toString() + " : Resend " + j);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 						Log.e("RESEND LIST", num[i]);
 						sendSMS(phoneNo, "&% " + j + " " + packetList.get(j));
 						Log.i("RESENT", packetList.get(j));
-
+						totalresends++;
 					}
 
 				}
@@ -390,7 +402,6 @@ public class SmsSenderActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		try {
-			Time time = new Time();
 			time.setToNow();
 			bw.write(time.toString() + " : Message Sending\n");
 		} catch (IOException e) {
@@ -399,7 +410,6 @@ public class SmsSenderActivity extends Activity {
 		}
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		try {
-			Time time = new Time();
 			time.setToNow();
 			bw.write(time.toString() + " : Message Sent\n");
 		} catch (IOException e) {
@@ -431,12 +441,11 @@ public class SmsSenderActivity extends Activity {
 		 */
 		@Override
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
-			Time time = new Time();
 
 			super.onSignalStrengthsChanged(signalStrength);
 			time.setToNow();
 			try {
-				bw.write(time.toString() + ": "
+				bw1.write(time.toString() + ": "
 						+ String.valueOf(signalStrength.getGsmSignalStrength())
 						+ "\n");
 			} catch (IOException e) {
@@ -451,6 +460,7 @@ public class SmsSenderActivity extends Activity {
 	protected void onDestroy() {
 		try {
 			bw.close();
+			bw1.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

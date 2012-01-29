@@ -30,9 +30,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SmsReceiverActivity extends Activity {
-	File file;
-	FileWriter fw = null;
-	BufferedWriter bw = null;
+	File logfile, logfile1;
+	FileWriter fw = null, fw1 = null;
+	BufferedWriter bw = null, bw1 = null;
 	Boolean received = false;
 	Boolean initialR = false;
 	String phoneNo = new String();
@@ -45,7 +45,7 @@ public class SmsReceiverActivity extends Activity {
 	int size; // number of messages to be received
 	String fileT;
 	int messageSize = 10;
-	Time time;
+	Time time = new Time();
 	long t1, t2, initial;
 	long last, current;
 
@@ -53,7 +53,6 @@ public class SmsReceiverActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 
-		time = new Time();
 		MyListener = new MyPhoneStateListener();
 		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
@@ -74,10 +73,13 @@ public class SmsReceiverActivity extends Activity {
 					Debug.startMethodTracing("receiver1", 32000000);
 					btnSendConfirmation.setClickable(false);
 
-					file = new File("/sdcard/outputreceiver1.txt");
+					logfile = new File("/sdcard/smsReceiverLog.txt");
+					logfile1 = new File("/sdcard/smsReceiverSignal.txt");
 					try {
-						fw = new FileWriter(file);
+						fw = new FileWriter(logfile);
 						bw = new BufferedWriter(fw);
+						fw1 = new FileWriter(logfile1);
+						bw1 = new BufferedWriter(fw1);
 						Log.i("SUCCESSFUL", "MADE FW AND BW");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -327,8 +329,9 @@ public class SmsReceiverActivity extends Activity {
 	protected void onDestroy() {
 		try {
 			// unregisterReceiver(rcvd);
-			if(bw!=null){
+			if(bw!=null && bw1!=null){
 				bw.close();
+				bw1.close();
 			}
 			
 		} catch (IOException e) {
@@ -363,9 +366,9 @@ public class SmsReceiverActivity extends Activity {
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 			super.onSignalStrengthsChanged(signalStrength);
 			time.setToNow();
-			if (fw != null && bw != null) {
+			if (fw1 != null && bw1 != null) {
 				try {
-					bw.write("Signal Strength"
+					bw1.write("Signal Strength"
 							+ time.toString()
 							+ ": "
 							+ String.valueOf(signalStrength
