@@ -150,6 +150,8 @@ public class SmsSenderActivity extends Activity {
 			try {
 				bw.close();
 				fw.close();
+				bw1.close();
+				fw1.close();
 				Debug.stopMethodTracing();
 				
 				this.finish();
@@ -170,8 +172,7 @@ public class SmsSenderActivity extends Activity {
 
 				for (int i = 0; i < num.length; i++) {
 
-					if (!num[i].equals(" ") || !num[i].equals("")
-							|| !num[i].equals("\n")) {
+					if (!num[i].equals(" ") || !num[i].equals("") || !num[i].equals("\n")) {
 						Log.e("-----NUM[i]-----", num[i]);
 						int j = Integer.parseInt(num[i]);
 						time.setToNow();
