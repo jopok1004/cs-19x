@@ -220,7 +220,8 @@ public class SmsReceiverActivity extends Activity {
 								Toast.LENGTH_LONG).show();
 						bw.close();
 						fw.close();
-
+						bw1.close();
+						fw1.close();
 						Debug.stopMethodTracing();
 						sendSMS(phoneNo, "%&done");
 						this.finish();
