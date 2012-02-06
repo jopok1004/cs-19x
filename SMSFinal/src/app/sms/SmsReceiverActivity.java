@@ -183,7 +183,7 @@ public class SmsReceiverActivity extends Activity {
 						for (int i = 0; i < size; i++) {
 							fw1.write(al.get(i) + "\n");
 						}
-						al.clear();
+						//al.clear();
 						fw1.close();
 
 						Log.i("WRITING TO FILE", "FILEWRITER");
@@ -339,6 +339,7 @@ public class SmsReceiverActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		al.clear();
 		super.onDestroy();
 	}
 
