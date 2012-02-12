@@ -43,6 +43,7 @@ public class MmsReceiverActivity extends Activity {
 	int size;
 	int alsize = 0;
 	boolean started = false;
+	boolean done = false;
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
 	Time time;
@@ -289,7 +290,7 @@ public class MmsReceiverActivity extends Activity {
 			//
 			// }
 			alsize = al.size();
-			if (tempalsize != alsize) {
+			if (tempalsize != alsize&& done!=true) {
 				Log.i("MMS", "NARECEIVE KO NA SI MMS");
 				sendSMS(phoneNum, "&%mmsreceived");
 				getContentResolver().delete(Uri.parse("content://mms"),
@@ -356,6 +357,7 @@ public class MmsReceiverActivity extends Activity {
 					Log.i("DONE!!!", "DONE");
 					sendSMS(phoneNum, "&%done");
 					Debug.stopMethodTracing();
+					done = true;
 					this.finish();
 
 				} catch (IOException e) {

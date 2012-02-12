@@ -163,7 +163,7 @@ public class MmsSenderActivity extends Activity {
 				e.printStackTrace();
 			}
 			sendMMS(phoneNum, msg);
-			// waiting(180);
+			waiting(20);
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -447,6 +447,7 @@ public class MmsSenderActivity extends Activity {
 			e.printStackTrace();
 		}
 		Debug.stopMethodTracing();
+		setResult(RESULT_OK);
 		super.onDestroy();
 
 	}
