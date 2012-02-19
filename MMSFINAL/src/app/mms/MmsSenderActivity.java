@@ -53,7 +53,7 @@ public class MmsSenderActivity extends Activity {
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
 	Time time;
-	long t1, t2;
+	long t1, t2,t3,t4;
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
 	private static final int SEND_MMS = 1003;
@@ -63,6 +63,7 @@ public class MmsSenderActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		time = new Time();
+		
 		File fl = new File("/sdcard/outputsender.txt");
 		try {
 			fw = new FileWriter(fl);
@@ -89,6 +90,8 @@ public class MmsSenderActivity extends Activity {
 
 		btnSendMMS.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				
+				t3 = System.currentTimeMillis();
 				randomNum = random.nextInt(1000);
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
@@ -440,6 +443,16 @@ public class MmsSenderActivity extends Activity {
 	};/* End of private Class */
 
 	public void onDestroy() {
+		
+		t4 = System.currentTimeMillis();
+		t4 = t4-t3;
+		
+		try {
+			bw.write("\nTotal time: "+t4);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try {
 			bw.close();
 		} catch (IOException e) {
