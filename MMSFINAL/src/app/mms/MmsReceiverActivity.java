@@ -47,6 +47,7 @@ public class MmsReceiverActivity extends Activity {
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
 	Time time;
+	long initTime;
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
 
 	Uri mmsInURI = Uri.parse("content://mms-sms");
@@ -85,6 +86,8 @@ public class MmsReceiverActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		time = new Time();
 		if (started == false) {
+			time.setToNow();
+			initTime = time.toMillis(true);
 			Debug.startMethodTracing("mmsreceiver");
 			started = true;
 		}
@@ -312,7 +315,11 @@ public class MmsReceiverActivity extends Activity {
 
 			if (al.size() == size) {
 				try {
-
+					
+					time.setToNow();
+					t1 = time.toMillis(true);
+					bw1.write("Receiving time: " + (t1 - initTime) + "\n");
+					
 					FileWriter fw2 = new FileWriter(new File(
 							"/sdcard/decode.txt"));
 					BufferedWriter bw2 = new BufferedWriter(fw2);
@@ -325,30 +332,21 @@ public class MmsReceiverActivity extends Activity {
 					fw2.close();
 
 					Log.i("WRITING TO FILE", "FILEWRITER");
-					time.setToNow();
-					t1 = time.toMillis(true);
+					
+					
 					Base64FileDecoder.decodeFile("/sdcard/decode.txt",
 							"/sdcard/file." + fileType + ".gz");
-					time.setToNow();
-					t2 = time.toMillis(true);
-					bw1.write("Decoding T2-T1: " + (t2 - t1) + "\n");
-
-					time.setToNow();
-					bw1.write(time.toString()
-							+ " : after decode and before unzip\n");
-
 					// File fl = new File("/sdcard/decode.txt");
 					// fl.delete();
-					time.setToNow();
-					t1 = time.toMillis(true);
 					compression.decompressGzip("/sdcard/file." + fileType
 							+ ".gz");
+					File fl = new File("/sdcard/file." + fileType + ".gz");
+					
 					time.setToNow();
 					t2 = time.toMillis(true);
-					bw1.write("Decompressing T2-T1: " + (t2 - t1) + "\n");
-					bw1.write(time.toString() + " : after decompress\n");
-					bw1.write("After Decompression: T2-T1: " + (t2 - t1));
-					File fl = new File("/sdcard/file." + fileType + ".gz");
+					bw1.write("Processing time: " + (t2 - t1) + "\n");
+					bw1.write("Total time: " + (t2 - initTime) + "\n");
+					
 					fl.delete();
 					bw1.close();
 					fw1.close();
