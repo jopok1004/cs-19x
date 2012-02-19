@@ -53,7 +53,7 @@ public class MmsSenderActivity extends Activity {
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
 	Time time;
-	long t1, t2,t3,t4;
+	long t1, t2;
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
 	private static final int SEND_MMS = 1003;
@@ -63,7 +63,6 @@ public class MmsSenderActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		time = new Time();
-		
 		File fl = new File("/sdcard/outputsender.txt");
 		try {
 			fw = new FileWriter(fl);
@@ -90,8 +89,6 @@ public class MmsSenderActivity extends Activity {
 
 		btnSendMMS.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				
-				t3 = System.currentTimeMillis();
 				randomNum = random.nextInt(1000);
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
@@ -135,6 +132,14 @@ public class MmsSenderActivity extends Activity {
 			}
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("done")) {
+			time.setToNow();
+			try {
+				bw.write("Sending time: " + (time.toMillis(true) - t2) + "\n");
+				bw.write("Total time: " + (time.toMillis(true) - t1) + "\n");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			this.finish();
 		}
 	}
@@ -158,13 +163,7 @@ public class MmsSenderActivity extends Activity {
 				Log.i("SUBMESSAGE", msg);
 			}
 			Log.i("parser", "before mms sending");
-			time.setToNow();
-			try {
-				bw.write(time.toString() + "before Messaging app\n");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 			sendMMS(phoneNum, msg);
 			waiting(20);
 
@@ -241,35 +240,16 @@ public class MmsSenderActivity extends Activity {
 
 				txtFileName.setText(file.getName() + " "
 						+ Long.toString((file.length())));
+				
 				time.setToNow();
 				t1 = time.toMillis(true);
-				try {
-					bw.write(time.toString() + "before compression\n");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				
 				compression.compressGzip(
 						data.getExtras().getString("filePath"), data
 								.getExtras().getString("fileName"));
-				time.setToNow();
-				t2 = time.toMillis(true);
-				try {
-					bw.write(time.toString()
-							+ "after compression and before b64\n");
-					bw.write("COMPRESSION TIME : T2-T1: " + (t2 - t1) + "\n");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+		
 				Log.i("Base 64", "Before Base 64");
-				t1 = time.toMillis(true);
-				try {
-					bw.write(time.toString() + "before base 64\n");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+			
 				try {
 					Log.i("FILE", data.getExtras().getString("filePath") + "/"
 							+ data.getExtras().getString("fileName") + ".gz");
@@ -288,8 +268,7 @@ public class MmsSenderActivity extends Activity {
 				time.setToNow();
 				t2 = time.toMillis(true);
 				try {
-					bw.write(time.toString() + "after base 64\n");
-					bw.write("ENCODING TIME : T2-T1: " + (t2 - t1) + "\n");
+					bw.write("Processing time: " + (t2 - t1) + "\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -443,16 +422,6 @@ public class MmsSenderActivity extends Activity {
 	};/* End of private Class */
 
 	public void onDestroy() {
-		
-		t4 = System.currentTimeMillis();
-		t4 = t4-t3;
-		
-		try {
-			bw.write("\nTotal time: "+t4);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		try {
 			bw.close();
 		} catch (IOException e) {
