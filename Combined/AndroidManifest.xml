@@ -37,6 +37,7 @@
         <activity android:name="SenderActivity"></activity>
         <activity android:name="ReceiverActivity"></activity>
         <activity android:name="SenderWelcome"></activity>
+        <activity android:name="FileExplore"></activity>
     </application>
 
 </manifest>
