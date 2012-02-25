@@ -38,6 +38,7 @@
         <activity android:name="ReceiverActivity"></activity>
         <activity android:name="SenderWelcome"></activity>
         <activity android:name="FileExplore"></activity>
+        <receiver android:name="SmsReceiver"></receiver>
     </application>
 
 </manifest>
