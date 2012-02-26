@@ -68,7 +68,9 @@ public class SenderInitial extends Activity {
 					//sendSMS(phoneNo, message);
 					//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub);
 					Intent intent = new Intent(SenderInitial.this,
-							SenderInput.class);
+							SenderActivity.class);
+					intent.putExtra("phoneNum", phoneNo);
+					intent.putStringArrayListExtra("arraylist", packetList);
 					intent.putExtra("packetCount", packetCount);
 					intent.putExtra("start?", "fromInitial");
 					startActivity(intent);
