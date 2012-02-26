@@ -26,7 +26,7 @@ import android.util.Log;
 public class XMPPReceiver extends Activity{
 
 	private XMPPConnection connection;
-    private SettingsReceiver mDialog;
+    private Settings mDialog;
     private BufferedWriter bw;
     private long t1, t2, initial;
     
@@ -59,7 +59,7 @@ public class XMPPReceiver extends Activity{
         Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
         
-        mDialog = new SettingsReceiver(this);
+        mDialog = new Settings(this);
         if (isOnline()) {
             mDialog.show();
         }else {
@@ -88,10 +88,14 @@ public class XMPPReceiver extends Activity{
 	}
 	
 	public void setConnection (XMPPConnection connection) {
-        this.connection = connection;
-        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-        connection.addPacketListener(new ReceiveHandler(this), filter);
-    }
+		if (connection == null) {
+			this.finish();
+		}else {
+	        this.connection = connection;
+	        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+	        connection.addPacketListener(new ReceiveHandler(this), filter);
+		}
+	}
 	
 	private class MyPhoneStateListener extends PhoneStateListener {
 
