@@ -14,6 +14,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -481,6 +483,32 @@ public class SenderActivity extends Activity {
 		}else {
 			this.connection = connection;
 		}
+	}
+	
+	public void logIn () {
+		LogInSettings dialog;
+        dialog = new LogInSettings(this);
+        if (isOnline(this)) {
+            dialog.show();
+        }else {
+        	Log.e("Sender:3GConnection", "No network connection available");
+        	finish();
+        }
+		
+	}
+	
+	public boolean isOnline(Context ctx) {
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+
+	    if (info == null || !info.isConnected()) {
+	        return false;
+	    }
+	    //if (info.isRoaming()) {
+	        // here is the roaming option you can change it if you want to
+	        // disable internet while roaming, just return false
+	    //    return false;
+	    //}
+	    return true;
 	}
 	
 	
