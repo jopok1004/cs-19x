@@ -28,7 +28,7 @@ import org.jivesoftware.smack.XMPPConnection;
 
 public class XMPPSender extends Activity {
 
-    private SettingsSender mDialog;
+    private Settings mDialog;
     private EditText mRecipient;
     private XMPPConnection connection;
     
@@ -70,7 +70,7 @@ public class XMPPSender extends Activity {
         
         mRecipient = (EditText) this.findViewById(R.id.recipient);
               
-        mDialog = new SettingsSender(this);
+        mDialog = new Settings(this);
         if (isOnline()) {
             mDialog.show();
         }else {
@@ -214,7 +214,11 @@ public class XMPPSender extends Activity {
     }
 
     public void setConnection (XMPPConnection connection) {
-        this.connection = connection;
+    	if (connection == null) {
+    		this.finish();
+    	}else {
+            this.connection = connection;
+    	}
     }
     
     public XMPPConnection getConnection () {

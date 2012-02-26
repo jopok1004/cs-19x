@@ -52,7 +52,7 @@ public class ReceiveHandler implements PacketListener{
 			Log.i("XMPPReceiver:Receiving", "Goal Map size " + packetSize);
 		}
 	}
-	
+
 	public void processPacket(Packet packet) {
 		Time time = new Time();
 
