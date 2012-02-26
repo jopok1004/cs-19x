@@ -123,8 +123,10 @@ public class SmsReceiver extends BroadcastReceiver {
 				Log.i("NUM", num);
 				size = Integer.parseInt(num);
 				sub = sub.substring(j + 1);
-				i.putExtra("fileType", sub);
+				String tokens[] = sub.split(" ");
+				i.putExtra("fileType", tokens[0]);
 				i.putExtra("size", size);
+				i.putExtra("3GAvailability", tokens[1]);
 				context.startActivity(i);
 
 			}

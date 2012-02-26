@@ -27,6 +27,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 public class SenderInitial extends Activity {
 	private String phoneNo = new String();
@@ -66,7 +68,12 @@ public class SenderInitial extends Activity {
 				String message = txtMessage.getText().toString();
 				if (phoneNo.length() > 0 && message.length() > 0) {
 					//sendSMS(phoneNo, message);
-					//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub);
+					if(haveInternet(getBaseContext())){
+						//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 1");
+					}else{
+						//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 0");
+					}
+					
 					Intent intent = new Intent(SenderInitial.this,
 							SenderActivity.class);
 					intent.putExtra("phoneNum", phoneNo);
@@ -205,7 +212,20 @@ public class SenderInitial extends Activity {
 	}
 
 	
+	public boolean haveInternet(Context ctx) {
 
+	    NetworkInfo info = (NetworkInfo) ((ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+
+	    if (info == null || !info.isConnected()) {
+	        return false;
+	    }
+	    if (info.isRoaming()) {
+	        // here is the roaming option you can change it if you want to
+	        // disable internet while roaming, just return false
+	        return false;
+	    }
+	    return true;
+	}
 	
 }
 

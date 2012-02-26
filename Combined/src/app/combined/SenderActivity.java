@@ -1,7 +1,9 @@
 package app.combined;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
@@ -28,7 +30,8 @@ public class SenderActivity extends Activity {
 	private Boolean check10Received; // for SMS Protocol
 	private int totalresends;		// for SMS Protocol, set to zero every after start of new SMS mode
 	private String sen = "";		// for SMS Protocol, i forgot kung para saan to. LOL
-	
+	private int randomNum;	private Random random = null;		// for MMS
+	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
 	
 	private XMPPConnection connection;
@@ -40,20 +43,22 @@ public class SenderActivity extends Activity {
 		packetList = intent.getStringArrayListExtra("arraylist");
 	}
 
-	
-	
-	//FUNCTIONS FOR SMS PROTOCOL
-	public void sms(String phoneNum, int startIndex) throws IOException{
-		tracker = startIndex;
-		send10(phoneNum);
-	}
-	
 	public void onNewIntent(Intent intent){
+		//SMS
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
 			try {
 				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
 				//DEPENDE SA KUNG ANONG CHANNEL
+				if(){
+					
+					
+				}else{
+					//SEND VIA MMS
+					//sendViaMms(StartIndex)
+				}
+					
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -98,8 +103,26 @@ public class SenderActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
-	}
+		//MMS
+		if ((intent.getStringExtra("start?").toString())
+				.equals("sendAnotherMms")) {
+			try {
+				if (tracker < packetCount) {
+					send1mms(phoneNum);
+				}
 
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	//FUNCTIONS FOR SMS CHANNEL
+	public void sms(String phoneNum, int startIndex) throws IOException{
+		tracker = startIndex;
+		send10(phoneNum);
+	}
 
 	private void send10(String phoneNumber) throws IOException {
 		String submessage = new String();
@@ -180,7 +203,65 @@ public class SenderActivity extends Activity {
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
+	
+	//FOR MMS CHANNEL
+	private void sendViaMms(int startIndex){
+		randomNum = random.nextInt(1000);
+		sendSMS(phoneNum, "SENDVIAMMS" + " 0 " + packetCount + " " + sub + " " + randomNum); // EDIT, REMOVE SUB
+		sendSMS(phoneNum, "MESSAGE"); // %&sendViaMms
+		Log.i("FINISHED", "DONE SENDING SMS");
+		try {
+			Log.i("SENDING MMS", "SENDING MMS");
+			send1mms(phoneNum);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} 	
+	}
+	private void send1mms(String phoneNum) throws IOException {
 
+		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		dialog.setMessage("Sending MMS...");
+		dialog.setCancelable(false);
+		dialog.show();
+		Log.i("CHLOE", "I AM AT PARSER NOW");
+		try {
+			// dialog.show(Mms2Activity.this, "Sending SMS", "Please Wait");
+			// 1024b * 300kb = 307200/160 char = 1920 packets
+
+			String msg = "";
+			for (int i = 0; i < 100 && tracker < packetCount; i++) {
+				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
+						+ "\n";
+				tracker++;
+				Log.i("SUBMESSAGE", msg);
+			}
+			Log.i("parser", "before mms sending");
+			
+			sendMMS(phoneNum, msg);
+			waiting(20);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		dialog.cancel();
+
+	}
+
+
+	private void sendMMS(String phoneNumber, String message) throws IOException {
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.putExtra("sms_body", message);
+		intent.putExtra("address", phoneNumber);
+		intent.putExtra("subject", "mms" + randomNum);
+		intent.setType("image/*");
+		intent.setClassName("com.android.mms",
+				"com.android.mms.ui.ComposeMessageActivity");
+		startActivityForResult(intent, SEND_MMS);
+
+	}
+	
+	//FOR 3G CHANNEL
 	public ArrayList<String> getPacketList() {
 		return this.packetList;
 	}
