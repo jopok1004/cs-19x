@@ -3,10 +3,6 @@ package smack.test;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -15,6 +11,8 @@ import org.jivesoftware.smack.packet.Message;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Debug;
 import android.telephony.PhoneStateListener;
@@ -60,7 +58,7 @@ public class XMPPReceiver extends Activity{
         Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
         
         mDialog = new Settings(this);
-        if (isOnline()) {
+        if (isOnline(this)) {
             mDialog.show();
         }else {
         	Log.e("XMPPReceiver:Connection", "No network connection available");
@@ -69,22 +67,18 @@ public class XMPPReceiver extends Activity{
         Debug.startMethodTracing("ReceiverActivityTrace");
     }
 	
-	public boolean isOnline() {
-		try {
-			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-				NetworkInterface intf = en.nextElement();
-	            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-	            	InetAddress inetAddress = enumIpAddr.nextElement();
-	                if (!inetAddress.isLoopbackAddress()) { 
-	                	Log.e("XMMPReceiver:Status", inetAddress.getHostAddress().toString() );
-	                	return true; 
-	                }
-	            }
-	        }
-	    } catch (SocketException ex) {
-	        Log.e("ServerActivity", ex.toString());
+	public boolean isOnline(Context ctx) {
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+
+	    if (info == null || !info.isConnected()) {
+	        return false;
 	    }
-	    return false;
+	    //if (info.isRoaming()) {
+	        // here is the roaming option you can change it if you want to
+	        // disable internet while roaming, just return false
+	    //    return false;
+	    //}
+	    return true;
 	}
 	
 	public void setConnection (XMPPConnection connection) {
