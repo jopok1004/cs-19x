@@ -27,17 +27,22 @@
         android:label="@string/app_name" >
         <activity
             android:name=".CombinedActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="SenderActivity"></activity>
-        <activity android:name="ReceiverActivity"></activity>
-        <activity android:name="SenderWelcome"></activity>
-        <activity android:name="FileExplore"></activity>
+        <activity android:name="SenderActivity"
+            	  android:screenOrientation="portrait"></activity>
+        <activity android:name="ReceiverActivity"
+                  android:screenOrientation="portrait"></activity>
+        <activity android:name="SenderWelcome"
+                  android:screenOrientation="portrait"></activity>
+        <activity android:name="FileExplore"
+                  android:screenOrientation="portrait"></activity>
         <receiver android:name="SmsReceiver"></receiver>
     </application>
 

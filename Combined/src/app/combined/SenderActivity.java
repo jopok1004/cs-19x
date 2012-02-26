@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.jivesoftware.smack.XMPPConnection;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -57,6 +59,8 @@ public class SenderActivity extends Activity {
 	private int sms_ctr = 0;
 	private int mms_ctr = 0;
 	private int g_ctr = 0;
+	
+	private XMPPConnection connection;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -465,6 +469,18 @@ public class SenderActivity extends Activity {
 			e.printStackTrace();
 		}
 		super.onDestroy();
+	}
+
+	public XMPPConnection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(XMPPConnection connection) {
+		if (connection == null) {
+			finish();
+		}else {
+			this.connection = connection;
+		}
 	}
 	
 	
