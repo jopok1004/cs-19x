@@ -3,7 +3,12 @@ package app.combined;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -25,6 +30,8 @@ public class SenderActivity extends Activity {
 	private String sen = "";		// for SMS Protocol, i forgot kung para saan to. LOL
 	
 	ProgressDialog dialog;
+	
+	private XMPPConnection connection;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		Intent intent = getIntent();
@@ -172,6 +179,48 @@ public class SenderActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+	}
+
+	public ArrayList<String> getPacketList() {
+		return this.packetList;
+	}
+
+	public XMPPConnection getConnection() {
+		return connection;
+	}
+
+
+	public void setConnection(XMPPConnection connection) {
+		if (connection == null) {
+			finish();
+		}else {
+			this.connection = connection;
+		}
+	}
+	
+	public void sendBy3G (String to) {
+		Roster r = getConnection().getRoster();
+		ChatManager chatManage = getConnection().getChatManager();
+        Chat nchat = chatManage.createChat(to, new Sender3GListener(this));
+        
+        if (r.getPresence(to).isAvailable()) {
+        	Log.i("XMPPSender", "ONLINE: Available");
+        	Message message = new Message();
+			message.setType(Message.Type.chat);
+			
+			//message.setBody("%&sendfile " + packetList.size() + " " + getFileType());
+			message.setBody("%&start3G");
+			
+			try {
+				nchat.sendMessage(message);
+				Log.e("XMPPSender:Sending", "Sending text [" + message.getBody() + "] SUCCESS");
+			} catch (XMPPException e) {
+				Log.e("XMPPSender:Sending", "Sending text [" + message.getBody() + "] FAILED");
+			}
+        }else {
+        	Log.i("XMPPSender", "OFFLINE si " + to);
+        }
+        
 	}
 }
 
