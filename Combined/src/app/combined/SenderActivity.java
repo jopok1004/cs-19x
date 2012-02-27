@@ -31,6 +31,7 @@ public class SenderActivity extends Activity {
 	private int totalresends;		// for SMS Protocol, set to zero every after start of new SMS mode
 	private String sen = "";		// for SMS Protocol, i forgot kung para saan to. LOL
 	private int randomNum;	private Random random = null;		// for MMS
+	private int sub;
 	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
 	
@@ -47,22 +48,22 @@ public class SenderActivity extends Activity {
 		//SMS
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
-			try {
-				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
-				//DEPENDE SA KUNG ANONG CHANNEL
-				if(){
-					
-					
-				}else{
-					//SEND VIA MMS
-					//sendViaMms(StartIndex)
-				}
-					
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			try {
+//				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
+//				//DEPENDE SA KUNG ANONG CHANNEL
+//				if(){
+//					
+//					
+//				}else{
+//					//SEND VIA MMS
+//					//sendViaMms(StartIndex)
+//				}
+//					
+//				
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("done receiving")) {
 			done = true;

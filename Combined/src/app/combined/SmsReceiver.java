@@ -38,6 +38,7 @@ public class SmsReceiver extends BroadcastReceiver {
 			}
 
 			// SENDER SIDE
+			//SMS
 			if (msgs[0].getMessageBody().toString().equals("%&start")) {
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
@@ -48,11 +49,11 @@ public class SmsReceiver extends BroadcastReceiver {
 				context.startActivity(i);
 
 			}
-			if (msgs[0].getMessageBody().toString().startsWith("%&done")) {
+			if (msgs[0].getMessageBody().toString().startsWith("%&doneSMS")) {
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
-				i.putExtra("start?", "done receiving");
+				i.putExtra("start?", "done SMS");
 				Toast.makeText(context, "File sent.", Toast.LENGTH_SHORT)
 						.show();
 				context.startActivity(i);
@@ -72,6 +73,21 @@ public class SmsReceiver extends BroadcastReceiver {
 
 				context.startActivity(i);
 			}
+			//MMS
+			if(msgs[0].getMessageBody().toString().startsWith("&%doneMMS")){
+            	this.abortBroadcast();
+            	Intent i = new Intent(context, SenderActivity.class);
+            	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
+            	i.putExtra("start?", "doneMMS");
+                context.startActivity(i);
+            }
+            if(msgs[0].getMessageBody().toString().startsWith("&%mmsreceived")){
+            	this.abortBroadcast();
+            	Intent i = new Intent(context, SenderActivity.class);
+            	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
+            	i.putExtra("start?", "sendAnotherMms");
+                context.startActivity(i);
+            }
 
 			// RECEIVER SIDE
 			//MMS
