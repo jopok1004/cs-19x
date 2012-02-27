@@ -65,7 +65,7 @@ public class Receiver3GListener implements PacketListener{
 		reply.setType(Message.Type.chat);
 		reply.setThread(message.getThread());
 
-		if (message.getBody().startsWith("%&sendfile ")) {
+		if (message.getBody().startsWith("%&start3G")) {
 			String s = message.getBody().substring(11);
 
 			String n = "";
