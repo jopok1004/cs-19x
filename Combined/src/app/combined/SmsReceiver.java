@@ -39,7 +39,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// SENDER SIDE
 			//SMS
-			if (msgs[0].getMessageBody().toString().equals("%&start")) {
+			if (msgs[0].getMessageBody().toString().equals("%& start")) {
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -49,7 +49,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				context.startActivity(i);
 
 			}
-			if (msgs[0].getMessageBody().toString().startsWith("%&doneSMS")) {
+			if (msgs[0].getMessageBody().toString().startsWith("%& doneSMS")) {
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -60,7 +60,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			}
 			
-			if (msgs[0].getMessageBody().toString().startsWith("%&resend")) {
+			if (msgs[0].getMessageBody().toString().startsWith("%& resend")) {
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -74,14 +74,14 @@ public class SmsReceiver extends BroadcastReceiver {
 				context.startActivity(i);
 			}
 			//MMS
-			if(msgs[0].getMessageBody().toString().startsWith("&%doneMMS")){
+			if(msgs[0].getMessageBody().toString().startsWith("%& doneMMS")){
             	this.abortBroadcast();
             	Intent i = new Intent(context, SenderActivity.class);
             	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
             	i.putExtra("start?", "doneMMS");
                 context.startActivity(i);
             }
-            if(msgs[0].getMessageBody().toString().startsWith("&%mmsreceived")){
+            if(msgs[0].getMessageBody().toString().startsWith("%& mmsreceived")){
             	this.abortBroadcast();
             	Intent i = new Intent(context, SenderActivity.class);
             	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
@@ -91,7 +91,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// RECEIVER SIDE
 			//MMS
-			if(msgs[0].getMessageBody().toString().startsWith("SENDVIAMMS")){
+			if(msgs[0].getMessageBody().toString().startsWith("%& sendViaSms")){
             	this.abortBroadcast();
             	Intent i = new Intent(context, ReceiverActivity.class);
             	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
@@ -110,7 +110,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 context.startActivity(i);
             }
 			//SMS
-			if (msgs[0].getMessageBody().toString().startsWith("%&check10")) {
+			if (msgs[0].getMessageBody().toString().startsWith("%& check10")) {
 				Intent i = new Intent(context, ReceiverActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -146,7 +146,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				context.startActivity(i);
 
 			}
-			if (msgs[0].getMessageBody().toString().startsWith("%&sent")) {
+			if (msgs[0].getMessageBody().toString().startsWith("%& sent")) {
 				Intent i = new Intent(context, ReceiverActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
