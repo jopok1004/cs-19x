@@ -35,7 +35,7 @@ public class SenderActivity extends Activity {
 	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
 	
-	private XMPPConnection connection;
+	private XMPPConnection connection; //for 3G connection
 	
 	public void onCreate(Bundle savedInstanceState) {
 		Intent intent = getIntent();
@@ -61,7 +61,6 @@ public class SenderActivity extends Activity {
 //					
 //				
 //			} catch (IOException e) {
-//				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
 		}
@@ -100,7 +99,6 @@ public class SenderActivity extends Activity {
 				Log.i("send10", "Before send10");
 				send10(phoneNum);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -113,12 +111,12 @@ public class SenderActivity extends Activity {
 				}
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
+	// ################################################################################################### //
 	//FUNCTIONS FOR SMS CHANNEL
 	public void sms(String phoneNum, int startIndex) throws IOException{
 		tracker = startIndex;
@@ -205,6 +203,7 @@ public class SenderActivity extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
 	
+	// ################################################################################################### //
 	//FOR MMS CHANNEL
 	private void sendViaMms(int startIndex){
 		randomNum = random.nextInt(1000);
@@ -242,7 +241,6 @@ public class SenderActivity extends Activity {
 			waiting(20);
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		dialog.cancel();
@@ -262,15 +260,24 @@ public class SenderActivity extends Activity {
 
 	}
 	
+	// ################################################################################################### //
 	//FOR 3G CHANNEL
+	
 	public ArrayList<String> getPacketList() {
 		return this.packetList;
+	}
+	
+	public Integer getTracker() {
+		return this.tracker;
+	}
+	
+	public void setTracker(int track) {
+		this.tracker = track;
 	}
 
 	public XMPPConnection getConnection() {
 		return connection;
 	}
-
 
 	public void setConnection(XMPPConnection connection) {
 		if (connection == null) {
@@ -280,7 +287,7 @@ public class SenderActivity extends Activity {
 		}
 	}
 	
-	public void sendBy3G (String to) {
+	public void sendBy3G (String to, int startIndex) {
 		Roster r = getConnection().getRoster();
 		ChatManager chatManage = getConnection().getChatManager();
         Chat nchat = chatManage.createChat(to, new Sender3GListener(this));
