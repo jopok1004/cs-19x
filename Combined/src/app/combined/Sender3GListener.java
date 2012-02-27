@@ -1,7 +1,5 @@
 package app.combined;
 
-import java.io.IOException;
-
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
@@ -12,8 +10,8 @@ import android.util.Log;
 
 public class Sender3GListener implements MessageListener{
 	private SenderActivity sender;
-	private Integer currentPacket;
-	private long t;
+	//private Integer currentPacket;
+	//private long t;
 	
 	public Sender3GListener (SenderActivity sender) {
 		this.sender = sender;
@@ -36,7 +34,7 @@ public class Sender3GListener implements MessageListener{
 		if (message.getBody().equals("%&proceed")) {
 			time.setToNow();
 			//sender.setInitial(time.toMillis(true));
-			setCurrentPacket(0);
+			//setCurrentPacket(0);
 			for (int i = 0; i < 10; i ++) {
 				sendPackets(chat, time);
 				waiting(2);
@@ -44,8 +42,8 @@ public class Sender3GListener implements MessageListener{
 			
 		}else if (message.getBody().equals("%&DONE")) {
 			Log.e("XMPPSender:Sending", "Sending file SUCCESSFUL");
-			setCurrentPacket(0);
-	
+			//setCurrentPacket(0);
+			
 			/*try {
 				sender.getWriter().write((t - sender.getT1()) + " : total time\n");
 				sender.getWriter().write(sender.getT2() - sender.getT1() + " : processing time\n");
@@ -76,17 +74,18 @@ public class Sender3GListener implements MessageListener{
 			String packet = "";
 			while (counter < 40) {
 				
-				if (getCurrentPacket() == sender.getPacketList().size()) {
+				//if (getCurrentPacket() == sender.getPacketList().size()) {
+				if (sender.getTracker() == sender.getPacketList().size()) {
 					time.setToNow();
-					t = time.toMillis(true);
+					//t = time.toMillis(true);
 					break;
 				}
 				
-				line = sender.getPacketList().get(getCurrentPacket());
-				packet = packet + "%&" + getCurrentPacket() + " " + line;
-				setCurrentPacket(getCurrentPacket() + 1);
+				line = sender.getPacketList().get(sender.getTracker());
+				packet = packet + "%&" + sender.getTracker() + " " + line;
+				//setCurrentPacket(getCurrentPacket() + 1);
+				sender.setTracker(sender.getTracker() + 1);
 				counter++;
-				//waiting(2);
 			}
 			
 			if (!packet.equals("")) {
@@ -111,19 +110,18 @@ public class Sender3GListener implements MessageListener{
 				}*/
 				
 				Log.e("XMPPSender:Sending", "Sending text [" + reply.getBody() + "] SUCCESS");
-				//waiting(2);
 			}
 		} catch (XMPPException e) {
 			Log.e("XMPPSender:Sending", "Sending text packet FAILED");
 		}
 	}
 
-	public Integer getCurrentPacket() {
+	/*public Integer getCurrentPacket() {
 		return currentPacket;
 	}
 
 	public void setCurrentPacket(Integer currentPacket) {
 		this.currentPacket = currentPacket;
-	}
+	}*/
 	
 }
