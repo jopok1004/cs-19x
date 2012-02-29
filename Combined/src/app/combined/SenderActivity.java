@@ -48,21 +48,22 @@ public class SenderActivity extends Activity {
 		//SMS
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
-//			try {
-//				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
-//				//DEPENDE SA KUNG ANONG CHANNEL
-//				if(){
-//					
-//					
-//				}else{
-//					//SEND VIA MMS
-//					//sendViaMms(StartIndex)
-//				}
-//					
-//				
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			while(tracker < packetCount){
+				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
+				//DEPENDE SA KUNG ANONG CHANNEL
+				if(){
+					
+					
+				}else{
+					//SEND VIA MMS
+					//sendViaMms(StartIndex)
+				}
+				
+			}
+				
+					
+				
+			
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("done receiving")) {
 			done = true;
@@ -118,7 +119,7 @@ public class SenderActivity extends Activity {
 	
 	// ################################################################################################### //
 	//FUNCTIONS FOR SMS CHANNEL
-	public void sms(String phoneNum, int startIndex) throws IOException{
+	public void sendViaSms(String phoneNum, int startIndex) throws IOException{
 		tracker = startIndex;
 		send10(phoneNum);
 	}
@@ -207,7 +208,7 @@ public class SenderActivity extends Activity {
 	//FOR MMS CHANNEL
 	private void sendViaMms(int startIndex){
 		randomNum = random.nextInt(1000);
-		sendSMS(phoneNum, "SENDVIAMMS" + " 0 " + packetCount + " " + sub + " " + randomNum); // EDIT, REMOVE SUB
+		sendSMS(phoneNum, "%& sendViaMms" + startIndex); // EDIT, REMOVE SUB
 		sendSMS(phoneNum, "MESSAGE"); // %&sendViaMms
 		Log.i("FINISHED", "DONE SENDING SMS");
 		try {

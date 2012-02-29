@@ -91,7 +91,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// RECEIVER SIDE
 			//MMS
-			if(msgs[0].getMessageBody().toString().startsWith("%& sendViaSms")){
+			if(msgs[0].getMessageBody().toString().startsWith("%& sendViaMms")){
             	this.abortBroadcast();
             	Intent i = new Intent(context, ReceiverActivity.class);
             	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
@@ -99,14 +99,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 i.putExtra("start?","startMmsReceive");
                 i.putExtra("phoneNum",msgs[0].getOriginatingAddress().toString());
                 String sub = msgs[0].getMessageBody().substring(11);
-                String tokens[] = sub.split(" ");
-                for(int j=0;j<tokens.length;j++) {
-                	Log.i("TOKEN "+j,tokens[j]);
-                }
-                
-                i.putExtra("initial", Integer.parseInt(tokens[0]));
-                i.putExtra("end", Integer.parseInt(tokens[1]));
-                i.putExtra("filetype", tokens[2]);
+                i.putExtra("startIndex", Integer.parseInt(sub));
                 context.startActivity(i);
             }
 			//SMS
