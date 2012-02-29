@@ -39,11 +39,13 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// SENDER SIDE
 			//SMS
-			if (msgs[0].getMessageBody().toString().equals("%& start")) {
+			if (msgs[0].getMessageBody().toString().equals("%& start ")) {
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
+				String sub = msgs[0].getMessageBody().substring(9);
 				i.putExtra("start?", "start sending");
+				i.putExtra("isOnline", sub);
 				i.putExtra("phoneNum", msgs[0].getOriginatingAddress()
 						.toString());
 				context.startActivity(i);
@@ -135,7 +137,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				String tokens[] = sub.split(" ");
 				i.putExtra("fileType", tokens[0]);
 				i.putExtra("size", size);
-				i.putExtra("3GAvailability", tokens[1]);
+				i.putExtra("isOnline", tokens[1]);
 				context.startActivity(i);
 
 			}

@@ -68,7 +68,7 @@ public class SenderInitial extends Activity {
 				String message = txtMessage.getText().toString();
 				if (phoneNo.length() > 0 && message.length() > 0) {
 					//sendSMS(phoneNo, message);
-					if(haveInternet(getBaseContext())){
+					if(isOnline(getBaseContext())){
 						//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 1");
 					}else{
 						//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 0");
@@ -212,18 +212,17 @@ public class SenderInitial extends Activity {
 	}
 
 	
-	public boolean haveInternet(Context ctx) {
-
-	    NetworkInfo info = (NetworkInfo) ((ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+	public boolean isOnline(Context ctx) {
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
 	    if (info == null || !info.isConnected()) {
 	        return false;
 	    }
-	    if (info.isRoaming()) {
+	    //if (info.isRoaming()) {
 	        // here is the roaming option you can change it if you want to
 	        // disable internet while roaming, just return false
-	        return false;
-	    }
+	    //    return false;
+	    //}
 	    return true;
 	}
 	
