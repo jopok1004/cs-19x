@@ -3,6 +3,8 @@ package app.combined;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.jivesoftware.smack.XMPPConnection;
@@ -12,14 +14,19 @@ import org.jivesoftware.smack.packet.Message;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Debug;
-import android.telephony.*;
+import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
@@ -36,21 +43,68 @@ public class ReceiverActivity extends Activity {
 	SmsReceiver rcvd;
 	HashMap<Integer, String> al = new HashMap();
 	TelephonyManager Tel;
-	MyPhoneStateListener MyListener;
+	//MyPhoneStateListener MyListener;
 	int size; // number of messages to be received
 	String fileT;
 	int messageSize = 10;
 	long last, current;
 	private XMPPConnection connection;
+	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
+	private Time time;
+	int temporary=0;
+	int tempalsize;
+	int alsize = 0;
+	private Uri mmsInURI = Uri.parse("content://mms-sms");
+	private BroadcastReceiver mmsMonitorBroadcastReceiver;
+	private int initial;
+	ContentObserver mmsObserver = new ContentObserver(null) {
+		@Override
+		public void onChange(boolean selfChange) {
+
+			Thread mmsNotify = new Thread() {
+				@Override
+				public void run() {
+					Intent mIntent = new Intent(MMSMON_RECEIVED_MMS);
+					sendBroadcast(mIntent);
+					super.run();
+				}
+			};
+			mmsNotify.start();
+			super.onChange(selfChange);
+			// try here
+
+			Log.i("MMS Received", "MMS RECEIVED HAHA");
+			try {
+				Log.i("SEARCHING", "SEARCHING MMS AGAIN");
+				//checkMMSMessages();
+				//temporary=tempalsize;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// end try
+
+		}
+	};
+	private int end;
+	private String fileType;
+	private File file;
+	private BufferedWriter bw1;
+	private FileWriter fw;
+	private BufferedWriter bw;
+	private FileWriter fw1;
+	private boolean started;
+	private File fileoutput = new File("/sdcard/outputreceiver.txt");
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 
-		MyListener = new MyPhoneStateListener();
-		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+		//MyListener = new MyPhoneStateListener();
+		//Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		//Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		Intent intent = getIntent();
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
@@ -77,6 +131,32 @@ public class ReceiverActivity extends Activity {
 							.show();
 			}
 		});
+		//FOR MMS
+		mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+
+				Log.i("MMS Received", "MMS RECEIVED HAHA");
+				try {
+					Log.i("SEARCHING", "SEARCHING MMS AGAIN");
+					checkMMSMessages();
+					temporary = tempalsize;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+
+		IntentFilter mIntentFilter = new IntentFilter();
+		mIntentFilter.addAction(MMSMON_RECEIVED_MMS);
+
+		registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
+
+		getApplicationContext().getContentResolver().registerContentObserver(
+				mmsInURI, true, mmsObserver);
+		getApplicationContext().getContentResolver().notifyChange(mmsInURI,
+				mmsObserver);
 	}
 	//FOR SMS
 	public void onNewIntent(Intent intent) {
@@ -141,8 +221,250 @@ public class ReceiverActivity extends Activity {
 			}
 
 		}
+		//FOR MMS
+		//Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
+		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
+			time = new Time();
+			if (started == false) {
+				Debug.startMethodTracing("mmsreceiver");
+				started = true;
+			}
+			try {
+				fw1 = new FileWriter(fileoutput);
+				bw1 = new BufferedWriter(fw1);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			Log.i("RECEIVED SMS", "RECEIVED SMS");
+			phoneNo = intent.getStringExtra("phoneNum");
+			Log.i("Phone num", phoneNo);
+			initial = intent.getIntExtra("initial", 0);
+			Log.i("initial", Integer.toString(initial));
+			end = intent.getIntExtra("end", 0);
+			Log.i("end", Integer.toString(end));
+			size = end - initial;
+			Log.i("size", "SIZE: " + Integer.toString(size));
+
+			fileType = intent.getStringExtra("filetype");
+			Log.i("fileType", fileType);
+
+		}
 	}
-	
+	//FOR MMS
+	private void checkMMSMessages() throws IOException {
+		
+		if (bw1 != null) {
+			tempalsize = alsize;
+			alsize = al.size();
+			String[] coloumns = null;
+			String[] values = null;
+			ArrayList<Integer> mid = new ArrayList<Integer>();
+			fw = new FileWriter(file);
+
+			bw = new BufferedWriter(fw);
+
+			Cursor curPart = this
+					.getApplicationContext()
+					.getContentResolver()
+					.query(Uri.parse("content://mms/inbox"), null, null, null,
+							null);
+
+			bw.write("TABLE 3\n");
+			for (int i = 0; i < curPart.getColumnCount(); i++) {
+				bw.write("column " + i + ": " + curPart.getColumnName(i));
+				bw.write("\n");
+			}
+
+			bw.write("SUBJECTS " + curPart.getCount());
+			curPart.moveToFirst();
+			for (int i = 0; i < curPart.getCount(); i++) {
+				bw.write("Subject " + i + ": "
+						+ curPart.getString(curPart.getColumnIndex("sub"))
+						+ "MESSAGE ID"
+						+ curPart.getInt(curPart.getColumnIndex("_id")));
+				bw.write("\n");
+
+				// add to List the mid of the MMS that is currently in the
+				// inbox
+
+				mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
+
+				curPart.moveToNext();
+			}
+
+			for (int i = 0; i < mid.size(); i++) {
+				bw.write("MID: " + mid.get(i) + "\n");
+			}
+			curPart.moveToFirst();
+
+			curPart = this
+					.getApplicationContext()
+					.getContentResolver()
+					.query(Uri.parse("content://mms/part"), null, null, null,
+							null);
+			bw.write("CURPART TEXT\n");
+
+			if (curPart.moveToFirst()) {
+				do {
+					coloumns = curPart.getColumnNames();
+
+					if (values == null)
+						values = new String[coloumns.length];
+
+					// just get the TEXT part
+					for (int i = 0; i < mid.size(); i++) {
+
+						String[] packets;
+						String[] packets2;
+
+						if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
+								.get(i)) {
+							time.setToNow();
+							bw1.write(time.toString() + " : packet num:"
+									+ al.size() + "\n");
+							String text = curPart.getString(curPart
+									.getColumnIndex("text"));
+							if (text != null) {
+								if (text.startsWith("&%")) {
+									packets = text.split("&% ");
+									// bw.write("MID: " + mid.get(i) + "\tTEXT:"
+									// + text + "\n");
+									for (int j = 0; j < packets.length; j++) {
+										// bw.write("packet " + j + ": " +
+										// packets[j]
+										// + "\n");
+										Log.i("PACKETS", packets[j]);
+										if (packets[j] != null) {
+											packets2 = packets[j].split(" ");
+											if (!packets2[0].equals("")) {
+												Log.i("packets2[0]",
+														packets2[0]);
+												Log.i("packets2[1]",
+														packets2[1]);
+												int pNum = Integer
+														.parseInt(packets2[0]);
+												Log.i("pNum", "pNum: " + pNum);
+												Log.i("packet", packets2[1]);
+												if (!al.containsKey(pNum)) {
+													al.put(pNum, packets2[1]);
+												}
+
+												Log.i("AL SIZE", "AL SIZE: "
+														+ al.size());
+												if (al.size() == size) {
+													receiveFile();
+												}
+											}
+
+										}
+
+									}
+								}
+							}
+
+						}
+
+					}
+
+				} while (curPart.moveToNext());
+				alsize = al.size();
+				
+				if (tempalsize != alsize) {
+					Log.i("SIZES", "ALSIZES: tempalsize: "+tempalsize + " alsize: "+alsize);
+					Log.i("MMS", "NARECEIVE KO NA SI MMS");
+					if(received==false) {
+						sendSMS(phoneNo, "&%mmsreceived");
+					}
+					
+					getContentResolver().delete(Uri.parse("content://mms"), null,
+							null);
+				}
+			}
+			curPart.close();
+			// for (int k = 0; k < mid.size(); k++) {
+			// getContentResolver().delete(
+			// Uri.parse("content://mms/inbox/" + mid.get(k)), null, null);
+			//
+			// }
+//			alsize = al.size();
+//			if (tempalsize != alsize) {
+//				Log.i("SIZES", "ALSIZES: "+tempalsize + " "+alsize);
+//				Log.i("MMS", "NARECEIVE KO NA SI MMS");
+//				if(received==false) {
+//					sendSMS(phoneNum, "&%mmsreceived");
+//				}
+//				
+//				getContentResolver().delete(Uri.parse("content://mms"), null,
+//						null);
+//			}
+		}
+		
+
+	}
+	public void receiveFile() {
+		long t1, t2;
+		if (bw1 != null) {
+
+			if (al.size() == size) {
+				try {
+					received = true;
+					FileWriter fw2 = new FileWriter(new File(
+							"/sdcard/decode.txt"));
+					BufferedWriter bw2 = new BufferedWriter(fw2);
+					for (int i = 0; i < size; i++) {
+						bw2.write(al.get(i) + "\n");
+
+					}
+
+					bw2.close();
+					fw2.close();
+
+					Log.i("WRITING TO FILE", "FILEWRITER");
+					time.setToNow();
+					t1 = time.toMillis(true);
+					Base64FileDecoder.decodeFile("/sdcard/decode.txt",
+							"/sdcard/file." + fileType + ".gz");
+					time.setToNow();
+					t2 = time.toMillis(true);
+					bw1.write("Decoding T2-T1: " + (t2 - t1) + "\n");
+
+					time.setToNow();
+					bw1.write(time.toString()
+							+ " : after decode and before unzip\n");
+
+					// File fl = new File("/sdcard/decode.txt");
+					// fl.delete();
+					time.setToNow();
+					t1 = time.toMillis(true);
+					compression.decompressGzip("/sdcard/file." + fileType
+							+ ".gz");
+					time.setToNow();
+					t2 = time.toMillis(true);
+					bw1.write("Decompressing T2-T1: " + (t2 - t1) + "\n");
+					bw1.write(time.toString() + " : after decompress\n");
+					bw1.write("After Decompression: T2-T1: " + (t2 - t1));
+					File fl = new File("/sdcard/file." + fileType + ".gz");
+					fl.delete();
+					bw1.close();
+					fw1.close();
+					al.clear();
+					bw1 = null;
+					Log.i("DONE!!!", "DONE");
+					sendSMS(phoneNo, "&%done");
+					Debug.stopMethodTracing();
+					
+					this.finish();
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				// sreceived=true;
+			}
+		}
+	}
 	
 	//FOR 3G
 
@@ -227,5 +549,10 @@ public class ReceiverActivity extends Activity {
 	        return false;
 	    }
 	    return true;
+	}
+	public void onDestroy() {
+		unregisterReceiver(mmsMonitorBroadcastReceiver);
+		bw1 = null;
+		super.onDestroy();
 	}
 }

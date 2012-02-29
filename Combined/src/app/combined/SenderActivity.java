@@ -51,13 +51,13 @@ public class SenderActivity extends Activity {
 			while(tracker < packetCount){
 				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
 				//DEPENDE SA KUNG ANONG CHANNEL
-				if(){
-					
-					
-				}else{
-					//SEND VIA MMS
-					//sendViaMms(StartIndex)
-				}
+//				if(){
+//					
+//					
+//				}else{
+//					//SEND VIA MMS
+//					//sendViaMms(StartIndex)
+//				}
 				
 			}
 				
