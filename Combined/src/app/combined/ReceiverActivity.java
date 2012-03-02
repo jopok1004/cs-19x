@@ -398,6 +398,7 @@ public class ReceiverActivity extends Activity {
 //				getContentResolver().delete(Uri.parse("content://mms"), null,
 //						null);
 //			}
+			
 		}
 		
 
