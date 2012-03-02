@@ -43,7 +43,7 @@ public class ReceiverActivity extends Activity {
 	SmsReceiver rcvd;
 	HashMap<Integer, String> al = new HashMap();
 	TelephonyManager Tel;
-	// MyPhoneStateListener MyListener;
+	//MyPhoneStateListener MyListener;
 	int size; // number of messages to be received
 	String fileT;
 	int messageSize = 10;
@@ -51,7 +51,7 @@ public class ReceiverActivity extends Activity {
 	private XMPPConnection connection;
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
 	private Time time;
-	int temporary = 0;
+	int temporary=0;
 	int tempalsize;
 	int alsize = 0;
 	private Uri mmsInURI = Uri.parse("content://mms-sms");
@@ -67,16 +67,16 @@ public class ReceiverActivity extends Activity {
 	private FileWriter fw1;
 	private boolean started;
 	private File fileoutput = new File("/sdcard/outputreceiver.txt");
-
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
 
-		// MyListener = new MyPhoneStateListener();
-		// Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		// Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+		//MyListener = new MyPhoneStateListener();
+		//Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		//Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		Intent intent = getIntent();
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
@@ -86,10 +86,10 @@ public class ReceiverActivity extends Activity {
 			public void onClick(View v) {
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
-					if (haveInternet(getBaseContext())) {
-						// sendSMS(phoneNo, "%& start 1");
-					} else {
-						// sendSMS(phoneNo, "%& start 0");
+					if(haveInternet(getBaseContext())){
+						//sendSMS(phoneNo, "%& start 1");
+					}else{
+						//sendSMS(phoneNo, "%& start 0");
 					}
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
@@ -103,7 +103,7 @@ public class ReceiverActivity extends Activity {
 							.show();
 			}
 		});
-		// FOR MMS
+		//FOR MMS
 		mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -130,8 +130,7 @@ public class ReceiverActivity extends Activity {
 		getApplicationContext().getContentResolver().notifyChange(mmsInURI,
 				mmsObserver);
 	}
-
-	// FOR SMS
+	//FOR SMS
 	public void onNewIntent(Intent intent) {
 		Log.i("INTENT", intent.getStringExtra("start?").toString());
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
@@ -149,8 +148,7 @@ public class ReceiverActivity extends Activity {
 			currentp = Integer.parseInt(intent.getStringExtra("tracker"));
 			resend = "%&resend ";
 			for (int i = (currentp % 10); i >= 0 && currentp < size; i--) {
-				if (al.containsKey(currentp - i - 1) == false
-						&& received == false) {
+				if (al.containsKey(currentp - i - 1) == false && received ==false) {
 					resend = resend + (currentp - i - 1) + " ";
 					Log.i("if not containskey", "checking for missing packets");
 					Log.i("resend", resend);
@@ -164,7 +162,7 @@ public class ReceiverActivity extends Activity {
 						resend = resend + k + " ";
 						Log.i("if not containskey",
 								"checking for missing packets");
-
+						
 						Log.i("resend", resend);
 						okay = false;
 					}
@@ -195,8 +193,8 @@ public class ReceiverActivity extends Activity {
 			}
 
 		}
-		// FOR MMS
-		// Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
+		//FOR MMS
+		//Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
 			time = new Time();
 			if (started == false) {
@@ -225,112 +223,189 @@ public class ReceiverActivity extends Activity {
 
 		}
 	}
-
-	// FOR MMS
+	//FOR MMS
 	private void checkMMSMessages() throws IOException {
+		
+			tempalsize = alsize;
+			alsize = al.size();
+			String[] coloumns = null;
+			String[] values = null;
+			ArrayList<Integer> mid = new ArrayList<Integer>();
 
-		tempalsize = alsize;
-		alsize = al.size();
-		String[] coloumns = null;
-		String[] values = null;
-		ArrayList<Integer> mid = new ArrayList<Integer>();
+			Cursor curPart = this
+					.getApplicationContext()
+					.getContentResolver()
+					.query(Uri.parse("content://mms/inbox"), null, null, null,
+							null);
 
-		Cursor curPart = this
-				.getApplicationContext()
-				.getContentResolver()
-				.query(Uri.parse("content://mms/inbox"), null, null, null, null);
+			
 
-		curPart.moveToFirst();
-		for (int i = 0; i < curPart.getCount(); i++) {
+			
+			curPart.moveToFirst();
+			for (int i = 0; i < curPart.getCount(); i++) {
+				
 
-			// add to List the mid of the MMS that is currently in the
-			// inbox
+				// add to List the mid of the MMS that is currently in the
+				// inbox
 
-			mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
+				mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
 
-			curPart.moveToNext();
-		}
+				curPart.moveToNext();
+			}
 
-		curPart.moveToFirst();
+			
+			curPart.moveToFirst();
 
-		curPart = this.getApplicationContext().getContentResolver()
-				.query(Uri.parse("content://mms/part"), null, null, null, null);
+			curPart = this
+					.getApplicationContext()
+					.getContentResolver()
+					.query(Uri.parse("content://mms/part"), null, null, null,
+							null);
 
-		if (curPart.moveToFirst()) {
-			do {
-				coloumns = curPart.getColumnNames();
+			if (curPart.moveToFirst()) {
+				do {
+					coloumns = curPart.getColumnNames();
 
-				if (values == null)
-					values = new String[coloumns.length];
+					if (values == null)
+						values = new String[coloumns.length];
 
-				// just get the TEXT part
-				for (int i = 0; i < mid.size(); i++) {
+					// just get the TEXT part
+					for (int i = 0; i < mid.size(); i++) {
 
-					String[] packets;
-					String[] packets2;
+						String[] packets;
+						String[] packets2;
 
-					if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
-							.get(i)) {
-						String text = curPart.getString(curPart
-								.getColumnIndex("text"));
-						if (text != null) {
-							if (text.startsWith("&%")) {
-								packets = text.split("&% ");
-								// bw.write("MID: " + mid.get(i) + "\tTEXT:"
-								// + text + "\n");
-								for (int j = 0; j < packets.length; j++) {
-									// bw.write("packet " + j + ": " +
-									// packets[j]
-									// + "\n");
-									Log.i("PACKETS", packets[j]);
-									if (packets[j] != null) {
-										packets2 = packets[j].split(" ");
-										if (!packets2[0].equals("")) {
-											Log.i("packets2[0]", packets2[0]);
-											Log.i("packets2[1]", packets2[1]);
-											int pNum = Integer
-													.parseInt(packets2[0]);
-											Log.i("pNum", "pNum: " + pNum);
-											Log.i("packet", packets2[1]);
-											if (!al.containsKey(pNum)) {
-												al.put(pNum, packets2[1]);
+						if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
+								.get(i)) {
+							String text = curPart.getString(curPart
+									.getColumnIndex("text"));
+							if (text != null) {
+								if (text.startsWith("&%")) {
+									packets = text.split("&% ");
+									// bw.write("MID: " + mid.get(i) + "\tTEXT:"
+									// + text + "\n");
+									for (int j = 0; j < packets.length; j++) {
+										// bw.write("packet " + j + ": " +
+										// packets[j]
+										// + "\n");
+										Log.i("PACKETS", packets[j]);
+										if (packets[j] != null) {
+											packets2 = packets[j].split(" ");
+											if (!packets2[0].equals("")) {
+												Log.i("packets2[0]",
+														packets2[0]);
+												Log.i("packets2[1]",
+														packets2[1]);
+												int pNum = Integer
+														.parseInt(packets2[0]);
+												Log.i("pNum", "pNum: " + pNum);
+												Log.i("packet", packets2[1]);
+												if (!al.containsKey(pNum)) {
+													al.put(pNum, packets2[1]);
+												}
+
+												Log.i("AL SIZE", "AL SIZE: "
+														+ al.size());
+												if (al.size() == size) {
+													receiveFile();
+												}
 											}
-
-											Log.i("AL SIZE",
-													"AL SIZE: " + al.size());
 
 										}
 
 									}
-
 								}
 							}
+
 						}
 
 					}
 
+				} while (curPart.moveToNext());
+				alsize = al.size();
+				
+				if (tempalsize != alsize) {
+					Log.i("SIZES", "ALSIZES: tempalsize: "+tempalsize + " alsize: "+alsize);
+					Log.i("MMS", "NARECEIVE KO NA SI MMS");
+					if(received==false) {
+						sendSMS(phoneNo, "&%mmsreceived");
+					}
+					
+					getContentResolver().delete(Uri.parse("content://mms"), null,
+							null);
 				}
-
-			} while (curPart.moveToNext());
-			alsize = al.size();
-
-			if (tempalsize != alsize) {
-				Log.i("SIZES", "ALSIZES: tempalsize: " + tempalsize
-						+ " alsize: " + alsize);
-				Log.i("MMS", "NARECEIVE KO NA SI MMS");
-				if (received == false) {
-					sendSMS(phoneNo, "&%mmsreceived");
-				}
-
-				getContentResolver().delete(Uri.parse("content://mms"), null,
-						null);
 			}
-		}
-		curPart.close();
+			curPart.close();
+
+			
+		
+		
 
 	}
+	public void receiveFile() {
+		long t1, t2;
+		if (bw1 != null) {
 
-	// FOR 3G
+			if (al.size() == size) {
+				try {
+					received = true;
+					FileWriter fw2 = new FileWriter(new File(
+							"/sdcard/decode.txt"));
+					BufferedWriter bw2 = new BufferedWriter(fw2);
+					for (int i = 0; i < size; i++) {
+						bw2.write(al.get(i) + "\n");
+
+					}
+
+					
+
+					Log.i("WRITING TO FILE", "FILEWRITER");
+					time.setToNow();
+					t1 = time.toMillis(true);
+					Base64FileDecoder.decodeFile("/sdcard/decode.txt",
+							"/sdcard/file." + fileType + ".gz");
+					time.setToNow();
+					t2 = time.toMillis(true);
+					bw1.write("Decoding T2-T1: " + (t2 - t1) + "\n");
+
+					time.setToNow();
+					bw1.write(time.toString()
+							+ " : after decode and before unzip\n");
+
+					// File fl = new File("/sdcard/decode.txt");
+					// fl.delete();
+					time.setToNow();
+					t1 = time.toMillis(true);
+					compression.decompressGzip("/sdcard/file." + fileType
+							+ ".gz");
+					time.setToNow();
+					t2 = time.toMillis(true);
+					bw1.write("Decompressing T2-T1: " + (t2 - t1) + "\n");
+					bw1.write(time.toString() + " : after decompress\n");
+					bw1.write("After Decompression: T2-T1: " + (t2 - t1));
+					File fl = new File("/sdcard/file." + fileType + ".gz");
+					fl.delete();
+					bw1.close();
+					fw1.close();
+					al.clear();
+					bw1 = null;
+					Log.i("DONE!!!", "DONE");
+					sendSMS(phoneNo, "&%done");
+					Debug.stopMethodTracing();
+					
+					this.finish();
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				// sreceived=true;
+			}
+		}
+	}
+	
+	//FOR 3G
 
 	public XMPPConnection getConnection() {
 		return connection;
@@ -339,42 +414,45 @@ public class ReceiverActivity extends Activity {
 	public void setConnection(XMPPConnection connection) {
 		if (connection == null) {
 			this.finish();
-		} else {
-			this.connection = connection;
-			PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-			connection.addPacketListener(new Receiver3GListener(this), filter);
+		}else {
+	        this.connection = connection;
+	        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+	        connection.addPacketListener(new Receiver3GListener(this), filter);
 		}
 	}
-
-	public void logIn() {
+	
+	public void logIn () {
 		LogInSettings dialog;
-		dialog = new LogInSettings(this);
-		if (isOnline(this)) {
-			dialog.show();
-		} else {
-			Log.e("Receiver:3GConnection", "No network connection available");
-			finish();
-		}
-
+        dialog = new LogInSettings(this);
+        if (isOnline(this)) {
+            dialog.show();
+        }else {
+        	Log.e("Receiver:3GConnection", "No network connection available");
+        	finish();
+        }
+		
 	}
-
+	
 	public boolean isOnline(Context ctx) {
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx
-				.getSystemService(Context.CONNECTIVITY_SERVICE))
-				.getActiveNetworkInfo();
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
-		if (info == null || !info.isConnected()) {
-			return false;
-		}
-		// if (info.isRoaming()) {
-		// here is the roaming option you can change it if you want to
-		// disable internet while roaming, just return false
-		// return false;
-		// }
-		return true;
+	    if (info == null || !info.isConnected()) {
+	        return false;
+	    }
+	    //if (info.isRoaming()) {
+	        // here is the roaming option you can change it if you want to
+	        // disable internet while roaming, just return false
+	    //    return false;
+	    //}
+	    return true;
 	}
 
-	// COMMON FUNCTIONS
+	
+	
+
+	
+	
+	//COMMON FUNCTIONS
 	private void sendSMS(String phoneNumber, String message) {
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
@@ -388,7 +466,6 @@ public class ReceiverActivity extends Activity {
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
-
 	public static void waiting(int n) {
 		long t0, t1;
 		t0 = System.currentTimeMillis();
@@ -397,24 +474,21 @@ public class ReceiverActivity extends Activity {
 			t1 = System.currentTimeMillis();
 		} while ((t1 - t0) < (n * 1000));
 	}
-
+	
 	public boolean haveInternet(Context ctx) {
 
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx
-				.getSystemService(Context.CONNECTIVITY_SERVICE))
-				.getActiveNetworkInfo();
+	    NetworkInfo info = (NetworkInfo) ((ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
-		if (info == null || !info.isConnected()) {
-			return false;
-		}
-		if (info.isRoaming()) {
-			// here is the roaming option you can change it if you want to
-			// disable internet while roaming, just return false
-			return false;
-		}
-		return true;
+	    if (info == null || !info.isConnected()) {
+	        return false;
+	    }
+	    if (info.isRoaming()) {
+	        // here is the roaming option you can change it if you want to
+	        // disable internet while roaming, just return false
+	        return false;
+	    }
+	    return true;
 	}
-
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		bw1 = null;
