@@ -56,6 +56,7 @@ public class ReceiverActivity extends Activity {
 	int alsize = 0;
 	private Uri mmsInURI = Uri.parse("content://mms-sms");
 	private BroadcastReceiver mmsMonitorBroadcastReceiver;
+	private BroadcastReceiver threeGMonitorBroadcastReceiver;
 	private int initial;
 	ContentObserver mmsObserver;
 	private int end;
@@ -86,7 +87,7 @@ public class ReceiverActivity extends Activity {
 			public void onClick(View v) {
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
-					if(haveInternet(getBaseContext())){
+					if(isOnline(getBaseContext())){
 						//sendSMS(phoneNo, "%& start 1");
 					}else{
 						//sendSMS(phoneNo, "%& start 0");
@@ -103,6 +104,25 @@ public class ReceiverActivity extends Activity {
 							.show();
 			}
 		});
+		
+		threeGMonitorBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+			     Log.d("app","Network connectivity change");
+			     if(intent.getExtras()!=null) {
+			        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
+			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
+			            Log.i("app","Network "+ni.getTypeName()+" connected");
+			            //send sms na connected
+			        }
+			     }
+			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
+			            Log.e("app","There's no network connectivity");
+			          //send sms na di connected
+			     }
+				
+			}
+		};
 		//FOR MMS
 		mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
@@ -122,7 +142,9 @@ public class ReceiverActivity extends Activity {
 
 		IntentFilter mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(MMSMON_RECEIVED_MMS);
-
+		IntentFilter gIntentFilter = new IntentFilter();
+		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+		registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
 		registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
 
 		getApplicationContext().getContentResolver().registerContentObserver(
@@ -220,6 +242,11 @@ public class ReceiverActivity extends Activity {
 
 			fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
+
+		}
+		//FOR 3G
+		if ((intent.getStringExtra("start?")).equals("start3GReceive")) {
+			logIn();
 
 		}
 	}
@@ -406,7 +433,7 @@ public class ReceiverActivity extends Activity {
 	}
 	
 	//FOR 3G
-
+	
 	public XMPPConnection getConnection() {
 		return connection;
 	}
@@ -475,20 +502,6 @@ public class ReceiverActivity extends Activity {
 		} while ((t1 - t0) < (n * 1000));
 	}
 	
-	public boolean haveInternet(Context ctx) {
-
-	    NetworkInfo info = (NetworkInfo) ((ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-
-	    if (info == null || !info.isConnected()) {
-	        return false;
-	    }
-	    if (info.isRoaming()) {
-	        // here is the roaming option you can change it if you want to
-	        // disable internet while roaming, just return false
-	        return false;
-	    }
-	    return true;
-	}
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		bw1 = null;

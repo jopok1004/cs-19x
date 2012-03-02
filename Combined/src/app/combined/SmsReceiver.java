@@ -184,10 +184,17 @@ public class SmsReceiver extends BroadcastReceiver {
 				context.startActivity(i);
 
 			}
-			
-			
-
 			// Toast.makeText(context,str, Toast.LENGTH_SHORT).show();
+			
+			//FOR 3G
+			if(msgs[0].getMessageBody().toString().startsWith("%& sendVia3G")){
+            	this.abortBroadcast();
+            	Intent i = new Intent(context, ReceiverActivity.class);
+            	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
+                i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
+                i.putExtra("start?","start3GReceive");
+                context.startActivity(i);
+            }
 
 		}
 	}

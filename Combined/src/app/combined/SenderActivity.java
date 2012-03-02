@@ -15,8 +15,10 @@ import org.jivesoftware.smack.packet.Message;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 public class SenderActivity extends Activity {
 	private String phoneNum;
 	private ArrayList<String> packetList = new ArrayList<String>();
+	private BroadcastReceiver threeGMonitorBroadcastReceiver;
 	private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
 	private int packetCount;
 	private int tracker= 0; 		//current packet number
@@ -45,6 +48,27 @@ public class SenderActivity extends Activity {
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
+		threeGMonitorBroadcastReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+			     Log.d("app","Network connectivity change");
+			     if(intent.getExtras()!=null) {
+			        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
+			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
+			            Log.i("app","Network "+ni.getTypeName()+" connected");
+			            //send sms na connected
+			        }
+			     }
+			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
+			            Log.e("app","There's no network connectivity");
+			          //send sms na di connected
+			     }
+				
+			}
+		};
+		IntentFilter gIntentFilter = new IntentFilter();
+		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+		registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
 	}
 
 	public void onNewIntent(Intent intent){
