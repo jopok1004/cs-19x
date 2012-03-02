@@ -57,35 +57,7 @@ public class ReceiverActivity extends Activity {
 	private Uri mmsInURI = Uri.parse("content://mms-sms");
 	private BroadcastReceiver mmsMonitorBroadcastReceiver;
 	private int initial;
-	ContentObserver mmsObserver = new ContentObserver(null) {
-		@Override
-		public void onChange(boolean selfChange) {
-
-			Thread mmsNotify = new Thread() {
-				@Override
-				public void run() {
-					Intent mIntent = new Intent(MMSMON_RECEIVED_MMS);
-					sendBroadcast(mIntent);
-					super.run();
-				}
-			};
-			mmsNotify.start();
-			super.onChange(selfChange);
-			// try here
-
-			Log.i("MMS Received", "MMS RECEIVED HAHA");
-			try {
-				Log.i("SEARCHING", "SEARCHING MMS AGAIN");
-				//checkMMSMessages();
-				//temporary=tempalsize;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			// end try
-
-		}
-	};
+	ContentObserver mmsObserver;
 	private int end;
 	private String fileType;
 	private File file;
@@ -254,15 +226,11 @@ public class ReceiverActivity extends Activity {
 	//FOR MMS
 	private void checkMMSMessages() throws IOException {
 		
-		if (bw1 != null) {
 			tempalsize = alsize;
 			alsize = al.size();
 			String[] coloumns = null;
 			String[] values = null;
 			ArrayList<Integer> mid = new ArrayList<Integer>();
-			fw = new FileWriter(file);
-
-			bw = new BufferedWriter(fw);
 
 			Cursor curPart = this
 					.getApplicationContext()
@@ -270,20 +238,12 @@ public class ReceiverActivity extends Activity {
 					.query(Uri.parse("content://mms/inbox"), null, null, null,
 							null);
 
-			bw.write("TABLE 3\n");
-			for (int i = 0; i < curPart.getColumnCount(); i++) {
-				bw.write("column " + i + ": " + curPart.getColumnName(i));
-				bw.write("\n");
-			}
+			
 
-			bw.write("SUBJECTS " + curPart.getCount());
+			
 			curPart.moveToFirst();
 			for (int i = 0; i < curPart.getCount(); i++) {
-				bw.write("Subject " + i + ": "
-						+ curPart.getString(curPart.getColumnIndex("sub"))
-						+ "MESSAGE ID"
-						+ curPart.getInt(curPart.getColumnIndex("_id")));
-				bw.write("\n");
+				
 
 				// add to List the mid of the MMS that is currently in the
 				// inbox
@@ -293,9 +253,7 @@ public class ReceiverActivity extends Activity {
 				curPart.moveToNext();
 			}
 
-			for (int i = 0; i < mid.size(); i++) {
-				bw.write("MID: " + mid.get(i) + "\n");
-			}
+			
 			curPart.moveToFirst();
 
 			curPart = this
@@ -303,7 +261,6 @@ public class ReceiverActivity extends Activity {
 					.getContentResolver()
 					.query(Uri.parse("content://mms/part"), null, null, null,
 							null);
-			bw.write("CURPART TEXT\n");
 
 			if (curPart.moveToFirst()) {
 				do {
@@ -320,9 +277,6 @@ public class ReceiverActivity extends Activity {
 
 						if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
 								.get(i)) {
-							time.setToNow();
-							bw1.write(time.toString() + " : packet num:"
-									+ al.size() + "\n");
 							String text = curPart.getString(curPart
 									.getColumnIndex("text"));
 							if (text != null) {
@@ -382,24 +336,9 @@ public class ReceiverActivity extends Activity {
 				}
 			}
 			curPart.close();
-			// for (int k = 0; k < mid.size(); k++) {
-			// getContentResolver().delete(
-			// Uri.parse("content://mms/inbox/" + mid.get(k)), null, null);
-			//
-			// }
-//			alsize = al.size();
-//			if (tempalsize != alsize) {
-//				Log.i("SIZES", "ALSIZES: "+tempalsize + " "+alsize);
-//				Log.i("MMS", "NARECEIVE KO NA SI MMS");
-//				if(received==false) {
-//					sendSMS(phoneNum, "&%mmsreceived");
-//				}
-//				
-//				getContentResolver().delete(Uri.parse("content://mms"), null,
-//						null);
-//			}
+
 			
-		}
+		
 		
 
 	}
