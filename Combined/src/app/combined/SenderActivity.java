@@ -15,7 +15,10 @@ import org.jivesoftware.smack.packet.Message;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -24,13 +27,13 @@ import android.widget.Toast;
 public class SenderActivity extends Activity {
 	private String phoneNum;
 	private ArrayList<String> packetList = new ArrayList<String>();
+	private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
 	private int packetCount;
-	private int tracker; 		//current packet number
+	private int tracker= 0; 		//current packet number
 	private Boolean done; 		//to check for end of file sharing
 	private Boolean check10Received; // for SMS Protocol
 	private int totalresends;		// for SMS Protocol, set to zero every after start of new SMS mode
-	private String sen = "";		// for SMS Protocol, i forgot kung para saan to. LOL
-	private int randomNum;	private Random random = null;		// for MMS
+	private Boolean mmsReceived;
 	private int sub;
 	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
@@ -49,22 +52,19 @@ public class SenderActivity extends Activity {
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
 
 			while(tracker < packetCount){
+				
 				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
 				//DEPENDE SA KUNG ANONG CHANNEL
-//				if(){
-//					
-//					
-//				}else{
-//					//SEND VIA MMS
-//					//sendViaMms(StartIndex)
-//				}
+				if(isOnline(getBaseContext()) && intent.getStringExtra("isOnline").equals("1")){
+					logIn();
+					sendBy3G("chloebelleaquino@gmail.com", tracker);
+				}else{
+					sendViaMms(tracker);
+				}
 				
 			}
-				
-					
-				
-			
 		}
+		
 		if ((intent.getStringExtra("start?").toString()).equals("done receiving")) {
 			done = true;
 			Toast.makeText(getBaseContext(), "Done Sending", Toast.LENGTH_SHORT);
@@ -106,6 +106,7 @@ public class SenderActivity extends Activity {
 		//MMS
 		if ((intent.getStringExtra("start?").toString())
 				.equals("sendAnotherMms")) {
+			mmsReceived= true;
 			try {
 				if (tracker < packetCount) {
 					send1mms(phoneNum);
@@ -119,12 +120,14 @@ public class SenderActivity extends Activity {
 	
 	// ################################################################################################### //
 	//FUNCTIONS FOR SMS CHANNEL
-	public void sendViaSms(String phoneNum, int startIndex) throws IOException{
-		tracker = startIndex;
-		send10(phoneNum);
+
+	public void sendViaSms(String phoneNo, int startIndex) throws IOException{
+
+		sendSMS(phoneNum, "%& sendViaSms" + startIndex);
+		send10(phoneNo);
 	}
 
-	private void send10(String phoneNumber) throws IOException {
+	private void send10(String phoneNo) throws IOException {
 		String submessage = new String();
 		String headerBegin = new String();
 		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -135,28 +138,27 @@ public class SenderActivity extends Activity {
 		dialog.show();
 
 		// dialog.show(SmsMessagingActivity.this, "Sending SMS", "Please Wait");
-		sen = "sending";
 		for (int counter = 0; counter < 10; counter++) {
 			Log.i("send10", "inside send10 for loop");
 			headerBegin = "&% " + tracker + " ";
 			submessage = headerBegin + packetList.get(tracker);
 			tracker++;
 			Log.i("SUBMESSAGE", submessage);
-			Log.i("PHONE NUMBER", phoneNumber);
-			sendSMS(phoneNumber, submessage);
+			Log.i("PHONE NUMBER", phoneNo);
+			sendSMS(phoneNo, submessage);
 			waiting(3);
 
 		}
 		check10Received= false;
-		sendSMS(phoneNumber, "%&check10 " + tracker);
+		sendSMS(phoneNo, "%& check10 " + tracker);
 		Log.i("After send tracker", "tracker" + tracker);
 	
-		Thread thread = new waitThread();
+		Thread thread = new smsWaitThread();
 		thread.start();
 		dialog.cancel();
 
 	}
-	class waitThread extends Thread {
+	class smsWaitThread extends Thread {
 	    // This method is called when the thread runs
 	    public void run() {
 	    	long t0, t1;
@@ -207,9 +209,8 @@ public class SenderActivity extends Activity {
 	// ################################################################################################### //
 	//FOR MMS CHANNEL
 	private void sendViaMms(int startIndex){
-		randomNum = random.nextInt(1000);
 		sendSMS(phoneNum, "%& sendViaMms" + startIndex); // EDIT, REMOVE SUB
-		sendSMS(phoneNum, "MESSAGE"); // %&sendViaMms
+
 		Log.i("FINISHED", "DONE SENDING SMS");
 		try {
 			Log.i("SENDING MMS", "SENDING MMS");
@@ -237,8 +238,10 @@ public class SenderActivity extends Activity {
 				Log.i("SUBMESSAGE", msg);
 			}
 			Log.i("parser", "before mms sending");
-			
+			mmsReceived= false;
 			sendMMS(phoneNum, msg);
+			Thread thread = new mmsWaitThread();
+			thread.start();
 			waiting(20);
 
 		} catch (FileNotFoundException e) {
@@ -253,7 +256,7 @@ public class SenderActivity extends Activity {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.putExtra("sms_body", message);
 		intent.putExtra("address", phoneNumber);
-		intent.putExtra("subject", "mms" + randomNum);
+		intent.putExtra("subject", "mms");
 		intent.setType("image/*");
 		intent.setClassName("com.android.mms",
 				"com.android.mms.ui.ComposeMessageActivity");
@@ -261,6 +264,25 @@ public class SenderActivity extends Activity {
 
 	}
 	
+	class mmsWaitThread extends Thread {
+	    // This method is called when the thread runs
+	    public void run() {
+	    	long t0, t1;
+			t0 = System.currentTimeMillis();
+			do {
+				t1 = System.currentTimeMillis();
+			} while ((t1 - t0) < (300 * 1000) && mmsReceived==false && done==false); //wait for 5 minutes
+			if(mmsReceived||done==true){
+				//do nothing
+			}else{
+				Log.i("shift to sms", "shift to sms");
+				//SHIFT TO SMS
+				
+			}
+			
+	    }
+	    
+	}
 	// ################################################################################################### //
 	//FOR 3G CHANNEL
 	
@@ -289,6 +311,7 @@ public class SenderActivity extends Activity {
 	}
 	
 	public void sendBy3G (String to, int startIndex) {
+		sendSMS(phoneNum, "%& sendVia3G");
 		Roster r = getConnection().getRoster();
 		ChatManager chatManage = getConnection().getChatManager();
         Chat nchat = chatManage.createChat(to, new Sender3GListener(this));
@@ -311,6 +334,30 @@ public class SenderActivity extends Activity {
         	Log.i("XMPPSender", "OFFLINE si " + to);
         }
         
+	}
+	public void logIn () {
+		LogInSettings dialog;
+        dialog = new LogInSettings(this);
+        if (isOnline(this)) {
+            dialog.show();
+        }else {
+        	Log.e("Receiver:3GConnection", "No network connection available");
+        	finish();
+        }
+		
+	}
+	public boolean isOnline(Context ctx) {
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+
+	    if (info == null || !info.isConnected()) {
+	        return false;
+	    }
+	    //if (info.isRoaming()) {
+	        // here is the roaming option you can change it if you want to
+	        // disable internet while roaming, just return false
+	    //    return false;
+	    //}
+	    return true;
 	}
 }
 
