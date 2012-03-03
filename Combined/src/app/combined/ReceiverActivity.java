@@ -247,7 +247,7 @@ public class ReceiverActivity extends Activity {
 			//size = end - initial;
 			Log.i("size", "SIZE: " + Integer.toString(size));
 
-			fileType = intent.getStringExtra("filetype");
+			//fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
 
 		}

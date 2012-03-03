@@ -1,10 +1,5 @@
 package app.combined;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
@@ -17,13 +12,12 @@ public class Receiver3GListener implements PacketListener{
 	
 	private ReceiverActivity receiver;
 	//private String fileType;
-	private int packetSize;
+	//private int packetSize;
 	private long messCtr;
-	private HashMap<Integer, String> packetList = new HashMap<Integer, String>();
+	//private HashMap<Integer, String> packetList = new HashMap<Integer, String>();
 
 	public Receiver3GListener (ReceiverActivity receiver) {
 		this.receiver = receiver;
-		packetList.clear();
 	}
 
 	public void getPackets(String body, Time time) {
@@ -36,7 +30,7 @@ public class Receiver3GListener implements PacketListener{
 			
 			packetNum = Integer.parseInt(data[0]);
 			packetLine = data[1];
-			packetList.put(packetNum, packetLine);
+			receiver.al.put(packetNum, packetLine);
 			
 			time.setToNow();
 			/*if (packetList.size() == 1) {
@@ -48,7 +42,7 @@ public class Receiver3GListener implements PacketListener{
 				e1.printStackTrace();
 			}*/
 			Log.i("XMPPReceiver:Receiving", "Received Packet number " + packetNum + " with value " + packetLine);
-			Log.i("XMPPReceiver:Receiving", "Current Map size " + Integer.toString(packetList.size()));
+			Log.i("XMPPReceiver:Receiving", "Current Map size " + Integer.toString(receiver.al.size()));
 			//Log.i("XMPPReceiver:Receiving", "Goal Map size " + packetSize);
 		}
 	}
@@ -113,7 +107,7 @@ public class Receiver3GListener implements PacketListener{
 			//String s = message.getBody().substring(2);
 			getPackets(message.getBody(),time);
 			setMessCtr(getMessCtr() + 1);
-			if (packetList.size() == packetSize) {
+			if (receiver.al.size() == receiver.size) {
 				finishing(time);
 					
 				Log.i("XMPPReceiver:File", "Finished");
