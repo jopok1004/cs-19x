@@ -37,6 +37,7 @@ public class SenderActivity extends Activity {
 	private Boolean check10Received; // for SMS Protocol
 	private int totalresends;		// for SMS Protocol, set to zero every after start of new SMS mode
 	private Boolean mmsReceived;
+	private Boolean receiverIsOnline;
 	private int sub;
 	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
@@ -56,11 +57,18 @@ public class SenderActivity extends Activity {
 			        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
 			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
+			            if(receiverIsOnline){
+			            	sendBy3G("chloebelleaquino@gmail.com",tracker);
+			            }else{
+			            	sendViaMms(tracker);
+			            }
+			            
 			            //send sms na connected
 			        }
 			     }
 			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
 			            Log.e("app","There's no network connectivity");
+			            sendViaMms(tracker);
 			          //send sms na di connected
 			     }
 				
@@ -73,19 +81,14 @@ public class SenderActivity extends Activity {
 
 	public void onNewIntent(Intent intent){
 		//SMS
-		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {
-
-			while(tracker < packetCount){
-				
-				//sms(intent.getStringExtra("phoneNum").toString(), 0);	
-				//DEPENDE SA KUNG ANONG CHANNEL
-				if(isOnline(getBaseContext()) && intent.getStringExtra("isOnline").equals("1")){
-					logIn();
-					sendBy3G("chloebelleaquino@gmail.com", tracker);
-				}else{
-					sendViaMms(tracker);
-				}
-				
+		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {	
+			//sms(intent.getStringExtra("phoneNum").toString(), 0);	
+			//DEPENDE SA KUNG ANONG CHANNEL
+			if(isOnline(getBaseContext()) && intent.getStringExtra("isOnline").equals("1")){
+				logIn();
+				sendBy3G("chloebelleaquino@gmail.com", tracker);
+			}else{
+				sendViaMms(tracker);
 			}
 		}
 		
@@ -138,6 +141,14 @@ public class SenderActivity extends Activity {
 
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+		//3G
+		if ((intent.getStringExtra("start?").toString()).equals("receiverConnectivity")) {
+			if(intent.getStringExtra("isOnline").toString().equals("1")){
+				receiverIsOnline= true;
+			}else{
+				receiverIsOnline= false;
 			}
 		}
 	}

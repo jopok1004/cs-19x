@@ -113,11 +113,13 @@ public class ReceiverActivity extends Activity {
 			        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
 			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
+			            sendSMS(phoneNo,"%& receiverConnectivity 1");
 			            //send sms na connected
 			        }
 			     }
 			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
 			            Log.e("app","There's no network connectivity");
+			            sendSMS(phoneNo,"%& receiverConnectivity 0");
 			          //send sms na di connected
 			     }
 				
@@ -159,7 +161,12 @@ public class ReceiverActivity extends Activity {
 			Log.i("GETCONFIRM", "GETCONFIRM");
 			size = intent.getIntExtra("size", 10);
 			fileT = intent.getStringExtra("fileType");
-
+			//send ng reply
+			if(isOnline(getBaseContext())){
+				sendSMS(phoneNo, "%& start 1");
+			}else{
+				sendSMS(phoneNo, "%& start 0");
+			}
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("check10")) {
 			Boolean okay = true;

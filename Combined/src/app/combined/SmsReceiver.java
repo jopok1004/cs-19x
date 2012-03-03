@@ -75,6 +75,20 @@ public class SmsReceiver extends BroadcastReceiver {
 
 				context.startActivity(i);
 			}
+			
+			if (msgs[0].getMessageBody().toString().startsWith("%& receiverConnectivity")) {
+				Intent i = new Intent(context, SenderActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
+						| Intent.FLAG_ACTIVITY_NEW_TASK);
+				i.putExtra("start?", "receiverConnectivity");
+				i.putExtra("phoneNum", msgs[0].getOriginatingAddress()
+						.toString());
+				String sub = msgs[0].getMessageBody().substring(24);
+
+				i.putExtra("isOnline", sub);
+
+				context.startActivity(i);
+			}
 			//MMS
 			if(msgs[0].getMessageBody().toString().startsWith("%& doneMMS")){
             	this.abortBroadcast();
