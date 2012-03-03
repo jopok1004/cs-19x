@@ -16,7 +16,7 @@ import android.util.Log;
 public class Receiver3GListener implements PacketListener{
 	
 	private ReceiverActivity receiver;
-	private String fileType;
+	//private String fileType;
 	private int packetSize;
 	private long messCtr;
 	private HashMap<Integer, String> packetList = new HashMap<Integer, String>();
@@ -49,7 +49,7 @@ public class Receiver3GListener implements PacketListener{
 			}*/
 			Log.i("XMPPReceiver:Receiving", "Received Packet number " + packetNum + " with value " + packetLine);
 			Log.i("XMPPReceiver:Receiving", "Current Map size " + Integer.toString(packetList.size()));
-			Log.i("XMPPReceiver:Receiving", "Goal Map size " + packetSize);
+			//Log.i("XMPPReceiver:Receiving", "Goal Map size " + packetSize);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class Receiver3GListener implements PacketListener{
 		reply.setThread(message.getThread());
 
 		if (message.getBody().startsWith("%&start3G")) {
-			String s = message.getBody().substring(11);
+			/*String s = message.getBody().substring(11);
 
 			String n = "";
 			int i;
@@ -75,9 +75,9 @@ public class Receiver3GListener implements PacketListener{
 			}
 			packetSize = Integer.parseInt(n);
 			fileType = s.substring(i + 1);
-			setMessCtr(0);
 			Log.i("XMPPReceiver:Receiving", "Packet size = " + packetSize + " File type = " + fileType);
-			
+			*/
+			setMessCtr(0);
 			reply.setBody("%&proceed");
 			Log.e("XMPPReceiver:Sending", "Sending text [" + reply.getBody() + "]");
 			receiver.getConnection().sendPacket(reply);
@@ -132,7 +132,9 @@ public class Receiver3GListener implements PacketListener{
 	}
 	
 	private void  finishing(Time time) {
+		/*
 		try {
+			
 			time.setToNow();
 			//receiver.setT1(time.toMillis(true));
 			//receiver.getWriter().write(time.toString() + " : Before write to file\n");
@@ -157,16 +159,16 @@ public class Receiver3GListener implements PacketListener{
 			file.delete();
 			
 			time.setToNow();
-			/*receiver.setT2(time.toMillis(true));
+			receiver.setT2(time.toMillis(true));
 			receiver.getWriter().write(time.toString() + " : After unzip\n");
 			receiver.getWriter().write(receiver.getT1() - receiver.getInitial() + " : start of receiveing to before processing\n");
 			receiver.getWriter().write(receiver.getT2() - receiver.getT1() + " : processing time\n");
 			receiver.getWriter().write(receiver.getT2() - receiver.getInitial() + " : start of receiveing to end of processing\n");
 			receiver.getWriter().close();
-			*/
+			
 		} catch (IOException e) {
 			Log.e("XMPPReceiver:File", "ERROR in File Creation");
-		}
+		}*/
 	}
 
 	public long getMessCtr() {

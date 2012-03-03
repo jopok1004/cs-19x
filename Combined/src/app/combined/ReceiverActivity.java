@@ -41,7 +41,7 @@ public class ReceiverActivity extends Activity {
 	Button btnSendConfirmation;
 	EditText txtPhoneNo;
 	SmsReceiver rcvd;
-	HashMap<Integer, String> al = new HashMap();
+	HashMap<Integer, String> al = new HashMap<Integer, String>();
 	TelephonyManager Tel;
 	//MyPhoneStateListener MyListener;
 	int size; // number of messages to be received
