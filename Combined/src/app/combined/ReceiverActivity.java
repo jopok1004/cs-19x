@@ -209,7 +209,10 @@ public class ReceiverActivity extends Activity {
 				
 				Log.i("AL SIZE", Integer.toString(al.size()));
 				Log.i("SIZE", Integer.toString(size));
-				receiveFile();
+				if(al.size() == size){
+					receiveFile();
+				}
+				
 			}
 
 		}
