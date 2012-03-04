@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -61,6 +65,9 @@ public class ReceiverActivity extends Activity {
 	private String fileType;
 	private boolean started;
 	private File fileoutput = new File("/sdcard/outputreceiver.txt");
+	
+	private String username;
+	private String password;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -402,16 +409,55 @@ public class ReceiverActivity extends Activity {
 		}
 	}
 	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 	public void logIn () {
-		LogInSettings dialog;
-        dialog = new LogInSettings(this);
         if (isOnline(this)) {
-            dialog.show();
+        	if (getUsername() == null && getPassword() == null) {
+        		LogInSettings lDialog;
+                lDialog = new LogInSettings(this);
+                lDialog.show();
+        	}else {
+        		establishConnection(getUsername(), getPassword());
+        	}
         }else {
-        	Log.e("Receiver:3GConnection", "No network connection available");
-        	finish();
+        	Log.e("Receiver:3GConnection", "No internet connectivity available");
         }
 		
+	}
+	
+	public void establishConnection(String user, String pwd) {
+		 SASLAuthentication.supportSASLMechanism("PLAIN");
+	     ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
+	     XMPPConnection conn = new XMPPConnection(connConfig);
+	     try {
+	            conn.connect();
+	            Log.i("XMPPClient", "[SettingsDialog] Connected to " + conn.getHost());
+	        	conn.login(user, pwd);
+	            Log.i("XMPPClient", "Logged in as " + conn.getUser());
+	            
+	            Presence presence = new Presence(Presence.Type.available, "", 24, Presence.Mode.chat);
+	            conn.sendPacket(presence);
+	            
+	            setConnection(conn);
+	     } catch (XMPPException ex) {
+	            Log.e("XMPPClient", "[SettingsDialog] Failed to connect to " + conn.getHost());
+	            setConnection(null);
+	     }
 	}
 	
 	public boolean isOnline(Context ctx) {

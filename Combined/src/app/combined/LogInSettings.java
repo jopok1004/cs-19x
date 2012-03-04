@@ -42,7 +42,7 @@ public class LogInSettings extends Dialog implements android.view.View.OnClickLi
 		 String username = getText(R.id.userid);
 	     String password = getText(R.id.password);
 	     
-	     SASLAuthentication.supportSASLMechanism("PLAIN");
+	     /*SASLAuthentication.supportSASLMechanism("PLAIN");
 	     ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
 	     XMPPConnection connection = new XMPPConnection(connConfig);
 	     try {
@@ -67,6 +67,15 @@ public class LogInSettings extends Dialog implements android.view.View.OnClickLi
 	            }else {
 	            	receiver.setConnection(null);
 	            }
+	     }*/
+	     if (isSender) {
+	    	 sender.setUsername(username);
+	    	 sender.setPassword(password);
+	    	 sender.establishConnection(username, password);
+	     }else {
+	    	 receiver.setUsername(username);
+	    	 receiver.setPassword(password);
+	    	 receiver.establishConnection(username, password);
 	     }
 	     dismiss();
 	}

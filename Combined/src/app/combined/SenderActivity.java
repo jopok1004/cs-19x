@@ -6,10 +6,13 @@ import java.util.ArrayList;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Presence;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -42,6 +45,8 @@ public class SenderActivity extends Activity {
 	ProgressDialog dialog;
 	
 	private XMPPConnection connection; //for 3G connection
+	private String username;
+	private String password;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		Intent intent = getIntent();
@@ -360,12 +365,28 @@ public class SenderActivity extends Activity {
 
 	public void setConnection(XMPPConnection connection) {
 		if (connection == null) {
-			finish();
+			Log.e("Receiver:3GConnection", "Connection failure");
 		}else {
 			this.connection = connection;
 		}
 	}
 	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	public void sendBy3G (String to, int startIndex) {
 		sendSMS(phoneNum, "%& sendVia3G");
 		Roster r = getConnection().getRoster();
@@ -391,17 +412,42 @@ public class SenderActivity extends Activity {
         }
         
 	}
+	
 	public void logIn () {
-		LogInSettings dialog;
-        dialog = new LogInSettings(this);
         if (isOnline(this)) {
-            dialog.show();
+        	if (getUsername() == null && getPassword() == null) {
+        		LogInSettings lDialog;
+                lDialog = new LogInSettings(this);
+                lDialog.show();
+        	}else {
+        		establishConnection(getUsername(), getPassword());
+        	}
         }else {
-        	Log.e("Receiver:3GConnection", "No network connection available");
-        	finish();
+        	Log.e("Receiver:3GConnection", "No internet connectivity available");
         }
 		
 	}
+	
+	public void establishConnection(String user, String pwd) {
+		 SASLAuthentication.supportSASLMechanism("PLAIN");
+	     ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
+	     XMPPConnection conn = new XMPPConnection(connConfig);
+	     try {
+	            conn.connect();
+	            Log.i("XMPPClient", "[SettingsDialog] Connected to " + conn.getHost());
+	        	conn.login(user, pwd);
+	            Log.i("XMPPClient", "Logged in as " + conn.getUser());
+	            
+	            Presence presence = new Presence(Presence.Type.available, "", 24, Presence.Mode.chat);
+	            conn.sendPacket(presence);
+	            
+	            setConnection(conn);
+	     } catch (XMPPException ex) {
+	            Log.e("XMPPClient", "[SettingsDialog] Failed to connect to " + conn.getHost());
+	            setConnection(null);
+	     }
+	}
+	
 	public boolean isOnline(Context ctx) {
 		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
