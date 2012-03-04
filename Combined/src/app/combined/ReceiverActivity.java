@@ -237,7 +237,6 @@ public class ReceiverActivity extends Activity {
 		//FOR 3G
 		if ((intent.getStringExtra("start?")).equals("start3GReceive")) {
 			logIn();
-
 		}
 	}
 	//FOR MMS

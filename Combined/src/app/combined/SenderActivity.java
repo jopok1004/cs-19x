@@ -37,10 +37,9 @@ public class SenderActivity extends Activity {
 	private int tracker= 0; 		//current packet number
 	private Boolean done; 		//to check for end of file sharing
 	private Boolean check10Received; // for SMS Protocol
-	private int totalresends;		// for SMS Protocol, set to zero every after start of new SMS mode
+	private int send10Resends;		// for SMS Protocol, number of resends per 10 packets
 	private Boolean mmsReceived;
 	private Boolean receiverIsOnline;
-	private int sub;
 	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
 	
@@ -115,7 +114,7 @@ public class SenderActivity extends Activity {
 			} else {
 				String[] num;
 				num = resend.split(" ");
-
+				send10Resends = 0;
 				for (int i = 0; i < num.length; i++) {
 
 					if (!num[i].equals(" ") || !num[i].equals("") || !num[i].equals("\n")) {
@@ -125,7 +124,7 @@ public class SenderActivity extends Activity {
 						Log.e("RESEND LIST", num[i]);
 						sendSMS(phoneNum, "&% " + j + " " + packetList.get(j));
 						Log.i("RESENT", packetList.get(j));
-						totalresends++;
+						send10Resends++;
 					}
 
 				}
@@ -134,8 +133,16 @@ public class SenderActivity extends Activity {
 
 			try {
 				Log.i("send10", "Before send10");
-				if(currentChannel == 1){
-					send10(phoneNum);
+				if(currentChannel == 0){
+					if(send10Resends<5){
+						send10(phoneNum);
+						//continue with sms since resends < 5
+					}else{
+						//shift to mms
+						currentChannel = 1;
+						sendViaMms(tracker);
+					}
+					
 				}
 				
 			} catch (IOException e) {
