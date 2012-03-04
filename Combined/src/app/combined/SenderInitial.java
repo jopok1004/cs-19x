@@ -1,25 +1,21 @@
 package app.combined;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
-import android.telephony.PhoneStateListener;
-import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
-import android.telephony.TelephonyManager;
 import android.text.InputFilter;
 import android.text.format.Time;
 import android.util.Log;
@@ -27,8 +23,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 
 public class SenderInitial extends Activity {
 	private String phoneNo = new String();

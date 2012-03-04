@@ -3,7 +3,6 @@ package app.combined;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;

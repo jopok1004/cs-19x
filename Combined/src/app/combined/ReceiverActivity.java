@@ -33,7 +33,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 public class ReceiverActivity extends Activity {
 	Boolean received = false;
 	Boolean initialR = false;
@@ -43,7 +42,6 @@ public class ReceiverActivity extends Activity {
 	SmsReceiver rcvd;
 	HashMap<Integer, String> al = new HashMap<Integer, String>();
 	TelephonyManager Tel;
-	//MyPhoneStateListener MyListener;
 	int size; // number of messages to be received
 	String fileT;
 	int messageSize = 10;
@@ -61,11 +59,6 @@ public class ReceiverActivity extends Activity {
 	ContentObserver mmsObserver;
 	private int end;
 	private String fileType;
-	private File file;
-	private BufferedWriter bw1;
-	private FileWriter fw;
-	private BufferedWriter bw;
-	private FileWriter fw1;
 	private boolean started;
 	private File fileoutput = new File("/sdcard/outputreceiver.txt");
 	
@@ -74,10 +67,6 @@ public class ReceiverActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.receiver);
-
-		//MyListener = new MyPhoneStateListener();
-		//Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		//Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		Intent intent = getIntent();
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
@@ -88,14 +77,13 @@ public class ReceiverActivity extends Activity {
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
 					if(isOnline(getBaseContext())){
-						//sendSMS(phoneNo, "%& start 1");
+						sendSMS(phoneNo, "%& start 1");
 					}else{
-						//sendSMS(phoneNo, "%& start 0");
+						sendSMS(phoneNo, "%& start 0");
 					}
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
-					Debug.startMethodTracing("receiver1", 32000000);
 					btnSendConfirmation.setClickable(false);
 
 				} else
@@ -161,12 +149,7 @@ public class ReceiverActivity extends Activity {
 			Log.i("GETCONFIRM", "GETCONFIRM");
 			size = intent.getIntExtra("size", 10);
 			fileT = intent.getStringExtra("fileType");
-			//send ng reply
-			if(isOnline(getBaseContext())){
-				sendSMS(phoneNo, "%& start 1");
-			}else{
-				sendSMS(phoneNo, "%& start 0");
-			}
+			//reply on button click
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("check10")) {
 			Boolean okay = true;
@@ -175,7 +158,7 @@ public class ReceiverActivity extends Activity {
 			String resend = "";
 			int currentp;
 			currentp = Integer.parseInt(intent.getStringExtra("tracker"));
-			resend = "%&resend ";
+			resend = "%& resend ";
 			for (int i = (currentp % 10); i >= 0 && currentp < size; i--) {
 				if (al.containsKey(currentp - i - 1) == false && received ==false) {
 					resend = resend + (currentp - i - 1) + " ";
@@ -198,7 +181,7 @@ public class ReceiverActivity extends Activity {
 				}
 			}
 			if (okay == true) {
-				sendSMS(phoneNo, "%&resend none");
+				sendSMS(phoneNo, "%& resend none");
 			} else {
 				sendSMS(phoneNo, resend);
 			}
@@ -229,13 +212,6 @@ public class ReceiverActivity extends Activity {
 			if (started == false) {
 				Debug.startMethodTracing("mmsreceiver");
 				started = true;
-			}
-			try {
-				fw1 = new FileWriter(fileoutput);
-				bw1 = new BufferedWriter(fw1);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
 			}
 			Log.i("RECEIVED SMS", "RECEIVED SMS");
 			phoneNo = intent.getStringExtra("phoneNum");
@@ -362,7 +338,7 @@ public class ReceiverActivity extends Activity {
 					Log.i("SIZES", "ALSIZES: tempalsize: "+tempalsize + " alsize: "+alsize);
 					Log.i("MMS", "NARECEIVE KO NA SI MMS");
 					if(received==false) {
-						sendSMS(phoneNo, "&%mmsreceived");
+						sendSMS(phoneNo, "%& mmsreceived");
 					}
 					
 					getContentResolver().delete(Uri.parse("content://mms"), null,
@@ -377,65 +353,36 @@ public class ReceiverActivity extends Activity {
 
 	}
 	public void receiveFile() {
-		long t1, t2;
-		if (bw1 != null) {
 
-			if (al.size() == size) {
-				try {
-					received = true;
-					FileWriter fw2 = new FileWriter(new File(
-							"/sdcard/decode.txt"));
-					BufferedWriter bw2 = new BufferedWriter(fw2);
-					for (int i = 0; i < size; i++) {
-						bw2.write(al.get(i) + "\n");
-
-					}
-
-					
-
-					Log.i("WRITING TO FILE", "FILEWRITER");
-					time.setToNow();
-					t1 = time.toMillis(true);
-					Base64FileDecoder.decodeFile("/sdcard/decode.txt",
-							"/sdcard/file." + fileType + ".gz");
-					time.setToNow();
-					t2 = time.toMillis(true);
-					bw1.write("Decoding T2-T1: " + (t2 - t1) + "\n");
-
-					time.setToNow();
-					bw1.write(time.toString()
-							+ " : after decode and before unzip\n");
-
-					// File fl = new File("/sdcard/decode.txt");
-					// fl.delete();
-					time.setToNow();
-					t1 = time.toMillis(true);
-					compression.decompressGzip("/sdcard/file." + fileType
-							+ ".gz");
-					time.setToNow();
-					t2 = time.toMillis(true);
-					bw1.write("Decompressing T2-T1: " + (t2 - t1) + "\n");
-					bw1.write(time.toString() + " : after decompress\n");
-					bw1.write("After Decompression: T2-T1: " + (t2 - t1));
-					File fl = new File("/sdcard/file." + fileType + ".gz");
-					fl.delete();
-					bw1.close();
-					fw1.close();
-					al.clear();
-					bw1 = null;
-					Log.i("DONE!!!", "DONE");
-					sendSMS(phoneNo, "&%done");
-					Debug.stopMethodTracing();
-					
-					this.finish();
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		if (al.size() == size) {
+			try {
+				FileWriter fw1 = new FileWriter(new File("/sdcard/decode.txt"));
+				for (int i = 0; i < size; i++) {
+					fw1.write(al.get(i) + "\n");
 				}
+				fw1.close();
 
-				// sreceived=true;
+				Log.i("WRITING TO FILE", "FILEWRITER");
+				
+				Base64FileDecoder.decodeFile("/sdcard/decode.txt","/sdcard/file." + fileT + ".gz");
+				File fl = new File("/sdcard/decode.txt");
+				fl.delete();
+
+				compression.decompressGzip("/sdcard/file." + fileT + ".gz");
+				fl = new File("/sdcard/file." + fileT + ".gz");
+				fl.delete();
+				
+				Log.i("DONE!!!", "DONE");
+				Toast.makeText(getBaseContext(),"File Received. Check your SD Card",Toast.LENGTH_LONG).show();
+				fw1.close();
+				sendSMS(phoneNo, "%& done");
+				this.finish();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			received = true;
 		}
 	}
 	
@@ -511,7 +458,6 @@ public class ReceiverActivity extends Activity {
 	
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
-		bw1 = null;
 		super.onDestroy();
 	}
 }
