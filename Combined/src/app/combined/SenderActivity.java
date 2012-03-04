@@ -57,8 +57,10 @@ public class SenderActivity extends Activity {
 			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
 			            if(receiverIsOnline){
+			            	currentChannel = 2;
 			            	sendBy3G("chloebelleaquino@gmail.com",tracker);
 			            }else{
+			            	currentChannel = 1;
 			            	sendViaMms(tracker);
 			            }
 			            
@@ -67,6 +69,7 @@ public class SenderActivity extends Activity {
 			     }
 			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
 			            Log.e("app","There's no network connectivity");
+			            currentChannel = 1;
 			            sendViaMms(tracker);
 			          //send sms na di connected
 			     }
@@ -85,8 +88,10 @@ public class SenderActivity extends Activity {
 			//DEPENDE SA KUNG ANONG CHANNEL
 			if(isOnline(getBaseContext()) && intent.getStringExtra("isOnline").equals("1")){
 				logIn();
+				currentChannel = 2;
 				sendBy3G("chloebelleaquino@gmail.com", tracker);
 			}else{
+				currentChannel = 1;
 				sendViaMms(tracker);
 			}
 		}
@@ -124,7 +129,10 @@ public class SenderActivity extends Activity {
 
 			try {
 				Log.i("send10", "Before send10");
-				send10(phoneNum);
+				if(currentChannel == 1){
+					send10(phoneNum);
+				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -134,7 +142,7 @@ public class SenderActivity extends Activity {
 				.equals("sendAnotherMms")) {
 			mmsReceived= true;
 			try {
-				if (tracker < packetCount) {
+				if (tracker < packetCount && currentChannel == 1) {
 					send1mms(phoneNum);
 				}
 
@@ -158,7 +166,10 @@ public class SenderActivity extends Activity {
 	public void sendViaSms(String phoneNo, int startIndex) throws IOException{
 
 		sendSMS(phoneNum, "%& sendViaSms" + startIndex);
-		send10(phoneNo);
+		if(currentChannel == 0){
+			send10(phoneNo);
+		}
+		
 	}
 
 	private void send10(String phoneNo) throws IOException {
@@ -248,7 +259,10 @@ public class SenderActivity extends Activity {
 		Log.i("FINISHED", "DONE SENDING SMS");
 		try {
 			Log.i("SENDING MMS", "SENDING MMS");
-			send1mms(phoneNum);
+			if(currentChannel == 1){
+				send1mms(phoneNum);
+			}
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} 	
@@ -310,6 +324,14 @@ public class SenderActivity extends Activity {
 				//do nothing
 			}else{
 				Log.i("shift to sms", "shift to sms");
+				
+				try {
+					currentChannel = 0;
+					sendViaSms(phoneNum, tracker);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//SHIFT TO SMS
 				
 			}
