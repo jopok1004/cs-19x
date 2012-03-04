@@ -206,9 +206,10 @@ public class ReceiverActivity extends Activity {
 						.getStringExtra("message").toString());
 				Toast.makeText(getBaseContext(), "Received Packet #" + pn,
 						Toast.LENGTH_SHORT).show();
-
+				
 				Log.i("AL SIZE", Integer.toString(al.size()));
 				Log.i("SIZE", Integer.toString(size));
+				receiveFile();
 			}
 
 		}
