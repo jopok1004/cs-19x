@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class Sender3GListener implements MessageListener{
 	private SenderActivity sender;
-	//private Integer currentPacket;
+	private Integer currentPacket;
 	//private long t;
 	
 	public Sender3GListener (SenderActivity sender) {
@@ -34,13 +34,14 @@ public class Sender3GListener implements MessageListener{
 		if (message.getBody().equals("%&proceed")) {
 			time.setToNow();
 			//sender.setInitial(time.toMillis(true));
-			//setCurrentPacket(0);
+			setCurrentPacket(sender.getTracker());
 			for (int i = 0; i < 10; i ++) {
 				sendPackets(chat, time);
 				waiting(2);
 			}	
 			
 		}else if (message.getBody().equals("%&DONE")) {
+			sender.setTracker(getCurrentPacket());
 			Log.e("XMPPSender:Sending", "Sending file SUCCESSFUL");
 			//setCurrentPacket(0);
 			
@@ -59,6 +60,7 @@ public class Sender3GListener implements MessageListener{
 			sender.finish();
 			
 		}else if (message.getBody().equals("%&CONTINUE")) {
+			sender.setTracker(getCurrentPacket());
 			for (int i = 0; i < 10; i ++) {
 				sendPackets(chat, time);
 				waiting(2);
@@ -75,16 +77,16 @@ public class Sender3GListener implements MessageListener{
 			while (counter < 40) {
 				
 				//if (getCurrentPacket() == sender.getPacketList().size()) {
-				if (sender.getTracker() == sender.getPacketList().size()) {
+				if (getCurrentPacket() == sender.getPacketList().size()) {
 					time.setToNow();
 					//t = time.toMillis(true);
 					break;
 				}
 				
-				line = sender.getPacketList().get(sender.getTracker());
-				packet = packet + "%&" + sender.getTracker() + " " + line;
+				line = sender.getPacketList().get(getCurrentPacket());
+				packet = packet + "%&" + getCurrentPacket() + " " + line;
 				//setCurrentPacket(getCurrentPacket() + 1);
-				sender.setTracker(sender.getTracker() + 1);
+				setCurrentPacket(getCurrentPacket() + 1);
 				counter++;
 			}
 			
@@ -114,6 +116,14 @@ public class Sender3GListener implements MessageListener{
 		} catch (XMPPException e) {
 			Log.e("XMPPSender:Sending", "Sending text packet FAILED");
 		}
+	}
+
+	public Integer getCurrentPacket() {
+		return currentPacket;
+	}
+
+	public void setCurrentPacket(Integer currentPacket) {
+		this.currentPacket = currentPacket;
 	}
 
 	/*public Integer getCurrentPacket() {
