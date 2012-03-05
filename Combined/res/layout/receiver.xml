@@ -51,4 +51,16 @@
 		android:layout_marginRight="5dp"
 		android:id="@+id/btnSendConfirmation" android:layout_gravity="right"></Button>
 
+	<Button
+	    android:text="Disconnect"
+		android:layout_width="156dp"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginRight="5dp"
+		android:id="@+id/btnDisconnect"
+		android:layout_gravity="right"
+		android:onClick ="disconnectWifi"
+		/>
+
 </LinearLayout>
