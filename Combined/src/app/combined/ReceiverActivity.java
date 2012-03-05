@@ -109,6 +109,7 @@ public class ReceiverActivity extends Activity {
 			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
 			            sendSMS(phoneNo,"%& receiverConnectivity 1");
+			            logIn();
 			            //send sms na connected
 			        }
 			     }
@@ -240,7 +241,7 @@ public class ReceiverActivity extends Activity {
 		}
 		//FOR 3G
 		if ((intent.getStringExtra("start?")).equals("start3GReceive")) {
-			logIn();
+			//logIn();
 		}
 	}
 	//FOR MMS
@@ -404,7 +405,7 @@ public class ReceiverActivity extends Activity {
 
 	public void setConnection(XMPPConnection connection) {
 		if (connection == null) {
-			this.finish();
+			Log.e("Receiver:3GConnection", "Connection failure");
 		}else {
 	        this.connection = connection;
 	        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
@@ -440,7 +441,12 @@ public class ReceiverActivity extends Activity {
         }else {
         	Log.e("Receiver:3GConnection", "No internet connectivity available");
         }
-		
+	}
+	
+	public void logOut() {
+		if (this.connection != null) {
+			this.connection.disconnect();
+		}
 	}
 	
 	public void establishConnection(String user, String pwd) {
@@ -507,6 +513,8 @@ public class ReceiverActivity extends Activity {
 	
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
+		unregisterReceiver(threeGMonitorBroadcastReceiver);
+		logOut();
 		super.onDestroy();
 	}
 }

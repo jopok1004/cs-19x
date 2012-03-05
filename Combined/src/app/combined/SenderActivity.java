@@ -435,6 +435,12 @@ public class SenderActivity extends Activity {
 		
 	}
 	
+	public void logOut() {
+		if (this.connection != null) {
+			this.connection.disconnect();
+		}
+	}
+	
 	public void establishConnection(String user, String pwd) {
 		 SASLAuthentication.supportSASLMechanism("PLAIN");
 	     ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
@@ -467,6 +473,14 @@ public class SenderActivity extends Activity {
 	    //    return false;
 	    //}
 	    return true;
+	}
+	
+	
+	
+	public void onDestroy() {
+		unregisterReceiver(threeGMonitorBroadcastReceiver);
+		logOut();
+		super.onDestroy();
 	}
 }
 
