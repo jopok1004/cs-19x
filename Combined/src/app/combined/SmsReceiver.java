@@ -39,7 +39,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// SENDER SIDE
 			//SMS
-			if (msgs[0].getMessageBody().toString().equals("%& start ")) {
+			if (msgs[0].getMessageBody().toString().startsWith("%& start ")) {
+				Log.e("START!","START!");
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -107,14 +108,14 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			// RECEIVER SIDE
 			//MMS
-			if(msgs[0].getMessageBody().toString().startsWith("%& sendViaMms")){
+			if(msgs[0].getMessageBody().toString().startsWith("%& sendViaMms ")){
             	this.abortBroadcast();
             	Intent i = new Intent(context, ReceiverActivity.class);
-            	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
+            	Log.i("RECEIVE VIA MMS", "RECEIVE VIA MMS");
                 i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
                 i.putExtra("start?","startMmsReceive");
                 i.putExtra("phoneNum",msgs[0].getOriginatingAddress().toString());
-                String sub = msgs[0].getMessageBody().substring(11);
+                String sub = msgs[0].getMessageBody().substring(14);
                 i.putExtra("startIndex", Integer.parseInt(sub));
                 context.startActivity(i);
             }
@@ -126,13 +127,14 @@ public class SmsReceiver extends BroadcastReceiver {
 				i.putExtra("start?", "check10");
 				i.putExtra("phoneNum", msgs[0].getOriginatingAddress()
 						.toString());
-				String sub = msgs[0].getMessageBody().substring(10);
+				String sub = msgs[0].getMessageBody().substring(11);
 				Log.i("inside check10", sub);
 				i.putExtra("tracker", sub);
 
 				context.startActivity(i);
 			}
 			if (msgs[0].getMessageBody().toString().contains("%& sendFile ")) {
+				Log.e("SendFile","SendFile");
 				Intent i = new Intent(context, ReceiverActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -150,6 +152,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				sub = sub.substring(j + 1);
 				String tokens[] = sub.split(" ");
 				i.putExtra("fileType", tokens[0]);
+				Log.e("SIZE",Integer.toString(size));
 				i.putExtra("size", size);
 				i.putExtra("isOnline", tokens[1]);
 				context.startActivity(i);
@@ -204,7 +207,7 @@ public class SmsReceiver extends BroadcastReceiver {
 			if(msgs[0].getMessageBody().toString().startsWith("%& sendVia3G")){
             	this.abortBroadcast();
             	Intent i = new Intent(context, ReceiverActivity.class);
-            	Log.i("RECEIVED VIA MMS", "RECEIVED VIA MMS");
+            	Log.i("RECEIVE VIA 3G", "RECEIVE VIA 3G");
                 i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
                 i.putExtra("start?","start3GReceive");
                 context.startActivity(i);

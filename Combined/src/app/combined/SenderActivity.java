@@ -35,19 +35,24 @@ public class SenderActivity extends Activity {
 	private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
 	private int packetCount;
 	private int tracker= 0; 		//current packet number
-	private Boolean done; 		//to check for end of file sharing
+	private Boolean done = false; 		//to check for end of file sharing
 	private Boolean check10Received; // for SMS Protocol
 	private int send10Resends;		// for SMS Protocol, number of resends per 10 packets
-	private Boolean mmsReceived;
-	private Boolean receiverIsOnline;
+	private Boolean mmsReceived = false;
+	private Boolean receiverIsOnline = false;
 	private static final int SEND_MMS = 1003;
 	ProgressDialog dialog;
 	
 	private XMPPConnection connection; //for 3G connection
-	private String username;
-	private String password;
+	private String username = "jvbsantos@gmail.com";
+	private String password = "jayvee14";
+	
+	IntentFilter gIntentFilter = new IntentFilter();
 	
 	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.senderactivity);
+		Log.e("SENDER ACT","SENDER ACT");
 		Intent intent = getIntent();
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
@@ -82,22 +87,34 @@ public class SenderActivity extends Activity {
 		};
 		IntentFilter gIntentFilter = new IntentFilter();
 		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-		registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
+		
 	}
 
 	public void onNewIntent(Intent intent){
 		//SMS
+		Log.e("NEW","NEW INTENT");
 		if ((intent.getStringExtra("start?").toString()).equals("start sending")) {	
+			Log.e("START SENDING", "START SENDING");
 			//sms(intent.getStringExtra("phoneNum").toString(), 0);	
 			//DEPENDE SA KUNG ANONG CHANNEL
+			if(intent.getStringExtra("isOnline").equals("1")) {
+				receiverIsOnline = true;
+			}
+			else{
+				receiverIsOnline = false;
+			}
+			
+			
 			if(isOnline(getBaseContext()) && intent.getStringExtra("isOnline").equals("1")){
-				logIn();
+				
+				
 				currentChannel = 2;
 				sendBy3G("chloebelleaquino@gmail.com", tracker);
 			}else{
 				currentChannel = 1;
 				sendViaMms(tracker);
 			}
+			registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
 		}
 		
 		if ((intent.getStringExtra("start?").toString()).equals("done receiving")) {
@@ -166,8 +183,15 @@ public class SenderActivity extends Activity {
 		if ((intent.getStringExtra("start?").toString()).equals("receiverConnectivity")) {
 			if(intent.getStringExtra("isOnline").toString().equals("1")){
 				receiverIsOnline= true;
+				if(isOnline(this)) {
+					currentChannel = 2;
+					sendBy3G("chloebelleaquino@gmail.com",tracker);
+				}
+				
 			}else{
 				receiverIsOnline= false;
+				currentChannel = 1;
+				sendViaMms(tracker);
 			}
 		}
 	}
@@ -187,12 +211,9 @@ public class SenderActivity extends Activity {
 	private void send10(String phoneNo) throws IOException {
 		String submessage = new String();
 		String headerBegin = new String();
-		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		dialog.setMessage("Sending SMS...");
-		dialog.setCancelable(false);
-		dialog.setProgress(0);
+		
 		Log.i("send10", "I AM AT send10");
-		dialog.show();
+		
 
 		// dialog.show(SmsMessagingActivity.this, "Sending SMS", "Please Wait");
 		for (int counter = 0; counter < 10; counter++) {
@@ -212,7 +233,7 @@ public class SenderActivity extends Activity {
 	
 		Thread thread = new smsWaitThread();
 		thread.start();
-		dialog.cancel();
+		
 
 	}
 	class smsWaitThread extends Thread {
@@ -227,7 +248,7 @@ public class SenderActivity extends Activity {
 				//do nothing
 			}else{
 				Log.i("resend check10", "tracker" + tracker);
-				sendSMS(phoneNum, "%&check10 " + tracker);
+				sendSMS(phoneNum, "%& check10 " + tracker);
 				//resend check10
 			}
 			
@@ -261,6 +282,7 @@ public class SenderActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+		Log.e("SMS", "SMS Sent");
 	}
 	
 	// ################################################################################################### //
@@ -281,10 +303,10 @@ public class SenderActivity extends Activity {
 	}
 	private void send1mms(String phoneNum) throws IOException {
 
-		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		dialog.setMessage("Sending MMS...");
-		dialog.setCancelable(false);
-		dialog.show();
+//		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//		dialog.setMessage("Sending MMS...");
+//		dialog.setCancelable(false);
+//		dialog.show();
 		Log.i("CHLOE", "I AM AT PARSER NOW");
 		try {
 			// dialog.show(Mms2Activity.this, "Sending SMS", "Please Wait");
@@ -307,7 +329,6 @@ public class SenderActivity extends Activity {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		dialog.cancel();
 
 	}
 
@@ -395,7 +416,12 @@ public class SenderActivity extends Activity {
 	}
 
 	public void sendBy3G (String to, int startIndex) {
+		logIn();
+		while(getConnection() == null) {
+			//do nothing
+		}
 		sendSMS(phoneNum, "%& sendVia3G");
+		waiting(30);
 		Roster r = getConnection().getRoster();
 		ChatManager chatManage = getConnection().getChatManager();
         Chat nchat = chatManage.createChat(to, new Sender3GListener(this));
@@ -421,10 +447,15 @@ public class SenderActivity extends Activity {
 	}
 	
 	public void logIn () {
+		Log.e("LOGIN","LOGIN");
+		
+		
+		
         if (isOnline(this)) {
-        	if (getUsername() == null && getPassword() == null) {
+        	if (getUsername().equals("null") && getPassword().equals("null")) {
         		LogInSettings lDialog;
                 lDialog = new LogInSettings(this);
+                Log.e("SHOW","SHOWING DIALOG BOX");
                 lDialog.show();
         	}else {
         		establishConnection(getUsername(), getPassword());

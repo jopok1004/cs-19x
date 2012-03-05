@@ -1,6 +1,5 @@
 package app.combined;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,8 +26,11 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Debug;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.text.format.Time;
@@ -42,6 +44,7 @@ public class ReceiverActivity extends Activity {
 	Boolean initialR = false;
 	String phoneNo = new String();
 	Button btnSendConfirmation;
+	Button btnDisconnect;
 	EditText txtPhoneNo;
 	SmsReceiver rcvd;
 	HashMap<Integer, String> al = new HashMap<Integer, String>();
@@ -60,37 +63,81 @@ public class ReceiverActivity extends Activity {
 	private BroadcastReceiver mmsMonitorBroadcastReceiver;
 	private BroadcastReceiver threeGMonitorBroadcastReceiver;
 	private int initial;
-	ContentObserver mmsObserver;
 	private int end;
 	private String fileType;
 	private boolean started;
 	private File fileoutput = new File("/sdcard/outputreceiver.txt");
 	
-	private String username;
-	private String password;
+	private String username = "chloebelleaquino@gmail.com";
+	private String password = "chloebelle";
+	IntentFilter mIntentFilter = new IntentFilter();
+	IntentFilter gIntentFilter = new IntentFilter();
 	
+	
+	ContentObserver mmsObserver = new ContentObserver(null) {
+		@Override
+		public void onChange(boolean selfChange) {
+
+			Thread mmsNotify = new Thread() {
+				@Override
+				public void run() {
+					Intent mIntent = new Intent(MMSMON_RECEIVED_MMS);
+					sendBroadcast(mIntent);
+					super.run();
+				}
+			};
+			mmsNotify.start();
+			super.onChange(selfChange);
+			// try here
+
+			Log.i("MMS Received", "MMS RECEIVED HAHA");
+			try {
+				Log.i("SEARCHING", "SEARCHING MMS AGAIN");
+				//checkMMSMessages();
+				//temporary=tempalsize;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// end try
+
+		}
+	};
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
+		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		setContentView(R.layout.receiver);
 		Intent intent = getIntent();
+		size = intent.getIntExtra("size", 10);
+		fileT = intent.getStringExtra("fileType");
 		rcvd = new SmsReceiver();
 		btnSendConfirmation = (Button) findViewById(R.id.btnSendConfirmation);
 		txtPhoneNo = (EditText) findViewById(R.id.phoneNumberText);
-
+		btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
 		btnSendConfirmation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
 					if(isOnline(getBaseContext())){
+						Log.e("ONLINE","ONLINE AKO!");
+						
 						sendSMS(phoneNo, "%& start 1");
+						Log.e("PHONE NUMBER: ",phoneNo);
+						Log.e("SMS SENT","SMS SENT");
 					}else{
+						Log.e("OFFLINE","OFFLINE AKO!");
 						sendSMS(phoneNo, "%& start 0");
+						Log.e("PHONE NUMBER: ",phoneNo);
+						Log.e("SMS SENT","SMS SENT");
 					}
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
+					registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
+					registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
 					btnSendConfirmation.setClickable(false);
 
 				} else
@@ -106,8 +153,9 @@ public class ReceiverActivity extends Activity {
 			     Log.d("app","Network connectivity change");
 			     if(intent.getExtras()!=null) {
 			        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
-			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
+			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED && !ni.getTypeName().equals("mobile_mms")) {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
+			            
 			            sendSMS(phoneNo,"%& receiverConnectivity 1");
 			            logIn();
 			            //send sms na connected
@@ -138,24 +186,26 @@ public class ReceiverActivity extends Activity {
 			}
 		};
 
-		IntentFilter mIntentFilter = new IntentFilter();
+		
 		mIntentFilter.addAction(MMSMON_RECEIVED_MMS);
-		IntentFilter gIntentFilter = new IntentFilter();
+		
 		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-		registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
-		registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
-
 		getApplicationContext().getContentResolver().registerContentObserver(
 				mmsInURI, true, mmsObserver);
 		getApplicationContext().getContentResolver().notifyChange(mmsInURI,
 				mmsObserver);
+
+		
 	}
 	//FOR SMS
 	public void onNewIntent(Intent intent) {
 		Log.i("INTENT", intent.getStringExtra("start?").toString());
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
+			registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
+			registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
 			Log.i("GETCONFIRM", "GETCONFIRM");
 			size = intent.getIntExtra("size", 10);
+			Log.e("SIZE",Integer.toString(size));
 			fileT = intent.getStringExtra("fileType");
 			//reply on button click
 		}
@@ -241,7 +291,7 @@ public class ReceiverActivity extends Activity {
 		}
 		//FOR 3G
 		if ((intent.getStringExtra("start?")).equals("start3GReceive")) {
-			//logIn();
+			logIn();
 		}
 	}
 	//FOR MMS
@@ -386,7 +436,7 @@ public class ReceiverActivity extends Activity {
 				Log.i("DONE!!!", "DONE");
 				Toast.makeText(getBaseContext(),"File Received. Check your SD Card",Toast.LENGTH_LONG).show();
 				fw1.close();
-				sendSMS(phoneNo, "%& done");
+				sendSMS(phoneNo, "%& doneMMS");
 				this.finish();
 
 			} catch (IOException e) {
@@ -489,7 +539,85 @@ public class ReceiverActivity extends Activity {
 	
 	
 	//COMMON FUNCTIONS
+	public void disconnectWifi(View view) {
+		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if(wifi.isWifiEnabled()) {
+			wifi.disconnect();
+			wifi.setWifiEnabled(false);
+			btnDisconnect.setText("Reconnect");
+		}
+		else {
+			wifi.setWifiEnabled(false);
+			wifi.reconnect();
+			
+			btnDisconnect.setText("Disconnect");
+		}
+		
+	}
+	
+	
+	private static final int CONTACT_PICKER_RESULT = 1001;
+
+	public void doLaunchContactPicker(View view) {
+		Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+				Contacts.CONTENT_URI);
+		startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+	}
+
+	
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
+			case CONTACT_PICKER_RESULT:
+				Cursor cursor = null;
+				String email = "";
+				try {
+					Uri result = data.getData();
+					Log.v("chloe", "Got a contact result: " + result.toString());
+
+					// get the contact id from the Uri
+					String id = result.getLastPathSegment();
+
+					// query for everything email --> contact
+					cursor = getContentResolver().query(Phone.CONTENT_URI,
+							null, Phone.CONTACT_ID + "=?", new String[] { id },
+							null);
+
+					int emailIdx = cursor.getColumnIndex(Phone.DATA);
+
+					// let's just get the first contact
+					if (cursor.moveToFirst()) {
+						email = cursor.getString(emailIdx);
+						Log.v("chloe", "Got mobile number: " + email);
+					} else {
+						Log.w("chloe", "No results");
+					}
+				} catch (Exception e) {
+					Log.e("chloe", "Failed to get contact number", e);
+				} finally {
+					if (cursor != null) {
+						cursor.close();
+					}
+					EditText emailEntry = (EditText) findViewById(R.id.phoneNumberText);
+					emailEntry.setText(email);
+					if (email.length() == 0) {
+						Toast.makeText(this,
+								"No mobile number found for contact.",
+								Toast.LENGTH_LONG).show();
+					}
+
+				}
+				break;
+
+			}
+
+		} else {
+			Log.w("chloe", "Warning: activity result not ok");
+		}
+	}
 	private void sendSMS(String phoneNumber, String message) {
+		
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
 
@@ -501,7 +629,10 @@ public class ReceiverActivity extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+		Log.e("SMS", "SMS Sent");
 	}
+	
+	
 	public static void waiting(int n) {
 		long t0, t1;
 		t0 = System.currentTimeMillis();

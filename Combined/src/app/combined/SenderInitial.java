@@ -61,11 +61,11 @@ public class SenderInitial extends Activity {
 				phoneNo = txtPhoneNo.getText().toString();
 				String message = txtMessage.getText().toString();
 				if (phoneNo.length() > 0 && message.length() > 0) {
-					//sendSMS(phoneNo, message);
+					sendSMS(phoneNo, message);
 					if(isOnline(getBaseContext())){
-						//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 1");
+						sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 1");
 					}else{
-						//sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 0");
+						sendSMS(phoneNo, "%& sendFile " + packetCount + " " + sub + " 0");
 					}
 					
 					Intent intent = new Intent(SenderInitial.this,

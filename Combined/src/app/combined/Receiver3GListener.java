@@ -107,6 +107,8 @@ public class Receiver3GListener implements PacketListener{
 			//String s = message.getBody().substring(2);
 			getPackets(message.getBody(),time);
 			setMessCtr(getMessCtr() + 1);
+			Log.e("AL SIZE",Integer.toString(receiver.al.size()));
+			Log.e("SIZE",Integer.toString(receiver.size));
 			if (receiver.al.size() == receiver.size) {
 					
 				Log.i("XMPPReceiver:File", "Finished");
