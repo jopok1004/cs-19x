@@ -480,11 +480,10 @@ public class ReceiverActivity extends Activity {
 				logbw.write("Receiving time:" + (t2 - t1) + "\n");
 				logbw.write("Processing time:" + (t3 - t2) + "\n");
 				logbw.write("Total time:" + (t3 - t1) + "\n");
-
-				Toast.makeText(getBaseContext(),
-						"File Received. Check your SD Card", Toast.LENGTH_LONG)
-						.show();
-				fw1.close();
+				
+				Log.e("LOG","DONE LOGGING");
+				
+				
 				sendSMS(phoneNo, "%& done");
 				Debug.stopMethodTracing();
 				Log.e("DONE","DONE");

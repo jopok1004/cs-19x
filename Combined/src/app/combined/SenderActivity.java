@@ -615,6 +615,9 @@ public class SenderActivity extends Activity {
 		}
 		
 	}
+	public void setText3G(String text) {
+		this.txt3G.setText(text);
+	}
 	public BufferedWriter getWriter() {
 		return logbw;
 	}

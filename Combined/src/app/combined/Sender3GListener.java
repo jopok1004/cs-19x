@@ -13,6 +13,7 @@ import android.util.Log;
 public class Sender3GListener implements MessageListener{
 	private SenderActivity sender;
 	private Integer currentPacket;
+	private int threeGCount=0;
 	//private long t;
 	
 	public Sender3GListener (SenderActivity sender) {
@@ -65,6 +66,7 @@ public class Sender3GListener implements MessageListener{
 			sender.setTracker(getCurrentPacket());
 			for (int i = 0; i < 10; i ++) {
 				sendPackets(chat, time);
+				sender.setText3G(Integer.toString(threeGCount));
 				waiting(2);
 			}	
 		}
@@ -106,8 +108,8 @@ public class Sender3GListener implements MessageListener{
 				
 				chat.sendMessage(reply);
 				//
-				sender.threeGCount++;
-				sender.txt3G.setText(Integer.toString(sender.threeGCount));
+				threeGCount++;
+				
 				
 				try {
 					time.setToNow();
