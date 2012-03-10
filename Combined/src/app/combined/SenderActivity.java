@@ -618,6 +618,13 @@ public class SenderActivity extends Activity {
 	public BufferedWriter getWriter() {
 		return logbw;
 	}
+	public void finish() {
+		Intent data = new Intent();
+		
+		setResult(RESULT_OK, data);
+		
+		super.finish();
+	}
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
 		logOut();
