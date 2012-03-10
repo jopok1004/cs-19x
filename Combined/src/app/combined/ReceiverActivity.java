@@ -42,6 +42,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 public class ReceiverActivity extends Activity {
 	Boolean received = false;
 	Boolean initialR = false;
@@ -57,7 +58,7 @@ public class ReceiverActivity extends Activity {
 	long last, current;
 	private XMPPConnection connection;
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
-	int temporary=0;
+	int temporary = 0;
 	int tempalsize;
 	int alsize = 0;
 	private Uri mmsInURI = Uri.parse("content://mms-sms");
@@ -67,24 +68,22 @@ public class ReceiverActivity extends Activity {
 	private int end;
 	private String fileType;
 	private boolean started;
-	//variables for log files
-	private Time time= new Time();
+	// variables for log files
+	private Time time = new Time();
 	private long t1, t2, t3;
 	private FileWriter logfw = null, logfw1 = null;
 	private BufferedWriter logbw = null, logbw1 = null;
 	private File receiverLog = new File("/sdcard/receiverLog.txt");
 	private File receiverSignal = new File("/sdcard/receiverSignal.txt");
-	
+
 	private String username = "chloebelleaquino@gmail.com";
 	private String password = "chloebelle";
 	IntentFilter mIntentFilter = new IntentFilter();
 	IntentFilter gIntentFilter = new IntentFilter();
-	//for signal strength
+	// for signal strength
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
-	
-	
-	
+
 	ContentObserver mmsObserver = new ContentObserver(null) {
 		@Override
 		public void onChange(boolean selfChange) {
@@ -104,8 +103,8 @@ public class ReceiverActivity extends Activity {
 			Log.i("MMS Received", "MMS RECEIVED HAHA");
 			try {
 				Log.i("SEARCHING", "SEARCHING MMS AGAIN");
-				//checkMMSMessages();
-				//temporary=tempalsize;
+				// checkMMSMessages();
+				// temporary=tempalsize;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -114,6 +113,7 @@ public class ReceiverActivity extends Activity {
 
 		}
 	};
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -134,14 +134,14 @@ public class ReceiverActivity extends Activity {
 		btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
 		btnSendConfirmation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				//get starting time
+				// get starting time
 				try {
 					logfw = new FileWriter(receiverLog);
 					logbw = new BufferedWriter(logfw);
 					logfw1 = new FileWriter(receiverSignal);
 					logbw1 = new BufferedWriter(logfw1);
 					time.setToNow();
-					t1= time.toMillis(true);
+					t1 = time.toMillis(true);
 					logbw.write(time.toString() + "RECEIVER START\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -149,21 +149,22 @@ public class ReceiverActivity extends Activity {
 				}
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
-					if(isOnline(getBaseContext())){
-						Log.e("ONLINE","ONLINE AKO!");
+					if (isOnline(getBaseContext())) {
+						Log.e("ONLINE", "ONLINE AKO!");
 						sendSMS(phoneNo, "%& start 1");
-						Log.e("PHONE NUMBER: ",phoneNo);
-						Log.e("SMS SENT","SMS SENT");
-					}else{
-						Log.e("OFFLINE","OFFLINE AKO!");
+						Log.e("PHONE NUMBER: ", phoneNo);
+						Log.e("SMS SENT", "SMS SENT");
+					} else {
+						Log.e("OFFLINE", "OFFLINE AKO!");
 						sendSMS(phoneNo, "%& start 0");
-						Log.e("PHONE NUMBER: ",phoneNo);
-						Log.e("SMS SENT","SMS SENT");
+						Log.e("PHONE NUMBER: ", phoneNo);
+						Log.e("SMS SENT", "SMS SENT");
 					}
 					Toast.makeText(getBaseContext(),
 							"Please do not close this application.",
 							Toast.LENGTH_SHORT).show();
-					registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
+					registerReceiver(threeGMonitorBroadcastReceiver,
+							gIntentFilter);
 					registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
 					btnSendConfirmation.setClickable(false);
 
@@ -173,30 +174,36 @@ public class ReceiverActivity extends Activity {
 							.show();
 			}
 		});
-		
+
 		threeGMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-			     Log.d("app","Network connectivity change");
-			     if(intent.getExtras()!=null) {
-			        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
-			        if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED && !ni.getTypeName().equals("mobile_mms")) {
-			            Log.i("app","Network "+ni.getTypeName()+" connected");
-			            
-			            sendSMS(phoneNo,"%& receiverConnectivity 1");
-			            logIn();
-			            //send sms na connected
-			        }
-			     }
-			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
-			            Log.e("app","There's no network connectivity");
-			            sendSMS(phoneNo,"%& receiverConnectivity 0");
-			          //send sms na di connected
-			     }
-				
+				Log.d("app", "Network connectivity change");
+				if (intent.getExtras() != null) {
+					NetworkInfo ni = (NetworkInfo) intent.getExtras().get(
+							ConnectivityManager.EXTRA_NETWORK_INFO);
+					if (ni != null
+							&& ni.getState() == NetworkInfo.State.CONNECTED
+							&& !ni.getTypeName().equals("mobile_mms")) {
+						Log.i("app", "Network " + ni.getTypeName()
+								+ " connected");
+
+						sendSMS(phoneNo, "%& receiverConnectivity 1");
+						logIn();
+						// send sms na connected
+					}
+				}
+				if (intent.getExtras().getBoolean(
+						ConnectivityManager.EXTRA_NO_CONNECTIVITY,
+						Boolean.FALSE)) {
+					Log.e("app", "There's no network connectivity");
+					sendSMS(phoneNo, "%& receiverConnectivity 0");
+					// send sms na di connected
+				}
+
 			}
 		};
-		//FOR MMS
+		// FOR MMS
 		mmsMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -213,28 +220,27 @@ public class ReceiverActivity extends Activity {
 			}
 		};
 
-		
 		mIntentFilter.addAction(MMSMON_RECEIVED_MMS);
-		
+
 		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 		getApplicationContext().getContentResolver().registerContentObserver(
 				mmsInURI, true, mmsObserver);
 		getApplicationContext().getContentResolver().notifyChange(mmsInURI,
 				mmsObserver);
 
-		
 	}
-	//FOR SMS
+
+	// FOR SMS
 	public void onNewIntent(Intent intent) {
 		Log.i("INTENT", intent.getStringExtra("start?").toString());
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
-			registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
+			registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
 			registerReceiver(mmsMonitorBroadcastReceiver, mIntentFilter);
 			Log.i("GETCONFIRM", "GETCONFIRM");
 			size = intent.getIntExtra("size", 10);
-			Log.e("SIZE",Integer.toString(size));
+			Log.e("SIZE", Integer.toString(size));
 			fileT = intent.getStringExtra("fileType");
-			//reply on button click
+			// reply on button click
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("check10")) {
 			Boolean okay = true;
@@ -245,7 +251,8 @@ public class ReceiverActivity extends Activity {
 			currentp = Integer.parseInt(intent.getStringExtra("tracker"));
 			resend = "%& resend ";
 			for (int i = (currentp % 10); i >= 0 && currentp < size; i--) {
-				if (al.containsKey(currentp - i - 1) == false && received ==false) {
+				if (al.containsKey(currentp - i - 1) == false
+						&& received == false) {
 					resend = resend + (currentp - i - 1) + " ";
 					Log.i("if not containskey", "checking for missing packets");
 					Log.i("resend", resend);
@@ -259,7 +266,7 @@ public class ReceiverActivity extends Activity {
 						resend = resend + k + " ";
 						Log.i("if not containskey",
 								"checking for missing packets");
-						
+
 						Log.i("resend", resend);
 						okay = false;
 					}
@@ -277,33 +284,34 @@ public class ReceiverActivity extends Activity {
 			if (received) {
 				// do nothing
 			} else {
-				
+
 				int pn;
 				pn = intent.getIntExtra("packetNum", 1000);
-				
+
 				try {
-					logbw1.write(time.toString() + " : Message " + pn + " Received\n");
+					logbw1.write(time.toString() + " : Message " + pn
+							+ " Received\n");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 				al.put(intent.getIntExtra("packetNum", 1000), intent
 						.getStringExtra("message").toString());
 				Toast.makeText(getBaseContext(), "Received Packet #" + pn,
 						Toast.LENGTH_SHORT).show();
-				
+
 				Log.i("AL SIZE", Integer.toString(al.size()));
 				Log.i("SIZE", Integer.toString(size));
-				if(al.size() == size){
+				if (al.size() == size) {
 					receiveFile();
 				}
-				
+
 			}
 
 		}
-		//FOR MMS
-		//Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
+		// FOR MMS
+		// Log.i("NEWINTENT", "NEW INTENT " + intent.getStringExtra("start?"));
 		if ((intent.getStringExtra("start?")).equals("startMmsReceive")) {
 			time = new Time();
 			if (started == false) {
@@ -317,148 +325,137 @@ public class ReceiverActivity extends Activity {
 			Log.i("initial", Integer.toString(initial));
 			end = intent.getIntExtra("end", 0);
 			Log.i("end", Integer.toString(end));
-			//size = end - initial;
+			// size = end - initial;
 			Log.i("size", "SIZE: " + Integer.toString(size));
 
-			//fileType = intent.getStringExtra("filetype");
+			// fileType = intent.getStringExtra("filetype");
 			Log.i("fileType", fileType);
 
 		}
-		//FOR 3G
+		// FOR 3G
 		if ((intent.getStringExtra("start?")).equals("start3GReceive")) {
 			logIn();
 		}
 	}
-	//FOR MMS
+
+	// FOR MMS
 	private void checkMMSMessages() throws IOException {
-		
-			tempalsize = alsize;
-			alsize = al.size();
-			String[] coloumns = null;
-			String[] values = null;
-			ArrayList<Integer> mid = new ArrayList<Integer>();
 
-			Cursor curPart = this
-					.getApplicationContext()
-					.getContentResolver()
-					.query(Uri.parse("content://mms/inbox"), null, null, null,
-							null);
+		tempalsize = alsize;
+		alsize = al.size();
+		String[] coloumns = null;
+		String[] values = null;
+		ArrayList<Integer> mid = new ArrayList<Integer>();
 
-			
+		Cursor curPart = this
+				.getApplicationContext()
+				.getContentResolver()
+				.query(Uri.parse("content://mms/inbox"), null, null, null, null);
 
-			
-			curPart.moveToFirst();
-			for (int i = 0; i < curPart.getCount(); i++) {
-				
+		curPart.moveToFirst();
+		for (int i = 0; i < curPart.getCount(); i++) {
 
-				// add to List the mid of the MMS that is currently in the
-				// inbox
+			// add to List the mid of the MMS that is currently in the
+			// inbox
 
-				mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
+			mid.add(curPart.getInt(curPart.getColumnIndex("_id")));
 
-				curPart.moveToNext();
-			}
+			curPart.moveToNext();
+		}
 
-			
-			curPart.moveToFirst();
+		curPart.moveToFirst();
 
-			curPart = this
-					.getApplicationContext()
-					.getContentResolver()
-					.query(Uri.parse("content://mms/part"), null, null, null,
-							null);
+		curPart = this.getApplicationContext().getContentResolver()
+				.query(Uri.parse("content://mms/part"), null, null, null, null);
 
-			if (curPart.moveToFirst()) {
-				do {
-					coloumns = curPart.getColumnNames();
+		if (curPart.moveToFirst()) {
+			do {
+				coloumns = curPart.getColumnNames();
 
-					if (values == null)
-						values = new String[coloumns.length];
+				if (values == null)
+					values = new String[coloumns.length];
 
-					// just get the TEXT part
-					for (int i = 0; i < mid.size(); i++) {
+				// just get the TEXT part
+				for (int i = 0; i < mid.size(); i++) {
 
-						String[] packets;
-						String[] packets2;
+					String[] packets;
+					String[] packets2;
 
-						if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
-								.get(i)) {
-							String text = curPart.getString(curPart
-									.getColumnIndex("text"));
-							if (text != null) {
-								if (text.startsWith("&%")) {
-									packets = text.split("&% ");
-									try {
-										logbw1.write(time.toString() + "Received packets via MMS\n");
-									} catch (IOException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									}
-									// bw.write("MID: " + mid.get(i) + "\tTEXT:"
-									// + text + "\n");
-									for (int j = 0; j < packets.length; j++) {
-										// bw.write("packet " + j + ": " +
-										// packets[j]
-										// + "\n");
-										Log.i("PACKETS", packets[j]);
-										if (packets[j] != null) {
-											packets2 = packets[j].split(" ");
-											if (!packets2[0].equals("")) {
-												Log.i("packets2[0]",
-														packets2[0]);
-												Log.i("packets2[1]",
-														packets2[1]);
-												int pNum = Integer
-														.parseInt(packets2[0]);
-												Log.i("pNum", "pNum: " + pNum);
-												Log.i("packet", packets2[1]);
-												if (!al.containsKey(pNum)) {
-													al.put(pNum, packets2[1]);
-												}
-
-												Log.i("AL SIZE", "AL SIZE: "
-														+ al.size());
-												if (al.size() == size) {
-													receiveFile();
-												}
+					if (curPart.getInt(curPart.getColumnIndex("mid")) == mid
+							.get(i)) {
+						String text = curPart.getString(curPart
+								.getColumnIndex("text"));
+						if (text != null) {
+							if (text.startsWith("&%")) {
+								packets = text.split("&% ");
+								try {
+									logbw1.write(time.toString()
+											+ "Received packets via MMS\n");
+								} catch (IOException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								// bw.write("MID: " + mid.get(i) + "\tTEXT:"
+								// + text + "\n");
+								for (int j = 0; j < packets.length; j++) {
+									// bw.write("packet " + j + ": " +
+									// packets[j]
+									// + "\n");
+									Log.i("PACKETS", packets[j]);
+									if (packets[j] != null) {
+										packets2 = packets[j].split(" ");
+										if (!packets2[0].equals("")) {
+											Log.i("packets2[0]", packets2[0]);
+											Log.i("packets2[1]", packets2[1]);
+											int pNum = Integer
+													.parseInt(packets2[0]);
+											Log.i("pNum", "pNum: " + pNum);
+											Log.i("packet", packets2[1]);
+											if (!al.containsKey(pNum)) {
+												al.put(pNum, packets2[1]);
 											}
 
+											Log.i("AL SIZE",
+													"AL SIZE: " + al.size());
+											if (al.size() == size) {
+												receiveFile();
+											}
 										}
 
 									}
+
 								}
 							}
-
 						}
 
 					}
 
-				} while (curPart.moveToNext());
-				alsize = al.size();
-				
-				if (tempalsize != alsize) {
-					Log.i("SIZES", "ALSIZES: tempalsize: "+tempalsize + " alsize: "+alsize);
-					Log.i("MMS", "NARECEIVE KO NA SI MMS");
-					if(received==false) {
-						sendSMS(phoneNo, "%& mmsreceived");
-					}
-					
-					getContentResolver().delete(Uri.parse("content://mms"), null,
-							null);
 				}
-			}
-			curPart.close();
 
-			
-		
-		
+			} while (curPart.moveToNext());
+			alsize = al.size();
+
+			if (tempalsize != alsize) {
+				Log.i("SIZES", "ALSIZES: tempalsize: " + tempalsize
+						+ " alsize: " + alsize);
+				Log.i("MMS", "NARECEIVE KO NA SI MMS");
+				if (received == false) {
+					sendSMS(phoneNo, "%& mmsreceived");
+				}
+
+				getContentResolver().delete(Uri.parse("content://mms"), null,
+						null);
+			}
+		}
+		curPart.close();
 
 	}
+
 	public void receiveFile() {
 
 		if (al.size() == size) {
-				time.setToNow();
-				t2= time.toMillis(true);
+			time.setToNow();
+			t2 = time.toMillis(true);
 			try {
 				FileWriter fw1 = new FileWriter(new File("/sdcard/decode.txt"));
 				for (int i = 0; i < size; i++) {
@@ -467,8 +464,9 @@ public class ReceiverActivity extends Activity {
 				fw1.close();
 
 				Log.i("WRITING TO FILE", "FILEWRITER");
-				
-				Base64FileDecoder.decodeFile("/sdcard/decode.txt","/sdcard/file." + fileT + ".gz");
+
+				Base64FileDecoder.decodeFile("/sdcard/decode.txt",
+						"/sdcard/file." + fileT + ".gz");
 				File fl = new File("/sdcard/decode.txt");
 				fl.delete();
 
@@ -476,20 +474,20 @@ public class ReceiverActivity extends Activity {
 				fl = new File("/sdcard/file." + fileT + ".gz");
 				fl.delete();
 				time.setToNow();
-				t3= time.toMillis(true);
+				t3 = time.toMillis(true);
 				Log.i("DONE!!!", "DONE");
-				try {
-					logbw.write("Receiving time:"+ (t2-t1) +"\n");
-					logbw.write("Processing time:"+ (t3-t2) +"\n");
-					logbw.write("Total time:"+ (t3-t1) +"\n");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				Toast.makeText(getBaseContext(),"File Received. Check your SD Card",Toast.LENGTH_LONG).show();
+
+				logbw.write("Receiving time:" + (t2 - t1) + "\n");
+				logbw.write("Processing time:" + (t3 - t2) + "\n");
+				logbw.write("Total time:" + (t3 - t1) + "\n");
+
+				Toast.makeText(getBaseContext(),
+						"File Received. Check your SD Card", Toast.LENGTH_LONG)
+						.show();
 				fw1.close();
-				sendSMS(phoneNo, "%& doneMMS");
+				sendSMS(phoneNo, "%& done");
 				Debug.stopMethodTracing();
+				Log.e("DONE","DONE");
 				this.finish();
 
 			} catch (IOException e) {
@@ -499,9 +497,9 @@ public class ReceiverActivity extends Activity {
 			received = true;
 		}
 	}
-	
-	//FOR 3G
-	
+
+	// FOR 3G
+
 	public XMPPConnection getConnection() {
 		return connection;
 	}
@@ -509,13 +507,13 @@ public class ReceiverActivity extends Activity {
 	public void setConnection(XMPPConnection connection) {
 		if (connection == null) {
 			Log.e("Receiver:3GConnection", "Connection failure");
-		}else {
-	        this.connection = connection;
-	        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-	        connection.addPacketListener(new Receiver3GListener(this), filter);
+		} else {
+			this.connection = connection;
+			PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
+			connection.addPacketListener(new Receiver3GListener(this), filter);
 		}
 	}
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -523,7 +521,7 @@ public class ReceiverActivity extends Activity {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
@@ -531,83 +529,87 @@ public class ReceiverActivity extends Activity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	public void logIn () {
-        if (isOnline(this)) {
-        	if (getUsername() == null && getPassword() == null) {
-        		LogInSettings lDialog;
-                lDialog = new LogInSettings(this);
-                lDialog.show();
-        	}else {
-        		establishConnection(getUsername(), getPassword());
-        	}
-        }else {
-        	Log.e("Receiver:3GConnection", "No internet connectivity available");
-        }
+
+	public void logIn() {
+		if (isOnline(this)) {
+			if (getUsername() == null && getPassword() == null) {
+				LogInSettings lDialog;
+				lDialog = new LogInSettings(this);
+				lDialog.show();
+			} else {
+				establishConnection(getUsername(), getPassword());
+			}
+		} else {
+			Log.e("Receiver:3GConnection", "No internet connectivity available");
+		}
 	}
-	
+
 	public void logOut() {
 		if (this.connection != null) {
 			this.connection.disconnect();
 		}
 	}
-	
-	public void establishConnection(String user, String pwd) {
-		 SASLAuthentication.supportSASLMechanism("PLAIN");
-	     ConnectionConfiguration connConfig = new ConnectionConfiguration("talk.google.com", 5222, "gmail.com");
-	     XMPPConnection conn = new XMPPConnection(connConfig);
-	     try {
-	            conn.connect();
-	            Log.i("XMPPClient", "[SettingsDialog] Connected to " + conn.getHost());
-	        	conn.login(user, pwd);
-	            Log.i("XMPPClient", "Logged in as " + conn.getUser());
-	            
-	            Presence presence = new Presence(Presence.Type.available, "", 24, Presence.Mode.chat);
-	            conn.sendPacket(presence);
-	            
-	            setConnection(conn);
-	     } catch (XMPPException ex) {
-	            Log.e("XMPPClient", "[SettingsDialog] Failed to connect to " + conn.getHost());
-	            setConnection(null);
-	     }
-	}
-	
-	public boolean isOnline(Context ctx) {
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
-	    if (info == null || !info.isConnected()) {
-	        return false;
-	    }
-	    //if (info.isRoaming()) {
-	        // here is the roaming option you can change it if you want to
-	        // disable internet while roaming, just return false
-	    //    return false;
-	    //}
-	    return true;
+	public void establishConnection(String user, String pwd) {
+		SASLAuthentication.supportSASLMechanism("PLAIN");
+		ConnectionConfiguration connConfig = new ConnectionConfiguration(
+				"talk.google.com", 5222, "gmail.com");
+		XMPPConnection conn = new XMPPConnection(connConfig);
+		try {
+			conn.connect();
+			Log.i("XMPPClient",
+					"[SettingsDialog] Connected to " + conn.getHost());
+			conn.login(user, pwd);
+			Log.i("XMPPClient", "Logged in as " + conn.getUser());
+
+			Presence presence = new Presence(Presence.Type.available, "", 24,
+					Presence.Mode.chat);
+			conn.sendPacket(presence);
+
+			setConnection(conn);
+		} catch (XMPPException ex) {
+			Log.e("XMPPClient",
+					"[SettingsDialog] Failed to connect to " + conn.getHost());
+			setConnection(null);
+		}
 	}
+
+	public boolean isOnline(Context ctx) {
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx
+				.getSystemService(Context.CONNECTIVITY_SERVICE))
+				.getActiveNetworkInfo();
+
+		if (info == null || !info.isConnected()) {
+			return false;
+		}
+		// if (info.isRoaming()) {
+		// here is the roaming option you can change it if you want to
+		// disable internet while roaming, just return false
+		// return false;
+		// }
+		return true;
+	}
+
 	public BufferedWriter getWriter() {
 		return logbw;
 	}
-	
-	
-	//COMMON FUNCTIONS
+
+	// COMMON FUNCTIONS
 	public void disconnectWifi(View view) {
 		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		if(wifi.isWifiEnabled()) {
+		if (wifi.isWifiEnabled()) {
 			wifi.disconnect();
 			wifi.setWifiEnabled(false);
 			btnDisconnect.setText("Reconnect");
-		}
-		else {
+		} else {
 			wifi.setWifiEnabled(false);
 			wifi.reconnect();
-			
+
 			btnDisconnect.setText("Disconnect");
 		}
-		
+
 	}
-	
-	
+
 	private static final int CONTACT_PICKER_RESULT = 1001;
 
 	public void doLaunchContactPicker(View view) {
@@ -616,8 +618,6 @@ public class ReceiverActivity extends Activity {
 		startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
 	}
 
-	
-	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
@@ -668,8 +668,9 @@ public class ReceiverActivity extends Activity {
 			Log.w("chloe", "Warning: activity result not ok");
 		}
 	}
+
 	private void sendSMS(String phoneNumber, String message) {
-		
+
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
 
@@ -683,8 +684,7 @@ public class ReceiverActivity extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		Log.e("SMS", "SMS Sent");
 	}
-	
-	
+
 	public static void waiting(int n) {
 		long t0, t1;
 		t0 = System.currentTimeMillis();
@@ -693,16 +693,25 @@ public class ReceiverActivity extends Activity {
 			t1 = System.currentTimeMillis();
 		} while ((t1 - t0) < (n * 1000));
 	}
-	
+
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
-		logbw1= null;
-		logbw= null;
+		
+		try {
+			logbw.close();
+			logbw1.close();
+			logfw.close();
+			logfw1.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		logOut();
 		super.onDestroy();
 	}
-	
+
 	// FOR SIGNAL STRENGTH
 
 	protected void onPause() {

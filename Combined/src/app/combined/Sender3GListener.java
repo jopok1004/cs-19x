@@ -105,6 +105,9 @@ public class Sender3GListener implements MessageListener{
 				}*/
 				
 				chat.sendMessage(reply);
+				//
+				sender.threeGCount++;
+				sender.txt3G.setText(Integer.toString(sender.threeGCount));
 				
 				try {
 					time.setToNow();

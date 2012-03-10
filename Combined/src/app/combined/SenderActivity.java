@@ -56,9 +56,12 @@ public class SenderActivity extends Activity {
 	private TextView txtCurrentChannel;
 	private TextView txtSMS;
 	private TextView txtMMS;
-	private TextView txt3G;
+	TextView txt3G;
 	private TextView txtTotalPackets;
 	ProgressDialog dialog;
+	private int smsCount = 0;
+	private int mmsCount = 0;
+	int threeGCount = 0;
 	
 	private XMPPConnection connection; //for 3G connection
 	private String username = "jvbsantos@gmail.com";
@@ -71,8 +74,8 @@ public class SenderActivity extends Activity {
 	private long t1, t2, t3;
 	private FileWriter logfw = null, logfw1 = null;
 	private BufferedWriter logbw = null, logbw1 = null;
-	private File receiverLog = new File("/sdcard/senderLog.txt");
-	private File receiverSignal = new File("/sdcard/senderSignal.txt");
+	private File senderLog = new File("/sdcard/senderLog.txt");
+	private File senderSignal = new File("/sdcard/senderSignal.txt");
 	//for signal strength
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
@@ -98,9 +101,9 @@ public class SenderActivity extends Activity {
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
 		try {
-			logfw = new FileWriter(receiverLog);
+			logfw = new FileWriter(senderLog);
 			logbw = new BufferedWriter(logfw);
-			logfw1 = new FileWriter(receiverSignal);
+			logfw1 = new FileWriter(senderSignal);
 			logbw1 = new BufferedWriter(logfw1);
 			time.setToNow();
 			t1= time.toMillis(true);
@@ -119,10 +122,12 @@ public class SenderActivity extends Activity {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
 			            if(receiverIsOnline){
 			            	currentChannel = 2;
+			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            	txtCurrentChannel.setText("3G");
 			            	sendBy3G("chloebelleaquino@gmail.com",tracker);
 			            }else{
 			            	currentChannel = 1;
+			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            	txtCurrentChannel.setText("MMS");
 			            	sendViaMms(tracker);
 			            }
@@ -133,6 +138,7 @@ public class SenderActivity extends Activity {
 			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
 			            Log.e("app","There's no network connectivity");
 			            currentChannel = 1;
+			            Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            txtCurrentChannel.setText("MMS");
 			            sendViaMms(tracker);
 			          //send sms na di connected
@@ -188,6 +194,7 @@ public class SenderActivity extends Activity {
 			}
 			done = true;
 			Toast.makeText(getBaseContext(), "Done Sending", Toast.LENGTH_SHORT);
+			this.finish();
 		}
 		
 		if ((intent.getStringExtra("start?").toString()).equals("sendAgain")) {
@@ -239,6 +246,8 @@ public class SenderActivity extends Activity {
 		//MMS
 		if ((intent.getStringExtra("start?").toString())
 				.equals("sendAnotherMms")) {
+			
+			Log.e("MMS","SEND ANOTHER MMS");
 			mmsReceived= true;
 			try {
 				if (tracker < packetCount && currentChannel == 1) {
@@ -359,6 +368,8 @@ public class SenderActivity extends Activity {
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		Log.e("SMS", "SMS Sent");
+		this.smsCount++;
+		this.txtSMS.setText(Integer.toString(smsCount));
 	}
 	
 	// ################################################################################################### //
@@ -409,6 +420,8 @@ public class SenderActivity extends Activity {
 		}
 		time.setToNow();
 		logbw.write(time.toString()  + "Sending via MMS\n");
+		mmsCount++;
+		this.txtMMS.setText(Integer.toString(mmsCount));
 	}
 
 
@@ -608,8 +621,17 @@ public class SenderActivity extends Activity {
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
 		logOut();
-		logbw= null;
-		logbw1= null;
+		try {
+			logbw.close();
+			logbw1.close();
+			logfw.close();
+			logfw1.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		super.onDestroy();
 	}
 	

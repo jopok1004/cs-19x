@@ -38,6 +38,9 @@ public class SenderInitial extends Activity {
 	private ArrayList<String> packetList = new ArrayList<String>();
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
+	private static final int SENDER_ACTIVITY_RESULT = 1010;
+	
+	
 	private long temp1, temp2;
 
 	/** Called when the activity is first created. */
@@ -78,7 +81,7 @@ public class SenderInitial extends Activity {
 					intent.putExtra("start?", "fromInitial");
 					intent.putExtra("temp1", temp1);
 					intent.putExtra("temp2", temp2);
-					startActivity(intent);
+					startActivityForResult(intent,SENDER_ACTIVITY_RESULT);
 					
 				} else
 					Toast.makeText(getBaseContext(),
@@ -178,7 +181,13 @@ public class SenderInitial extends Activity {
 				temp2 = time.toMillis(true);
 				
 				break;
+			case SENDER_ACTIVITY_RESULT:
+				this.finish();
+				break;
+				
 			}
+			
+			
 
 		} else {
 			Log.w("OnActivityResult", "Warning: activity result not ok");
