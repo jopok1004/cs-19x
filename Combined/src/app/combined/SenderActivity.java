@@ -28,6 +28,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Debug;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
@@ -38,7 +39,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Debug;
 public class SenderActivity extends Activity {
 	private String phoneNum;
 	private ArrayList<String> packetList = new ArrayList<String>();
@@ -52,12 +52,12 @@ public class SenderActivity extends Activity {
 	private Boolean mmsReceived = false;
 	private Boolean receiverIsOnline = false;
 	private static final int SEND_MMS = 1003;
-	private Button btnDisconnect =(Button) this.findViewById(R.id.btnConnect);
-	private TextView txtCurrentChannel = (TextView)this.findViewById(R.id.txtCurrentChannel);
-	private TextView txtSMS = (TextView)this.findViewById(R.id.txtSMS);
-	private TextView txtMMS = (TextView)this.findViewById(R.id.txtMMS);
-	private TextView txt3G = (TextView)this.findViewById(R.id.txt3G);
-	private TextView txtTotalPackets = (TextView)this.findViewById(R.id.txtTotalPackets);
+	private Button btnDisconnect;
+	private TextView txtCurrentChannel;
+	private TextView txtSMS;
+	private TextView txtMMS;
+	private TextView txt3G;
+	private TextView txtTotalPackets;
 	ProgressDialog dialog;
 	
 	private XMPPConnection connection; //for 3G connection
@@ -71,8 +71,8 @@ public class SenderActivity extends Activity {
 	private long t1, t2, t3;
 	private FileWriter logfw = null, logfw1 = null;
 	private BufferedWriter logbw = null, logbw1 = null;
-	private File receiverLog = new File("/sdcard/receiverLog.txt");
-	private File receiverSignal = new File("/sdcard/receiverSignal.txt");
+	private File receiverLog = new File("/sdcard/senderLog.txt");
+	private File receiverSignal = new File("/sdcard/senderSignal.txt");
 	//for signal strength
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
@@ -81,8 +81,17 @@ public class SenderActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Debug.startMethodTracing("sender");
 		setContentView(R.layout.senderactivity);
+		btnDisconnect =(Button) this.findViewById(R.id.btnConnect);
+		txtCurrentChannel = (TextView)this.findViewById(R.id.txtCurrentChannel);
+		txtSMS = (TextView)this.findViewById(R.id.txtSMS);
+		txtMMS = (TextView)this.findViewById(R.id.txtMMS);
+		txt3G = (TextView)this.findViewById(R.id.txt3G);
+		txtTotalPackets = (TextView)this.findViewById(R.id.txtTotalPackets);
 		Log.e("SENDER ACT","SENDER ACT");
 		Intent intent = getIntent();
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		t1 = intent.getLongExtra("temp1", 0);
 		t2 = intent.getLongExtra("temp2", 0);
 		phoneNum = intent.getStringExtra("phoneNum");

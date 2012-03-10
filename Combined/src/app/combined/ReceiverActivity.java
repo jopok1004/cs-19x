@@ -83,6 +83,8 @@ public class ReceiverActivity extends Activity {
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
 	
+	
+	
 	ContentObserver mmsObserver = new ContentObserver(null) {
 		@Override
 		public void onChange(boolean selfChange) {
@@ -121,6 +123,9 @@ public class ReceiverActivity extends Activity {
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		setContentView(R.layout.receiver);
 		Intent intent = getIntent();
+		MyListener = new MyPhoneStateListener();
+		Tel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		size = intent.getIntExtra("size", 10);
 		fileT = intent.getStringExtra("fileType");
 		rcvd = new SmsReceiver();
