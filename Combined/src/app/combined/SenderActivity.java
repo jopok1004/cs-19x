@@ -1,6 +1,9 @@
 package app.combined;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -25,13 +28,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.os.Debug;
 public class SenderActivity extends Activity {
 	private String phoneNum;
 	private ArrayList<String> packetList = new ArrayList<String>();
@@ -59,14 +66,38 @@ public class SenderActivity extends Activity {
 	
 	IntentFilter gIntentFilter = new IntentFilter();
 	
+	//variables for log files
+	private Time time= new Time();
+	private long t1, t2, t3;
+	private FileWriter logfw = null, logfw1 = null;
+	private BufferedWriter logbw = null, logbw1 = null;
+	private File receiverLog = new File("/sdcard/receiverLog.txt");
+	private File receiverSignal = new File("/sdcard/receiverSignal.txt");
+	//for signal strength
+	TelephonyManager Tel;
+	MyPhoneStateListener MyListener;
+		
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Debug.startMethodTracing("sender");
 		setContentView(R.layout.senderactivity);
 		Log.e("SENDER ACT","SENDER ACT");
 		Intent intent = getIntent();
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
+		try {
+			logfw = new FileWriter(receiverLog);
+			logbw = new BufferedWriter(logfw);
+			logfw1 = new FileWriter(receiverSignal);
+			logbw1 = new BufferedWriter(logfw1);
+			time.setToNow();
+			t1= time.toMillis(true);
+			logbw.write(time.toString() + "SENDER START\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		threeGMonitorBroadcastReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -133,6 +164,17 @@ public class SenderActivity extends Activity {
 		}
 		
 		if ((intent.getStringExtra("start?").toString()).equals("done receiving")) {
+			Debug.stopMethodTracing();
+			time.setToNow();
+			t3 = time.toMillis(true);
+			try {
+				logbw.write("Receiving time:"+ (t3-t2) +"\n");
+				logbw.write("Processing time:"+ (t2-t1) +"\n");
+				logbw.write("Total time:"+ (t3-t1) +"\n");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			done = true;
 			Toast.makeText(getBaseContext(), "Done Sending", Toast.LENGTH_SHORT);
 		}
@@ -255,7 +297,8 @@ public class SenderActivity extends Activity {
 	
 		Thread thread = new smsWaitThread();
 		thread.start();
-		
+		time.setToNow();
+		logbw.write(time.toString()  + "Sending via SMS INSIDE send10\n");
 
 	}
 	class smsWaitThread extends Thread {
@@ -353,7 +396,8 @@ public class SenderActivity extends Activity {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
+		time.setToNow();
+		logbw.write(time.toString()  + "Sending via MMS\n");
 	}
 
 
@@ -366,7 +410,7 @@ public class SenderActivity extends Activity {
 		intent.setClassName("com.android.mms",
 				"com.android.mms.ui.ComposeMessageActivity");
 		startActivityForResult(intent, SEND_MMS);
-
+		
 	}
 	
 	class mmsWaitThread extends Thread {
@@ -547,11 +591,63 @@ public class SenderActivity extends Activity {
 		}
 		
 	}
-	
+	public BufferedWriter getWriter() {
+		return logbw;
+	}
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
 		logOut();
+		logbw= null;
+		logbw1= null;
 		super.onDestroy();
 	}
+	
+	// FOR SIGNAL STRENGTH
+
+		protected void onPause() {
+			super.onPause();
+			Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
+		}
+
+		/* Called when the application resumes */
+		@Override
+		protected void onResume() {
+			super.onResume();
+			Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+		}
+
+		/* ÑÑÑÑÑÑÑÑÑÐ */
+		/* Start the PhoneState listener */
+		/* ÑÑÑÑÑÑÑÑÑÐ */
+		private class MyPhoneStateListener extends PhoneStateListener {
+			/*
+			 * Get the Signal strength from the provider, each tiome there is an
+			 * update
+			 */
+			@Override
+			public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+				super.onSignalStrengthsChanged(signalStrength);
+				time.setToNow();
+				if (logfw1 != null && logbw1 != null) {
+					try {
+						logbw1.write("Signal Strength"
+								+ time.toString()
+								+ ": "
+								+ String.valueOf(signalStrength
+										.getGsmSignalStrength()) + "\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};/* End of private Class */
+		
+		//FOR LOG
+		public void setTime(long time1, long time2){
+			t1 = time1;
+			t2 = time2;
+			
+		}
 }
 

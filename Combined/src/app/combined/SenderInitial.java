@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class SenderInitial extends Activity {
+	private SenderActivity Sender;
 	private String phoneNo = new String();
 	private Button btnSendSMS;
 	private EditText txtPhoneNo;
@@ -129,6 +130,9 @@ public class SenderInitial extends Activity {
 				}
 				break;
 			case FILE_EXPLORE_RESULT:
+				long temp1, temp2;
+				time.setToNow();
+				temp1 = time.toMillis(true);
 				txtFileName.setText(data.getExtras().getString("fileName"));
 				File file = new File(data.getExtras().getString("filePath")
 						+ "/" + data.getExtras().getString("fileName"));
@@ -167,7 +171,9 @@ public class SenderInitial extends Activity {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
+				time.setToNow();
+				temp2 = time.toMillis(true);
+				Sender.setTime(temp1, temp2);
 				break;
 			}
 

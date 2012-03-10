@@ -108,7 +108,7 @@ public class Sender3GListener implements MessageListener{
 				
 				try {
 					time.setToNow();
-					sender.getWriter().write(time.toString() + " : Packet " + getCurrentPacket() +  "Sent\n");
+					sender.getWriter().write(time.toString() + " : Packet " + getCurrentPacket() +  "Sent Via 3G\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
