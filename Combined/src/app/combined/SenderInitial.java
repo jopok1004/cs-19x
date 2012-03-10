@@ -38,6 +38,7 @@ public class SenderInitial extends Activity {
 	private ArrayList<String> packetList = new ArrayList<String>();
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
+	private long temp1, temp2;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -75,6 +76,8 @@ public class SenderInitial extends Activity {
 					intent.putStringArrayListExtra("arraylist", packetList);
 					intent.putExtra("packetCount", packetCount);
 					intent.putExtra("start?", "fromInitial");
+					intent.putExtra("temp1", temp1);
+					intent.putExtra("temp2", temp2);
 					startActivity(intent);
 					
 				} else
@@ -130,7 +133,7 @@ public class SenderInitial extends Activity {
 				}
 				break;
 			case FILE_EXPLORE_RESULT:
-				long temp1, temp2;
+				
 				time.setToNow();
 				temp1 = time.toMillis(true);
 				txtFileName.setText(data.getExtras().getString("fileName"));
@@ -173,7 +176,7 @@ public class SenderInitial extends Activity {
 				}
 				time.setToNow();
 				temp2 = time.toMillis(true);
-				Sender.setTime(temp1, temp2);
+				
 				break;
 			}
 

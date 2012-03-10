@@ -83,6 +83,8 @@ public class SenderActivity extends Activity {
 		setContentView(R.layout.senderactivity);
 		Log.e("SENDER ACT","SENDER ACT");
 		Intent intent = getIntent();
+		t1 = intent.getLongExtra("temp1", 0);
+		t2 = intent.getLongExtra("temp2", 0);
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
@@ -644,10 +646,6 @@ public class SenderActivity extends Activity {
 		};/* End of private Class */
 		
 		//FOR LOG
-		public void setTime(long time1, long time2){
-			t1 = time1;
-			t2 = time2;
-			
-		}
+		
 }
 
