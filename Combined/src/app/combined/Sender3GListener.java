@@ -44,19 +44,19 @@ public class Sender3GListener implements MessageListener{
 			sender.setTracker(getCurrentPacket());
 			Log.e("XMPPSender:Sending", "Sending file SUCCESSFUL");
 			//setCurrentPacket(0);
-			
-			/*try {
-				sender.getWriter().write((t - sender.getT1()) + " : total time\n");
-				sender.getWriter().write(sender.getT2() - sender.getT1() + " : processing time\n");
-				sender.getWriter().write((t - sender.getInitial()) + " : sending time\n");
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			try {
-				sender.getWriter().close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}*/
+		
+//			try {
+//				sender.getWriter().write((t - sender.getT1()) + " : total time\n");
+//				sender.getWriter().write(sender.getT2() - sender.getT1() + " : processing time\n");
+//				sender.getWriter().write((t - sender.getInitial()) + " : sending time\n");
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
+//			try {
+//				sender.getWriter().close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 			sender.finish();
 			
 		}else if (message.getBody().equals("%&CONTINUE")) {
