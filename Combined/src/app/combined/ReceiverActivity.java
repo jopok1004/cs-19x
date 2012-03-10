@@ -1,5 +1,6 @@
 package app.combined;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +32,8 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.text.format.Time;
@@ -48,14 +51,12 @@ public class ReceiverActivity extends Activity {
 	EditText txtPhoneNo;
 	SmsReceiver rcvd;
 	HashMap<Integer, String> al = new HashMap<Integer, String>();
-	TelephonyManager Tel;
 	int size; // number of messages to be received
 	String fileT;
 	int messageSize = 10;
 	long last, current;
 	private XMPPConnection connection;
 	public static final String MMSMON_RECEIVED_MMS = "MMStesting.intent.action.MMSMON_RECEIVED_MMS";
-	private Time time;
 	int temporary=0;
 	int tempalsize;
 	int alsize = 0;
@@ -66,13 +67,21 @@ public class ReceiverActivity extends Activity {
 	private int end;
 	private String fileType;
 	private boolean started;
-	private File fileoutput = new File("/sdcard/outputreceiver.txt");
+	//variables for log files
+	private Time time= new Time();
+	private long t1, t2, t3;
+	private FileWriter logfw = null, logfw1 = null;
+	private BufferedWriter logbw = null, logbw1 = null;
+	private File receiverLog = new File("/sdcard/receiverLog.txt");
+	private File receiverSignal = new File("/sdcard/receiverSignal.txt");
 	
 	private String username = "chloebelleaquino@gmail.com";
 	private String password = "chloebelle";
 	IntentFilter mIntentFilter = new IntentFilter();
 	IntentFilter gIntentFilter = new IntentFilter();
-	
+	//for signal strength
+	TelephonyManager Tel;
+	MyPhoneStateListener MyListener;
 	
 	ContentObserver mmsObserver = new ContentObserver(null) {
 		@Override
@@ -106,6 +115,7 @@ public class ReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Debug.startMethodTracing("receiver");
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
@@ -119,11 +129,23 @@ public class ReceiverActivity extends Activity {
 		btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
 		btnSendConfirmation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				//get starting time
+				try {
+					logfw = new FileWriter(receiverLog);
+					logbw = new BufferedWriter(logfw);
+					logfw1 = new FileWriter(receiverSignal);
+					logbw1 = new BufferedWriter(logfw1);
+					time.setToNow();
+					t1= time.toMillis(true);
+					logbw.write(time.toString() + "RECEIVER START\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				phoneNo = txtPhoneNo.getText().toString();
 				if (phoneNo.length() > 0) {
 					if(isOnline(getBaseContext())){
 						Log.e("ONLINE","ONLINE AKO!");
-						
 						sendSMS(phoneNo, "%& start 1");
 						Log.e("PHONE NUMBER: ",phoneNo);
 						Log.e("SMS SENT","SMS SENT");
@@ -250,9 +272,17 @@ public class ReceiverActivity extends Activity {
 			if (received) {
 				// do nothing
 			} else {
-
+				
 				int pn;
 				pn = intent.getIntExtra("packetNum", 1000);
+				
+				try {
+					logbw1.write(time.toString() + " : Message " + pn + " Received\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				al.put(intent.getIntExtra("packetNum", 1000), intent
 						.getStringExtra("message").toString());
 				Toast.makeText(getBaseContext(), "Received Packet #" + pn,
@@ -353,6 +383,12 @@ public class ReceiverActivity extends Activity {
 							if (text != null) {
 								if (text.startsWith("&%")) {
 									packets = text.split("&% ");
+									try {
+										logbw1.write(time.toString() + "Received packets via MMS\n");
+									} catch (IOException e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									// bw.write("MID: " + mid.get(i) + "\tTEXT:"
 									// + text + "\n");
 									for (int j = 0; j < packets.length; j++) {
@@ -416,6 +452,8 @@ public class ReceiverActivity extends Activity {
 	public void receiveFile() {
 
 		if (al.size() == size) {
+				time.setToNow();
+				t2= time.toMillis(true);
 			try {
 				FileWriter fw1 = new FileWriter(new File("/sdcard/decode.txt"));
 				for (int i = 0; i < size; i++) {
@@ -432,11 +470,21 @@ public class ReceiverActivity extends Activity {
 				compression.decompressGzip("/sdcard/file." + fileT + ".gz");
 				fl = new File("/sdcard/file." + fileT + ".gz");
 				fl.delete();
-				
+				time.setToNow();
+				t3= time.toMillis(true);
 				Log.i("DONE!!!", "DONE");
+				try {
+					logbw.write("Receiving time:"+ (t2-t1) +"\n");
+					logbw.write("Processing time:"+ (t3-t2) +"\n");
+					logbw.write("Total time:"+ (t3-t1) +"\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				Toast.makeText(getBaseContext(),"File Received. Check your SD Card",Toast.LENGTH_LONG).show();
 				fw1.close();
 				sendSMS(phoneNo, "%& doneMMS");
+				Debug.stopMethodTracing();
 				this.finish();
 
 			} catch (IOException e) {
@@ -532,10 +580,9 @@ public class ReceiverActivity extends Activity {
 	    //}
 	    return true;
 	}
-
-	
-	
-
+	public BufferedWriter getWriter() {
+		return logbw;
+	}
 	
 	
 	//COMMON FUNCTIONS
@@ -645,7 +692,50 @@ public class ReceiverActivity extends Activity {
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
+		logbw1= null;
+		logbw= null;
 		logOut();
 		super.onDestroy();
 	}
+	
+	// FOR SIGNAL STRENGTH
+
+	protected void onPause() {
+		super.onPause();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
+	}
+
+	/* Called when the application resumes */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+	}
+
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	/* Start the PhoneState listener */
+	/* ÑÑÑÑÑÑÑÑÑÐ */
+	private class MyPhoneStateListener extends PhoneStateListener {
+		/*
+		 * Get the Signal strength from the provider, each tiome there is an
+		 * update
+		 */
+		@Override
+		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+			super.onSignalStrengthsChanged(signalStrength);
+			time.setToNow();
+			if (logfw1 != null && logbw1 != null) {
+				try {
+					logbw1.write("Signal Strength"
+							+ time.toString()
+							+ ": "
+							+ String.valueOf(signalStrength
+									.getGsmSignalStrength()) + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	};/* End of private Class */
 }

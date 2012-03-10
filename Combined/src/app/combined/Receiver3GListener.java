@@ -1,5 +1,7 @@
 package app.combined;
 
+import java.io.IOException;
+
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
@@ -77,7 +79,7 @@ public class Receiver3GListener implements PacketListener{
 			receiver.getConnection().sendPacket(reply);
 		
 		}else if (message.getBody().startsWith("%&")) {
-			/*int packetNum;
+			int packetNum;
 			String packetLine;
 			
 			String s = message.getBody().substring(2);
@@ -89,21 +91,16 @@ public class Receiver3GListener implements PacketListener{
 			}
 			packetNum = Integer.parseInt(n);
 			packetLine = s.substring(i+1);
-			packetList.put(packetNum, packetLine);
 			
 			time.setToNow();
-			if (packetList.size() == 1) {
-				receiver.setInitial(time.toMillis(true));
-			}
 			try {
 				receiver.getWriter().write(time.toString() + " : Message " + packetNum + " Received\n");
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			Log.i("XMPPReceiver:Receiving", "Received Packet number " + packetNum + " with value " + packetLine);
-			Log.i("XMPPReceiver:Receiving", "Current Map size " + Integer.toString(packetList.size()));
-			Log.i("XMPPReceiver:Receiving", "Goal Map size " + packetSize);
-			*/
+			//Log.i("XMPPReceiver:Receiving", "Goal Map size " + packetSize);
+			
 			//String s = message.getBody().substring(2);
 			getPackets(message.getBody(),time);
 			setMessCtr(getMessCtr() + 1);
