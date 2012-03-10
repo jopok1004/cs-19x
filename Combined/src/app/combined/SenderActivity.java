@@ -23,9 +23,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SenderActivity extends Activity {
@@ -41,6 +45,12 @@ public class SenderActivity extends Activity {
 	private Boolean mmsReceived = false;
 	private Boolean receiverIsOnline = false;
 	private static final int SEND_MMS = 1003;
+	private Button btnDisconnect =(Button) this.findViewById(R.id.btnConnect);
+	private TextView txtCurrentChannel = (TextView)this.findViewById(R.id.txtCurrentChannel);
+	private TextView txtSMS = (TextView)this.findViewById(R.id.txtSMS);
+	private TextView txtMMS = (TextView)this.findViewById(R.id.txtMMS);
+	private TextView txt3G = (TextView)this.findViewById(R.id.txt3G);
+	private TextView txtTotalPackets = (TextView)this.findViewById(R.id.txtTotalPackets);
 	ProgressDialog dialog;
 	
 	private XMPPConnection connection; //for 3G connection
@@ -67,9 +77,11 @@ public class SenderActivity extends Activity {
 			            Log.i("app","Network "+ni.getTypeName()+" connected");
 			            if(receiverIsOnline){
 			            	currentChannel = 2;
+			            	txtCurrentChannel.setText("3G");
 			            	sendBy3G("chloebelleaquino@gmail.com",tracker);
 			            }else{
 			            	currentChannel = 1;
+			            	txtCurrentChannel.setText("MMS");
 			            	sendViaMms(tracker);
 			            }
 			            
@@ -79,6 +91,7 @@ public class SenderActivity extends Activity {
 			     if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
 			            Log.e("app","There's no network connectivity");
 			            currentChannel = 1;
+			            txtCurrentChannel.setText("MMS");
 			            sendViaMms(tracker);
 			          //send sms na di connected
 			     }
@@ -109,9 +122,11 @@ public class SenderActivity extends Activity {
 				
 				
 				currentChannel = 2;
+				txtCurrentChannel.setText("3G");
 				sendBy3G("chloebelleaquino@gmail.com", tracker);
 			}else{
 				currentChannel = 1;
+				txtCurrentChannel.setText("MMS");
 				sendViaMms(tracker);
 			}
 			registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
@@ -151,12 +166,14 @@ public class SenderActivity extends Activity {
 			try {
 				Log.i("send10", "Before send10");
 				if(currentChannel == 0){
+					txtCurrentChannel.setText("SMS");
 					if(send10Resends<5){
 						send10(phoneNum);
 						//continue with sms since resends < 5
 					}else{
 						//shift to mms
 						currentChannel = 1;
+						txtCurrentChannel.setText("MMS");
 						sendViaMms(tracker);
 					}
 					
@@ -172,6 +189,7 @@ public class SenderActivity extends Activity {
 			mmsReceived= true;
 			try {
 				if (tracker < packetCount && currentChannel == 1) {
+					txtCurrentChannel.setText("MMS");
 					send1mms(phoneNum);
 				}
 
@@ -185,12 +203,14 @@ public class SenderActivity extends Activity {
 				receiverIsOnline= true;
 				if(isOnline(this)) {
 					currentChannel = 2;
+					txtCurrentChannel.setText("3G");
 					sendBy3G("chloebelleaquino@gmail.com",tracker);
 				}
 				
 			}else{
 				receiverIsOnline= false;
 				currentChannel = 1;
+				txtCurrentChannel.setText("MMS");
 				sendViaMms(tracker);
 			}
 		}
@@ -203,6 +223,7 @@ public class SenderActivity extends Activity {
 
 		sendSMS(phoneNum, "%& sendViaSms" + startIndex);
 		if(currentChannel == 0){
+			txtCurrentChannel.setText("SMS");
 			send10(phoneNo);
 		}
 		
@@ -221,6 +242,7 @@ public class SenderActivity extends Activity {
 			headerBegin = "&% " + tracker + " ";
 			submessage = headerBegin + packetList.get(tracker);
 			tracker++;
+			txtTotalPackets.setText(Integer.toString(tracker));
 			Log.i("SUBMESSAGE", submessage);
 			Log.i("PHONE NUMBER", phoneNo);
 			sendSMS(phoneNo, submessage);
@@ -294,6 +316,7 @@ public class SenderActivity extends Activity {
 		try {
 			Log.i("SENDING MMS", "SENDING MMS");
 			if(currentChannel == 1){
+				txtCurrentChannel.setText("MMS");
 				send1mms(phoneNum);
 			}
 			
@@ -317,6 +340,7 @@ public class SenderActivity extends Activity {
 				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
 						+ "\n";
 				tracker++;
+				txtTotalPackets.setText(Integer.toString(tracker));
 				Log.i("SUBMESSAGE", msg);
 			}
 			Log.i("parser", "before mms sending");
@@ -360,6 +384,7 @@ public class SenderActivity extends Activity {
 				
 				try {
 					currentChannel = 0;
+					txtCurrentChannel.setText("SMS");
 					sendViaSms(phoneNum, tracker);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -506,7 +531,22 @@ public class SenderActivity extends Activity {
 	    return true;
 	}
 	
-	
+	public void disconnectWifi(View view) {
+		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if(wifi.isWifiEnabled()) {
+			wifi.disconnect();
+			wifi.setWifiEnabled(false);
+			btnDisconnect.setText("Reconnect");
+		}
+		else {
+			wifi.setWifiEnabled(false);
+			btnDisconnect.setText("Disconnect");
+			wifi.reconnect();
+			
+			
+		}
+		
+	}
 	
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
