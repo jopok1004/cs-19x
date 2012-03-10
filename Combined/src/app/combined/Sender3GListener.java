@@ -1,4 +1,6 @@
-package app.combined;
+ package app.combined;
+
+import java.io.IOException;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
@@ -44,19 +46,19 @@ public class Sender3GListener implements MessageListener{
 			sender.setTracker(getCurrentPacket());
 			Log.e("XMPPSender:Sending", "Sending file SUCCESSFUL");
 			//setCurrentPacket(0);
-		
-//			try {
-//				sender.getWriter().write((t - sender.getT1()) + " : total time\n");
-//				sender.getWriter().write(sender.getT2() - sender.getT1() + " : processing time\n");
-//				sender.getWriter().write((t - sender.getInitial()) + " : sending time\n");
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
-//			try {
-//				sender.getWriter().close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			
+			/*try {
+				sender.getWriter().write((t - sender.getT1()) + " : total time\n");
+				sender.getWriter().write(sender.getT2() - sender.getT1() + " : processing time\n");
+				sender.getWriter().write((t - sender.getInitial()) + " : sending time\n");
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			try {
+				sender.getWriter().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}*/
 			sender.finish();
 			
 		}else if (message.getBody().equals("%&CONTINUE")) {
@@ -104,12 +106,12 @@ public class Sender3GListener implements MessageListener{
 				
 				chat.sendMessage(reply);
 				
-				/*try {
+				try {
 					time.setToNow();
 					sender.getWriter().write(time.toString() + " : Packet " + getCurrentPacket() +  "Sent\n");
 				} catch (IOException e) {
 					e.printStackTrace();
-				}*/
+				}
 				
 				Log.e("XMPPSender:Sending", "Sending text [" + reply.getBody() + "] SUCCESS");
 			}
