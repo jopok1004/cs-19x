@@ -29,6 +29,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Debug;
+import android.os.Handler;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.SmsManager;
@@ -67,7 +68,7 @@ public class SenderActivity extends Activity {
 	private XMPPConnection connection; //for 3G connection
 	private String username = "jvbsantos@gmail.com";
 	private String password = "jayvee14";
-	
+	private String text;
 	IntentFilter gIntentFilter = new IntentFilter();
 	
 	//variables for log files
@@ -80,7 +81,7 @@ public class SenderActivity extends Activity {
 	//for signal strength
 	TelephonyManager Tel;
 	MyPhoneStateListener MyListener;
-		
+	Handler handler;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Debug.startMethodTracing("sender");
@@ -101,6 +102,7 @@ public class SenderActivity extends Activity {
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
+		handler = new Handler();
 		try {
 			logfw = new FileWriter(senderLog);
 			logbw = new BufferedWriter(logfw);
@@ -124,12 +126,24 @@ public class SenderActivity extends Activity {
 			            if(receiverIsOnline){
 			            	currentChannel = 2;
 			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
-			            	txtCurrentChannel.setText("3G");
+			            	handler.post(new Runnable() {
+								@Override
+								public void run() {
+									txtCurrentChannel.setText("3G");
+								}
+							});
+			            	
 			            	sendBy3G("dummy19x@gmail.com",tracker);
 			            }else{
 			            	currentChannel = 1;
 			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
-			            	txtCurrentChannel.setText("MMS");
+			            	handler.post(new Runnable() {
+								@Override
+								public void run() {
+									txtCurrentChannel.setText("MMS");
+								}
+							});
+			            	
 			            	sendViaMms(tracker);
 			            }
 			            
@@ -140,7 +154,14 @@ public class SenderActivity extends Activity {
 			            Log.e("app","There's no network connectivity");
 			            currentChannel = 1;
 			            Log.e("BRECEIVER","I AM AT BRECEIVER");
-			            txtCurrentChannel.setText("MMS");
+			            handler.post(new Runnable() {
+							@Override
+							public void run() {
+								txtCurrentChannel.setText("MMS");
+							}
+						});
+		            	
+			           
 			            sendViaMms(tracker);
 			          //send sms na di connected
 			     }
@@ -171,11 +192,24 @@ public class SenderActivity extends Activity {
 				
 				
 				currentChannel = 2;
-				txtCurrentChannel.setText("3G");
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						txtCurrentChannel.setText("3G");
+					}
+				});
+            	
+				
 				sendBy3G("dummy19x@gmail.com", tracker);
 			}else{
 				currentChannel = 1;
-				txtCurrentChannel.setText("MMS");
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						txtCurrentChannel.setText("MMS");
+					}
+				});
+            	
 				sendViaMms(tracker);
 			}
 			registerReceiver(threeGMonitorBroadcastReceiver,gIntentFilter);
@@ -227,14 +261,26 @@ public class SenderActivity extends Activity {
 			try {
 				Log.i("send10", "Before send10");
 				if(currentChannel == 0){
-					txtCurrentChannel.setText("SMS");
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							txtCurrentChannel.setText("SMS");
+						}
+					});
+	            	
 					if(send10Resends<5){
 						send10(phoneNum);
 						//continue with sms since resends < 5
 					}else{
 						//shift to mms
 						currentChannel = 1;
-						txtCurrentChannel.setText("MMS");
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								txtCurrentChannel.setText("MMS");
+							}
+						});
+		            	
 						sendViaMms(tracker);
 					}
 					
@@ -252,7 +298,13 @@ public class SenderActivity extends Activity {
 			mmsReceived= true;
 			try {
 				if (tracker < packetCount && currentChannel == 1) {
-					txtCurrentChannel.setText("MMS");
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							txtCurrentChannel.setText("MMS");
+						}
+					});
+	            	
 					send1mms(phoneNum);
 				}
 
@@ -266,14 +318,26 @@ public class SenderActivity extends Activity {
 				receiverIsOnline= true;
 				if(isOnline(this)) {
 					currentChannel = 2;
-					txtCurrentChannel.setText("3G");
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							txtCurrentChannel.setText("3G");
+						}
+					});
+	            	
 					sendBy3G("dummy19x@gmail.com",tracker);
 				}
 				
 			}else{
 				receiverIsOnline= false;
 				currentChannel = 1;
-				txtCurrentChannel.setText("MMS");
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						txtCurrentChannel.setText("MMS");
+					}
+				});
+            	
 				sendViaMms(tracker);
 			}
 		}
@@ -286,7 +350,13 @@ public class SenderActivity extends Activity {
 
 		sendSMS(phoneNum, "%& sendViaSms" + startIndex);
 		if(currentChannel == 0){
-			txtCurrentChannel.setText("SMS");
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					txtCurrentChannel.setText("SMS");
+				}
+			});
+        	
 			send10(phoneNo);
 		}
 		
@@ -305,7 +375,15 @@ public class SenderActivity extends Activity {
 			headerBegin = "&% " + tracker + " ";
 			submessage = headerBegin + packetList.get(tracker);
 			tracker++;
-			txtTotalPackets.setText(Integer.toString(tracker));
+			
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					txtTotalPackets.setText(Integer.toString(tracker));
+				}
+			});
+        	
+			
 			Log.i("SUBMESSAGE", submessage);
 			Log.i("PHONE NUMBER", phoneNo);
 			sendSMS(phoneNo, submessage);
@@ -370,7 +448,14 @@ public class SenderActivity extends Activity {
 		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 		Log.e("SMS", "SMS Sent");
 		this.smsCount++;
-		this.txtSMS.setText(Integer.toString(smsCount));
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				txtSMS.setText(Integer.toString(smsCount));
+			}
+		});
+    	
+		
 	}
 	
 	// ################################################################################################### //
@@ -382,7 +467,13 @@ public class SenderActivity extends Activity {
 		try {
 			Log.i("SENDING MMS", "SENDING MMS");
 			if(currentChannel == 1){
-				txtCurrentChannel.setText("MMS");
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						txtCurrentChannel.setText("MMS");
+					}
+				});
+				
 				send1mms(phoneNum);
 			}
 			
@@ -406,7 +497,13 @@ public class SenderActivity extends Activity {
 				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
 						+ "\n";
 				tracker++;
-				txtTotalPackets.setText(Integer.toString(tracker));
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						txtTotalPackets.setText(Integer.toString(tracker));
+					}
+				});
+				
 				Log.i("SUBMESSAGE", msg);
 			}
 			Log.i("parser", "before mms sending");
@@ -422,7 +519,13 @@ public class SenderActivity extends Activity {
 		time.setToNow();
 		logbw.write(time.toString()  + "Sending via MMS\n");
 		mmsCount++;
-		this.txtMMS.setText(Integer.toString(mmsCount));
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				txtMMS.setText(Integer.toString(mmsCount));
+			}
+		});
+		
 	}
 
 
@@ -453,7 +556,13 @@ public class SenderActivity extends Activity {
 				
 				try {
 					currentChannel = 0;
-					txtCurrentChannel.setText("SMS");
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							txtCurrentChannel.setText("SMS");
+						}
+					});
+					
 					sendViaSms(phoneNum, tracker);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -616,8 +725,15 @@ public class SenderActivity extends Activity {
 		}
 		
 	}
-	public void setText3G(String text) {
-		this.txt3G.setText(text);
+	public void setText3G(String text2) {
+		this.text = text2;
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				txt3G.setText(text);
+			}
+		});
+		
 	}
 	public BufferedWriter getWriter() {
 		return logbw;
