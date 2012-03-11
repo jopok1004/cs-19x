@@ -62,7 +62,8 @@ public class SenderActivity extends Activity {
 	private int smsCount = 0;
 	private int mmsCount = 0;
 	int threeGCount = 0;
-	
+	Chat nchat;
+	Sender3GListener sender3GListener;
 	private XMPPConnection connection; //for 3G connection
 	private String username = "jvbsantos@gmail.com";
 	private String password = "jayvee14";
@@ -124,7 +125,7 @@ public class SenderActivity extends Activity {
 			            	currentChannel = 2;
 			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            	txtCurrentChannel.setText("3G");
-			            	sendBy3G("chloebelleaquino@gmail.com",tracker);
+			            	sendBy3G("dummy19x@gmail.com",tracker);
 			            }else{
 			            	currentChannel = 1;
 			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
@@ -171,7 +172,7 @@ public class SenderActivity extends Activity {
 				
 				currentChannel = 2;
 				txtCurrentChannel.setText("3G");
-				sendBy3G("chloebelleaquino@gmail.com", tracker);
+				sendBy3G("dummy19x@gmail.com", tracker);
 			}else{
 				currentChannel = 1;
 				txtCurrentChannel.setText("MMS");
@@ -266,7 +267,7 @@ public class SenderActivity extends Activity {
 				if(isOnline(this)) {
 					currentChannel = 2;
 					txtCurrentChannel.setText("3G");
-					sendBy3G("chloebelleaquino@gmail.com",tracker);
+					sendBy3G("dummy19x@gmail.com",tracker);
 				}
 				
 			}else{
@@ -517,8 +518,8 @@ public class SenderActivity extends Activity {
 		waiting(30);
 		Roster r = getConnection().getRoster();
 		ChatManager chatManage = getConnection().getChatManager();
-        Chat nchat = chatManage.createChat(to, new Sender3GListener(this));
-        
+		sender3GListener =  new Sender3GListener(this);
+        nchat = chatManage.createChat(to,sender3GListener);
         if (r.getPresence(to).isAvailable()) {
         	Log.i("XMPPSender", "ONLINE: Available");
         	Message message = new Message();
@@ -607,7 +608,7 @@ public class SenderActivity extends Activity {
 			btnDisconnect.setText("Reconnect");
 		}
 		else {
-			wifi.setWifiEnabled(false);
+			wifi.setWifiEnabled(true);
 			btnDisconnect.setText("Disconnect");
 			wifi.reconnect();
 			
@@ -630,6 +631,7 @@ public class SenderActivity extends Activity {
 	}
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
+		nchat.removeMessageListener(sender3GListener);
 		logOut();
 		try {
 			logbw.close();

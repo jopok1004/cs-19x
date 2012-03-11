@@ -76,8 +76,8 @@ public class ReceiverActivity extends Activity {
 	private File receiverLog = new File("/sdcard/receiverLog.txt");
 	private File receiverSignal = new File("/sdcard/receiverSignal.txt");
 
-	private String username = "chloebelleaquino@gmail.com";
-	private String password = "chloebelle";
+	private String username = "dummy19x@gmail.com";
+	private String password = "noctilucent";
 	IntentFilter mIntentFilter = new IntentFilter();
 	IntentFilter gIntentFilter = new IntentFilter();
 	// for signal strength
@@ -601,7 +601,7 @@ public class ReceiverActivity extends Activity {
 			wifi.setWifiEnabled(false);
 			btnDisconnect.setText("Reconnect");
 		} else {
-			wifi.setWifiEnabled(false);
+			wifi.setWifiEnabled(true);
 			wifi.reconnect();
 
 			btnDisconnect.setText("Disconnect");
