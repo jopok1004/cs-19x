@@ -64,7 +64,7 @@ public class SenderActivity extends Activity {
 	private int smsCount = 0;
 	private int mmsCount = 0;
 	int threeGCount = 0;
-	Chat nchat;
+	Chat nchat=null;
 	Sender3GListener sender3GListener;
 	private XMPPConnection connection; //for 3G connection
 	private String username = "jvbsantos@gmail.com";
@@ -750,7 +750,10 @@ public class SenderActivity extends Activity {
 	}
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
-		nchat.removeMessageListener(sender3GListener);
+		if(nchat !=null){
+			nchat.removeMessageListener(sender3GListener);
+		}
+		
 		logOut();
 		try {
 			logbw.close();
