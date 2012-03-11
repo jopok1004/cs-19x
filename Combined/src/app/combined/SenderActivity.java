@@ -127,7 +127,6 @@ public class SenderActivity extends Activity {
 			            	currentChannel = 2;
 			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            	handler.post(new Runnable() {
-								@Override
 								public void run() {
 									txtCurrentChannel.setText("3G");
 								}
@@ -138,7 +137,6 @@ public class SenderActivity extends Activity {
 			            	currentChannel = 1;
 			            	Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            	handler.post(new Runnable() {
-								@Override
 								public void run() {
 									txtCurrentChannel.setText("MMS");
 								}
@@ -155,7 +153,6 @@ public class SenderActivity extends Activity {
 			            currentChannel = 1;
 			            Log.e("BRECEIVER","I AM AT BRECEIVER");
 			            handler.post(new Runnable() {
-							@Override
 							public void run() {
 								txtCurrentChannel.setText("MMS");
 							}
@@ -193,7 +190,6 @@ public class SenderActivity extends Activity {
 				
 				currentChannel = 2;
 				handler.post(new Runnable() {
-					@Override
 					public void run() {
 						txtCurrentChannel.setText("3G");
 					}
@@ -204,7 +200,6 @@ public class SenderActivity extends Activity {
 			}else{
 				currentChannel = 1;
 				handler.post(new Runnable() {
-					@Override
 					public void run() {
 						txtCurrentChannel.setText("MMS");
 					}
@@ -262,7 +257,6 @@ public class SenderActivity extends Activity {
 				Log.i("send10", "Before send10");
 				if(currentChannel == 0){
 					handler.post(new Runnable() {
-						@Override
 						public void run() {
 							txtCurrentChannel.setText("SMS");
 						}
@@ -275,7 +269,6 @@ public class SenderActivity extends Activity {
 						//shift to mms
 						currentChannel = 1;
 						handler.post(new Runnable() {
-							@Override
 							public void run() {
 								txtCurrentChannel.setText("MMS");
 							}
@@ -299,7 +292,6 @@ public class SenderActivity extends Activity {
 			try {
 				if (tracker < packetCount && currentChannel == 1) {
 					handler.post(new Runnable() {
-						@Override
 						public void run() {
 							txtCurrentChannel.setText("MMS");
 						}
@@ -319,7 +311,6 @@ public class SenderActivity extends Activity {
 				if(isOnline(this)) {
 					currentChannel = 2;
 					handler.post(new Runnable() {
-						@Override
 						public void run() {
 							txtCurrentChannel.setText("3G");
 						}
@@ -332,7 +323,6 @@ public class SenderActivity extends Activity {
 				receiverIsOnline= false;
 				currentChannel = 1;
 				handler.post(new Runnable() {
-					@Override
 					public void run() {
 						txtCurrentChannel.setText("MMS");
 					}
@@ -351,7 +341,6 @@ public class SenderActivity extends Activity {
 		sendSMS(phoneNum, "%& sendViaSms" + startIndex);
 		if(currentChannel == 0){
 			handler.post(new Runnable() {
-				@Override
 				public void run() {
 					txtCurrentChannel.setText("SMS");
 				}
@@ -377,7 +366,6 @@ public class SenderActivity extends Activity {
 			tracker++;
 			
 			handler.post(new Runnable() {
-				@Override
 				public void run() {
 					txtTotalPackets.setText(Integer.toString(tracker));
 				}
@@ -449,7 +437,6 @@ public class SenderActivity extends Activity {
 		Log.e("SMS", "SMS Sent");
 		this.smsCount++;
 		handler.post(new Runnable() {
-			@Override
 			public void run() {
 				txtSMS.setText(Integer.toString(smsCount));
 			}
@@ -468,7 +455,6 @@ public class SenderActivity extends Activity {
 			Log.i("SENDING MMS", "SENDING MMS");
 			if(currentChannel == 1){
 				handler.post(new Runnable() {
-					@Override
 					public void run() {
 						txtCurrentChannel.setText("MMS");
 					}
@@ -498,7 +484,6 @@ public class SenderActivity extends Activity {
 						+ "\n";
 				tracker++;
 				handler.post(new Runnable() {
-					@Override
 					public void run() {
 						txtTotalPackets.setText(Integer.toString(tracker));
 					}
@@ -520,7 +505,6 @@ public class SenderActivity extends Activity {
 		logbw.write(time.toString()  + "Sending via MMS\n");
 		mmsCount++;
 		handler.post(new Runnable() {
-			@Override
 			public void run() {
 				txtMMS.setText(Integer.toString(mmsCount));
 			}
@@ -557,7 +541,6 @@ public class SenderActivity extends Activity {
 				try {
 					currentChannel = 0;
 					handler.post(new Runnable() {
-						@Override
 						public void run() {
 							txtCurrentChannel.setText("SMS");
 						}
@@ -728,7 +711,7 @@ public class SenderActivity extends Activity {
 	public void setText3G(String text2) {
 		this.text = text2;
 		handler.post(new Runnable() {
-			@Override
+
 			public void run() {
 				txt3G.setText(text);
 			}
