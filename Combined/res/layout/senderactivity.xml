@@ -145,5 +145,11 @@
             android:layout_height="wrap_content"
             android:text="Disconnect" 
             android:onClick ="disconnectWifi"/>
+        <Button
+            android:id="@+id/btnConnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close App" 
+            android:onClick ="finish"/>
         
     </TableLayout>
