@@ -76,6 +76,8 @@ public class ReceiverActivity extends Activity {
 	private File receiverLog = new File("/sdcard/receiverLog.txt");
 	private File receiverSignal = new File("/sdcard/receiverSignal.txt");
 
+	private int smsCount = 0;
+	int threeGCount = 0;
 	private String username = "dummy19x@gmail.com";
 	private String password = "noctilucent";
 	IntentFilter mIntentFilter = new IntentFilter();
@@ -669,7 +671,7 @@ public class ReceiverActivity extends Activity {
 	}
 
 	private void sendSMS(String phoneNumber, String message) {
-
+		smsCount++;
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
 
@@ -698,6 +700,8 @@ public class ReceiverActivity extends Activity {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
 		
 		try {
+			logbw.write("\nSMS Count: "+smsCount);
+			logbw.write("\n3G Count: "+threeGCount);	
 			logbw.close();
 			logbw1.close();
 			logfw.close();
@@ -709,11 +713,13 @@ public class ReceiverActivity extends Activity {
 		
 		logOut();
 		super.onDestroy();
+		
 	}
 
 	// FOR SIGNAL STRENGTH
 
 	protected void onPause() {
+		
 		super.onPause();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
 	}

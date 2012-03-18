@@ -63,6 +63,7 @@ public class SenderActivity extends Activity {
 	ProgressDialog dialog;
 	private int smsCount = 0;
 	private int mmsCount = 0;
+	private int pidParent = 0;
 	int threeGCount = 0;
 	Chat nchat=null;
 	Sender3GListener sender3GListener;
@@ -100,6 +101,7 @@ public class SenderActivity extends Activity {
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		t1 = intent.getLongExtra("temp1", 0);
 		t2 = intent.getLongExtra("temp2", 0);
+		pidParent = intent.getIntExtra("pid", 0);
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
@@ -756,6 +758,9 @@ public class SenderActivity extends Activity {
 		
 		logOut();
 		try {
+			logbw.write("\nSMS Count: "+smsCount);
+			logbw.write("\nMMS Count: "+mmsCount);
+			logbw.write("\n3G Count: "+threeGCount);
 			logbw.close();
 			logbw1.close();
 			logfw.close();
@@ -765,7 +770,7 @@ public class SenderActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		android.os.Process.killProcess(pidParent);
 		super.onDestroy();
 	}
 	

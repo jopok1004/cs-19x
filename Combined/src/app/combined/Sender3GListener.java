@@ -66,7 +66,7 @@ public class Sender3GListener implements MessageListener{
 			sender.setTracker(getCurrentPacket());
 			for (int i = 0; i < 10; i ++) {
 				sendPackets(chat, time);
-				sender.setText3G(Integer.toString(threeGCount));
+				sender.setText3G(Integer.toString(sender.threeGCount));
 				waiting(2);
 			}	
 		}
@@ -108,7 +108,7 @@ public class Sender3GListener implements MessageListener{
 				
 				chat.sendMessage(reply);
 				//
-				threeGCount++;
+				sender.threeGCount++;
 				
 				
 				try {

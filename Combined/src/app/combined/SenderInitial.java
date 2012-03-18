@@ -39,7 +39,7 @@ public class SenderInitial extends Activity {
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final int FILE_EXPLORE_RESULT = 1002;
 	private static final int SENDER_ACTIVITY_RESULT = 1010;
-	
+	private int pid;
 	
 	private long temp1, temp2;
 
@@ -47,6 +47,7 @@ public class SenderInitial extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		pid  = android.os.Process.myPid();
 		//Debug.startMethodTracing("sender",32000000);
 		//LOG FILES
 		Intent intent = getIntent();
@@ -81,6 +82,7 @@ public class SenderInitial extends Activity {
 					intent.putExtra("start?", "fromInitial");
 					intent.putExtra("temp1", temp1);
 					intent.putExtra("temp2", temp2);
+					intent.putExtra("pid", pid);
 					startActivityForResult(intent,SENDER_ACTIVITY_RESULT);
 					
 				} else

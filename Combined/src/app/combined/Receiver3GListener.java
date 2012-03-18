@@ -77,6 +77,7 @@ public class Receiver3GListener implements PacketListener{
 			reply.setBody("%&proceed");
 			Log.e("XMPPReceiver:Sending", "Sending text [" + reply.getBody() + "]");
 			receiver.getConnection().sendPacket(reply);
+			receiver.threeGCount++;
 		
 		}else if (message.getBody().startsWith("%&")) {
 			int packetNum;
