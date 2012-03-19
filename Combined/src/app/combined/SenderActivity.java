@@ -66,7 +66,7 @@ public class SenderActivity extends Activity {
 	private int smsCount = 0;
 	private int mmsCount = 0;
 	private int pidParent = 0;
-	private int temp3;
+	private int packetstobesent;
 	int threeGCount = 0;
 	Chat nchat=null;
 	Sender3GListener sender3GListener;
@@ -521,10 +521,12 @@ public class SenderActivity extends Activity {
 			String msg = "";
 			//temp3= 0;
 			//temp3 = tracker;
+			packetstobesent = 0;
 			for (int i = 0; i < 100 && tracker < packetCount; i++) {
 				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
 						+ "\n";
 				tracker++;
+				packetstobesent++;
 				handler.post(new Runnable() {
 					
 					public void run() {
@@ -584,7 +586,7 @@ public class SenderActivity extends Activity {
 				//do nothing
 			}else{
 				Log.i("shift to sms", "shift to sms");
-				
+				tracker = tracker - packetstobesent;
 				try {
 					currentChannel = 0;
 					handler.post(new Runnable() {
