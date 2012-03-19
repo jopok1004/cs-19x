@@ -318,7 +318,7 @@ public class SenderActivity extends Activity {
 		//MMS
 		if ((intent.getStringExtra("start?").toString())
 				.equals("sendAnotherMms")) {
-			
+			tracker = tracker + 100;
 			Log.e("MMS","SEND ANOTHER MMS");
 			mmsReceived= true;
 			try {
@@ -521,7 +521,7 @@ public class SenderActivity extends Activity {
 			for (int i = 0; i < 100 && tracker < packetCount; i++) {
 				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
 						+ "\n";
-				tracker++;
+				//tracker++;
 				handler.post(new Runnable() {
 					
 					public void run() {
