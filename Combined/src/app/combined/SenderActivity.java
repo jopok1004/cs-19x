@@ -28,6 +28,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Debug;
 import android.os.Handler;
 import android.telephony.PhoneStateListener;
@@ -44,6 +45,7 @@ public class SenderActivity extends Activity {
 	private String phoneNum;
 	private ArrayList<String> packetList = new ArrayList<String>();
 	private BroadcastReceiver threeGMonitorBroadcastReceiver;
+	SenderActivity senderact;
 	private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
 	private int packetCount;
 	private int tracker= 0; 		//current packet number
@@ -72,7 +74,7 @@ public class SenderActivity extends Activity {
 	private String password = "jayvee14";
 	private String text="0";
 	IntentFilter gIntentFilter = new IntentFilter();
-	
+	CountDownTimer timer;
 	//variables for log files
 	private Time time= new Time();
 	private long t1, t2, t3;
@@ -86,8 +88,27 @@ public class SenderActivity extends Activity {
 	Handler handler;
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		senderact = this;
 		Debug.startMethodTracing("sender");
 		setContentView(R.layout.senderactivity);
+		timer = new CountDownTimer(1800000,1000)
+		{
+
+			public void onFinish() {
+				handler.post(new Runnable() {
+		            public void run() {
+		                senderact.finishActivity(0);
+		                         
+		            }
+		        });
+			}
+
+			public void onTick(long arg0) {
+				Log.i("Time", "Time left: " + arg0/1000);
+			}
+        };
+
+        
 		btnDisconnect =(Button) this.findViewById(R.id.btnConnect);
 		txtCurrentChannel = (TextView)this.findViewById(R.id.txtCurrentChannel);
 		txtSMS = (TextView)this.findViewById(R.id.txtSMS);
@@ -371,7 +392,7 @@ public class SenderActivity extends Activity {
 		String headerBegin = new String();
 		
 		Log.i("send10", "I AM AT send10");
-		
+		timer.cancel(); 
 
 		// dialog.show(SmsMessagingActivity.this, "Sending SMS", "Please Wait");
 		for (int counter = 0; counter < 10; counter++) {
@@ -397,7 +418,7 @@ public class SenderActivity extends Activity {
 		check10Received= false;
 		sendSMS(phoneNo, "%& check10 " + tracker);
 		Log.i("After send tracker", "tracker" + tracker);
-	
+		timer.start();
 		Thread thread = new smsWaitThread();
 		thread.start();
 		time.setToNow();
@@ -466,7 +487,7 @@ public class SenderActivity extends Activity {
 	//FOR MMS CHANNEL
 	private void sendViaMms(int startIndex){
 		sendSMS(phoneNum, "%& sendViaMms" + startIndex); // EDIT, REMOVE SUB
-
+		timer.cancel();
 		Log.i("FINISHED", "DONE SENDING SMS");
 		try {
 			Log.i("SENDING MMS", "SENDING MMS");
@@ -513,6 +534,7 @@ public class SenderActivity extends Activity {
 			Log.i("parser", "before mms sending");
 			mmsReceived= false;
 			sendMMS(phoneNum, msg);
+			timer.start();
 			Thread thread = new mmsWaitThread();
 			thread.start();
 			waiting(20);
