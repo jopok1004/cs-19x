@@ -531,7 +531,10 @@ public class SenderActivity extends Activity {
 				
 				Log.i("SUBMESSAGE", msg);
 			}
-			tracker = tracker -100;
+			if(tracker>=100) {
+				tracker = tracker -100;
+			}
+			
 			Log.i("parser", "before mms sending");
 			mmsReceived= false;
 			sendMMS(phoneNum, msg);
