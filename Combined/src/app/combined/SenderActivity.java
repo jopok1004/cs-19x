@@ -521,7 +521,7 @@ public class SenderActivity extends Activity {
 			for (int i = 0; i < 100 && tracker < packetCount; i++) {
 				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
 						+ "\n";
-				//tracker++;
+				tracker++;
 				handler.post(new Runnable() {
 					
 					public void run() {
@@ -531,6 +531,7 @@ public class SenderActivity extends Activity {
 				
 				Log.i("SUBMESSAGE", msg);
 			}
+			tracker = tracker -100;
 			Log.i("parser", "before mms sending");
 			mmsReceived= false;
 			sendMMS(phoneNum, msg);
