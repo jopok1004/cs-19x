@@ -66,6 +66,7 @@ public class SenderActivity extends Activity {
 	private int smsCount = 0;
 	private int mmsCount = 0;
 	private int pidParent = 0;
+	private int temp3;
 	int threeGCount = 0;
 	Chat nchat=null;
 	Sender3GListener sender3GListener;
@@ -318,7 +319,7 @@ public class SenderActivity extends Activity {
 		//MMS
 		if ((intent.getStringExtra("start?").toString())
 				.equals("sendAnotherMms")) {
-			tracker = tracker + 100;
+			//tracker = tracker + 100;
 			Log.e("MMS","SEND ANOTHER MMS");
 			mmsReceived= true;
 			try {
@@ -518,6 +519,8 @@ public class SenderActivity extends Activity {
 			// 1024b * 300kb = 307200/160 char = 1920 packets
 
 			String msg = "";
+			//temp3= 0;
+			//temp3 = tracker;
 			for (int i = 0; i < 100 && tracker < packetCount; i++) {
 				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
 						+ "\n";
@@ -531,9 +534,7 @@ public class SenderActivity extends Activity {
 				
 				Log.i("SUBMESSAGE", msg);
 			}
-			if(tracker>=100) {
-				tracker = tracker -100;
-			}
+			
 			
 			Log.i("parser", "before mms sending");
 			mmsReceived= false;
