@@ -119,7 +119,7 @@ public class ReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Debug.startMethodTracing("receiver");
+		//Debug.startMethodTracing("receiver");
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
@@ -487,7 +487,7 @@ public class ReceiverActivity extends Activity {
 				
 				
 				sendSMS(phoneNo, "%& done");
-				Debug.stopMethodTracing();
+				//Debug.stopMethodTracing();
 				Log.e("DONE","DONE");
 				this.finish();
 

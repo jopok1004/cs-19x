@@ -95,7 +95,7 @@ public class SenderActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		senderact = this;
-		Debug.startMethodTracing("sender");
+		//Debug.startMethodTracing("sender");
 		setContentView(R.layout.senderactivity);
 		timer = new CountDownTimer(1800000, 1000) {
 
@@ -131,6 +131,7 @@ public class SenderActivity extends Activity {
 		phoneNum = intent.getStringExtra("phoneNum");
 		packetCount = intent.getIntExtra("packetCount", 0);
 		packetList = intent.getStringArrayListExtra("arraylist");
+		Log.e("ON CREATE PACKETLIST",Integer.toString(packetList.size()));
 		handler = new Handler();
 		try {
 			logfw = new FileWriter(senderLog);
@@ -204,12 +205,13 @@ public class SenderActivity extends Activity {
 		};
 		IntentFilter gIntentFilter = new IntentFilter();
 		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-		registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
+		
 	}
 
 	public void onNewIntent(Intent intent) {
 		// SMS
 		Log.e("NEW", "NEW INTENT");
+		Log.e("AL SIZE",Integer.toString(packetList.size()));
 		if ((intent.getStringExtra("start?").toString())
 				.equals("start sending")) {
 			Log.e("START SENDING", "START SENDING");
@@ -245,12 +247,13 @@ public class SenderActivity extends Activity {
 				sendViaMms(tracker);
 			}
 			started = true;
+			registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
 
 		}
 
 		if ((intent.getStringExtra("start?").toString())
 				.equals("done receiving")) {
-			Debug.stopMethodTracing();
+			//Debug.stopMethodTracing();
 			time.setToNow();
 			t3 = time.toMillis(true);
 			try {
@@ -364,7 +367,7 @@ public class SenderActivity extends Activity {
 						}
 					});
 
-					sendBy3G("dummy19x@gmail.com", tracker);
+					//sendBy3G("dummy19x@gmail.com", tracker);
 				}
 
 			} else {
@@ -377,7 +380,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 
-				sendViaMms(tracker);
+				//sendViaMms(tracker);
 			}
 		}
 	}
