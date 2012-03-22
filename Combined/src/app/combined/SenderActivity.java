@@ -129,8 +129,18 @@ public class SenderActivity extends Activity {
 		t2 = intent.getLongExtra("temp2", 0);
 		pidParent = intent.getIntExtra("pid", 0);
 		phoneNum = intent.getStringExtra("phoneNum");
-		packetCount = intent.getIntExtra("packetCount", 0);
-		packetList = intent.getStringArrayListExtra("arraylist");
+		//packetCount = intent.getIntExtra("packetCount", 0);
+		//packetList = intent.getStringArrayListExtra("arraylist");
+		try {
+			packetList = Base64FileEncoder.encodeFile(intent.getStringExtra("tempAddress"), intent.getStringExtra("tempAddress2"));
+			Log.i("Base 64", "After Base 64");
+			
+
+			packetCount = packetList.size();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Log.e("ON CREATE PACKETLIST",Integer.toString(packetList.size()));
 		handler = new Handler();
 		try {

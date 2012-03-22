@@ -455,7 +455,7 @@ public class ReceiverActivity extends Activity {
 
 	public void receiveFile() {
 
-		if (al.size() == size) {
+		if (al.size() >= size) {
 			time.setToNow();
 			t2 = time.toMillis(true);
 			try {
