@@ -233,6 +233,7 @@ public class ReceiverActivity extends Activity {
 	}
 
 	// FOR SMS
+	@Override
 	public void onNewIntent(Intent intent) {
 		Log.i("INTENT", intent.getStringExtra("start?").toString());
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
@@ -576,7 +577,7 @@ public class ReceiverActivity extends Activity {
 	}
 
 	public boolean isOnline(Context ctx) {
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx
+		NetworkInfo info = ((ConnectivityManager) ctx
 				.getSystemService(Context.CONNECTIVITY_SERVICE))
 				.getActiveNetworkInfo();
 
@@ -619,6 +620,7 @@ public class ReceiverActivity extends Activity {
 		startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
 	}
 
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
@@ -695,6 +697,7 @@ public class ReceiverActivity extends Activity {
 		} while ((t1 - t0) < (n * 1000));
 	}
 
+	@Override
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
@@ -718,6 +721,7 @@ public class ReceiverActivity extends Activity {
 
 	// FOR SIGNAL STRENGTH
 
+	@Override
 	protected void onPause() {
 		
 		super.onPause();

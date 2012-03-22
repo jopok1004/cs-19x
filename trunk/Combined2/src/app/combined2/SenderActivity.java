@@ -50,7 +50,7 @@ public class SenderActivity extends Activity {
 	SenderActivity senderact;
 	private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
 	private int packetCount;
-	private int tracker = 0; // current packet number
+	private int headtracker = 0, tailtracker; // current packet number
 	private Boolean done = false; // to check for end of file sharing
 	private Boolean check10Received; // for SMS Protocol
 	private int send10Resends; // for SMS Protocol, number of resends per 10
@@ -91,6 +91,7 @@ public class SenderActivity extends Activity {
 	MyPhoneStateListener MyListener;
 	Handler handler;
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		senderact = this;
@@ -98,6 +99,7 @@ public class SenderActivity extends Activity {
 		setContentView(R.layout.senderactivity);
 		timer = new CountDownTimer(1800000, 1000) {
 
+			@Override
 			public void onFinish() {
 				handler.post(new Runnable() {
 					public void run() {
@@ -107,6 +109,7 @@ public class SenderActivity extends Activity {
 				});
 			}
 
+			@Override
 			public void onTick(long arg0) {
 				Log.i("Time", "Time left: " + arg0 / 1000);
 			}
@@ -145,6 +148,7 @@ public class SenderActivity extends Activity {
 		}
 		threeGMonitorBroadcastReceiver = new BroadcastReceiver() {
 
+			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d("app", "Network connectivity change");
 				if (intent.getExtras() != null) {
@@ -165,7 +169,7 @@ public class SenderActivity extends Activity {
 								}
 							});
 
-							sendBy3G("dummy19x@gmail.com", tracker);
+							sendBy3G("dummy19x@gmail.com", headtracker);
 						} else {
 							currentChannel = 1;
 							Log.e("BRECEIVER", "I AM AT BRECEIVER");
@@ -176,7 +180,7 @@ public class SenderActivity extends Activity {
 								}
 							});
 
-							sendViaMms(tracker);
+							sendViaMms(headtracker);
 						}
 
 						// send sms na connected
@@ -195,7 +199,7 @@ public class SenderActivity extends Activity {
 						}
 					});
 
-					sendViaMms(tracker);
+					sendViaMms(headtracker);
 					// send sms na di connected
 				}
 
@@ -203,9 +207,10 @@ public class SenderActivity extends Activity {
 		};
 		IntentFilter gIntentFilter = new IntentFilter();
 		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-		registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
+		
 	}
 
+	@Override
 	public void onNewIntent(Intent intent) {
 		// SMS
 		Log.e("NEW", "NEW INTENT");
@@ -231,7 +236,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 
-				sendBy3G("dummy19x@gmail.com", tracker);
+				//sendBy3G("dummy19x@gmail.com", headtracker);
 			} else {
 				currentChannel = 1;
 				handler.post(new Runnable() {
@@ -241,10 +246,10 @@ public class SenderActivity extends Activity {
 					}
 				});
 
-				sendViaMms(tracker);
+				//sendViaMms(headtracker);
 			}
 			started = true;
-
+			registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
 		}
 
 		if ((intent.getStringExtra("start?").toString())
@@ -318,7 +323,7 @@ public class SenderActivity extends Activity {
 							}
 						});
 
-						sendViaMms(tracker);
+						sendViaMms(headtracker);
 					}
 
 				}
@@ -330,11 +335,11 @@ public class SenderActivity extends Activity {
 		// MMS
 		if ((intent.getStringExtra("start?").toString())
 				.equals("sendAnotherMms")) {
-			// tracker = tracker + 100;
+			// headtracker = headtracker + 100;
 			Log.e("MMS", "SEND ANOTHER MMS");
 			mmsReceived = true;
 			try {
-				if (tracker < packetCount && currentChannel == 1) {
+				if (headtracker < packetCount && currentChannel == 1) {
 					handler.post(new Runnable() {
 
 						public void run() {
@@ -363,7 +368,7 @@ public class SenderActivity extends Activity {
 						}
 					});
 
-					sendBy3G("dummy19x@gmail.com", tracker);
+					sendBy3G("dummy19x@gmail.com", headtracker);
 				}
 
 			} else {
@@ -376,11 +381,27 @@ public class SenderActivity extends Activity {
 					}
 				});
 
-				sendViaMms(tracker);
+				sendViaMms(headtracker);
 			}
 		}
 	}
+	//THREADS
+	class smsThread extends Thread {
+		// This method is called when the thread runs
+		@Override
+		public void run() {
 
+		}
+
+	}
+	class mmsThread extends Thread {
+		// This method is called when the thread runs
+		@Override
+		public void run() {
+
+		}
+
+	}
 	// ###################################################################################################
 	// //
 	// FUNCTIONS FOR SMS CHANNEL
@@ -411,14 +432,14 @@ public class SenderActivity extends Activity {
 		// dialog.show(SmsMessagingActivity.this, "Sending SMS", "Please Wait");
 		for (int counter = 0; counter < 10; counter++) {
 			Log.i("send10", "inside send10 for loop");
-			headerBegin = "&% " + tracker + " ";
-			submessage = headerBegin + packetList.get(tracker);
-			tracker++;
+			headerBegin = "&% " + headtracker + " ";
+			submessage = headerBegin + packetList.get(headtracker);
+			headtracker++;
 
 			handler.post(new Runnable() {
 
 				public void run() {
-					txtTotalPackets.setText(Integer.toString(tracker));
+					txtTotalPackets.setText(Integer.toString(headtracker));
 				}
 			});
 
@@ -429,8 +450,8 @@ public class SenderActivity extends Activity {
 
 		}
 		check10Received = false;
-		sendSMS(phoneNo, "%& check10 " + tracker);
-		Log.i("After send tracker", "tracker" + tracker);
+		sendSMS(phoneNo, "%& check10 " + headtracker);
+		Log.i("After send headtracker", "headtracker" + headtracker);
 		timer.start();
 		Thread thread = new smsWaitThread();
 		thread.start();
@@ -441,6 +462,7 @@ public class SenderActivity extends Activity {
 
 	class smsWaitThread extends Thread {
 		// This method is called when the thread runs
+		@Override
 		public void run() {
 			long t0, t1;
 			t0 = System.currentTimeMillis();
@@ -451,11 +473,10 @@ public class SenderActivity extends Activity {
 			if (check10Received || done == true) {
 				// do nothing
 			} else {
-				Log.i("resend check10", "tracker" + tracker);
-				sendSMS(phoneNum, "%& check10 " + tracker);
+				Log.i("resend check10", "headtracker" + headtracker);
+				sendSMS(phoneNum, "%& check10 " + headtracker);
 				// resend check10
 			}
-
 		}
 
 	}
@@ -533,17 +554,17 @@ public class SenderActivity extends Activity {
 
 			String msg = "";
 			// temp3= 0;
-			// temp3 = tracker;
+			// temp3 = headtracker;
 			packetstobesent = 0;
-			for (int i = 0; i < 100 && tracker < packetCount; i++) {
-				msg = msg + "&% " + tracker + " " + packetList.get(tracker)
+			for (int i = 0; i < 100 && headtracker < packetCount; i++) {
+				msg = msg + "&% " + headtracker + " " + packetList.get(headtracker)
 						+ "\n";
-				tracker++;
+				headtracker++;
 				packetstobesent++;
 				handler.post(new Runnable() {
 
 					public void run() {
-						txtTotalPackets.setText(Integer.toString(tracker));
+						txtTotalPackets.setText(Integer.toString(headtracker));
 					}
 				});
 
@@ -587,6 +608,7 @@ public class SenderActivity extends Activity {
 
 	class mmsWaitThread extends Thread {
 		// This method is called when the thread runs
+		@Override
 		public void run() {
 			long t0, t1;
 			t0 = System.currentTimeMillis();
@@ -598,7 +620,7 @@ public class SenderActivity extends Activity {
 				// do nothing
 			} else {
 				Log.i("shift to sms", "shift to sms");
-				tracker = tracker - packetstobesent;
+				headtracker = headtracker - packetstobesent;
 				try {
 					currentChannel = 0;
 					handler.post(new Runnable() {
@@ -608,7 +630,7 @@ public class SenderActivity extends Activity {
 						}
 					});
 
-					sendViaSms(phoneNum, tracker);
+					sendViaSms(phoneNum, headtracker);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -629,12 +651,12 @@ public class SenderActivity extends Activity {
 		return this.packetList;
 	}
 
-	public Integer getTracker() {
-		return this.tracker;
+	public Integer getheadtracker() {
+		return this.headtracker;
 	}
 
-	public void setTracker(int track) {
-		this.tracker = track;
+	public void setheadtracker(int track) {
+		this.headtracker = track;
 	}
 
 	public XMPPConnection getConnection() {
@@ -749,7 +771,7 @@ public class SenderActivity extends Activity {
 	}
 
 	public boolean isOnline(Context ctx) {
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx
+		NetworkInfo info = ((ConnectivityManager) ctx
 				.getSystemService(Context.CONNECTIVITY_SERVICE))
 				.getActiveNetworkInfo();
 
@@ -794,6 +816,7 @@ public class SenderActivity extends Activity {
 		return logbw;
 	}
 
+	@Override
 	public void finish() {
 		Intent data = new Intent();
 
@@ -802,6 +825,7 @@ public class SenderActivity extends Activity {
 		super.finish();
 	}
 
+	@Override
 	public void onDestroy() {
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
 		if (nchat != null) {
@@ -828,6 +852,7 @@ public class SenderActivity extends Activity {
 
 	// FOR SIGNAL STRENGTH
 
+	@Override
 	protected void onPause() {
 		super.onPause();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
@@ -835,6 +860,7 @@ public class SenderActivity extends Activity {
 
 	/* Called when the application resumes */
 
+	@Override
 	protected void onResume() {
 		super.onResume();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
@@ -849,6 +875,7 @@ public class SenderActivity extends Activity {
 		 * update
 		 */
 
+		@Override
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 			super.onSignalStrengthsChanged(signalStrength);
 			time.setToNow();

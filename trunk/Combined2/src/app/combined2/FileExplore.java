@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import app.combined2.R;
 
 public class FileExplore extends Activity {
 
@@ -206,6 +205,7 @@ public class FileExplore extends Activity {
 		dialog = builder.show();
 		return dialog;
 	}
+	@Override
 	public void finish() {
 		Intent data = new Intent();
 		data.putExtra("returnKey1", "Swinging on a star. ");

@@ -12,6 +12,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 	String str = "";
 
+	@Override
 	public void onReceive(Context context, Intent intent) {
 
 		// ---get the SMS message passed in---

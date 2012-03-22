@@ -95,6 +95,7 @@ public class SenderInitial extends Activity {
 
 	}
 	
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
@@ -227,7 +228,7 @@ public class SenderInitial extends Activity {
 
 	
 	public boolean isOnline(Context ctx) {
-		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		NetworkInfo info = ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
 	    if (info == null || !info.isConnected()) {
 	        return false;
