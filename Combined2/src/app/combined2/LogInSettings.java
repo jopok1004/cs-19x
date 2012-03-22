@@ -1,11 +1,5 @@
 package app.combined2;
 
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.SASLAuthentication;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
-
 import android.app.Dialog;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +23,7 @@ public class LogInSettings extends Dialog implements android.view.View.OnClickLi
 		this.isSender = true;
 	}
 	
+	@Override
 	protected void onStart() {
         super.onStart();
         setContentView(R.layout.login);
