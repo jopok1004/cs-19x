@@ -181,6 +181,11 @@ public class ReceiverActivity extends Activity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d("app", "Network connectivity change");
+				int tracker=0;
+				while(al.containsKey(tracker)) {
+					tracker++;
+				}
+				
 				if (intent.getExtras() != null) {
 					NetworkInfo ni = (NetworkInfo) intent.getExtras().get(
 							ConnectivityManager.EXTRA_NETWORK_INFO);
@@ -189,8 +194,8 @@ public class ReceiverActivity extends Activity {
 							&& !ni.getTypeName().equals("mobile_mms")) {
 						Log.i("app", "Network " + ni.getTypeName()
 								+ " connected");
-
-						sendSMS(phoneNo, "%& receiverConnectivity 1");
+						
+						sendSMS(phoneNo, "%& receiverConnectivity 1 "+tracker);
 						logIn();
 						// send sms na connected
 					}
@@ -199,7 +204,7 @@ public class ReceiverActivity extends Activity {
 						ConnectivityManager.EXTRA_NO_CONNECTIVITY,
 						Boolean.FALSE)) {
 					Log.e("app", "There's no network connectivity");
-					sendSMS(phoneNo, "%& receiverConnectivity 0");
+					sendSMS(phoneNo, "%& receiverConnectivity 0 "+tracker);
 					// send sms na di connected
 				}
 

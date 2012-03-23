@@ -95,7 +95,7 @@ public class SenderActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		senderact = this;
-		//Debug.startMethodTracing("sender");
+		// Debug.startMethodTracing("sender");
 		setContentView(R.layout.senderactivity);
 		timer = new CountDownTimer(1800000, 1000) {
 
@@ -129,19 +129,20 @@ public class SenderActivity extends Activity {
 		t2 = intent.getLongExtra("temp2", 0);
 		pidParent = intent.getIntExtra("pid", 0);
 		phoneNum = intent.getStringExtra("phoneNum");
-		//packetCount = intent.getIntExtra("packetCount", 0);
-		//packetList = intent.getStringArrayListExtra("arraylist");
+		// packetCount = intent.getIntExtra("packetCount", 0);
+		// packetList = intent.getStringArrayListExtra("arraylist");
 		try {
-			packetList = Base64FileEncoder.encodeFile(intent.getStringExtra("tempAddress"), intent.getStringExtra("tempAddress2"));
+			packetList = Base64FileEncoder.encodeFile(
+					intent.getStringExtra("tempAddress"),
+					intent.getStringExtra("tempAddress2"));
 			Log.i("Base 64", "After Base 64");
-			
 
 			packetCount = packetList.size();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Log.e("ON CREATE PACKETLIST",Integer.toString(packetList.size()));
+		Log.e("ON CREATE PACKETLIST", Integer.toString(packetList.size()));
 		handler = new Handler();
 		try {
 			logfw = new FileWriter(senderLog);
@@ -215,13 +216,13 @@ public class SenderActivity extends Activity {
 		};
 		IntentFilter gIntentFilter = new IntentFilter();
 		gIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-		
+
 	}
 
 	public void onNewIntent(Intent intent) {
 		// SMS
 		Log.e("NEW", "NEW INTENT");
-		Log.e("AL SIZE",Integer.toString(packetList.size()));
+		Log.e("AL SIZE", Integer.toString(packetList.size()));
 		if ((intent.getStringExtra("start?").toString())
 				.equals("start sending")) {
 			Log.e("START SENDING", "START SENDING");
@@ -263,7 +264,7 @@ public class SenderActivity extends Activity {
 
 		if ((intent.getStringExtra("start?").toString())
 				.equals("done receiving")) {
-			//Debug.stopMethodTracing();
+			// Debug.stopMethodTracing();
 			time.setToNow();
 			t3 = time.toMillis(true);
 			try {
@@ -366,9 +367,14 @@ public class SenderActivity extends Activity {
 		// 3G
 		if ((intent.getStringExtra("start?").toString())
 				.equals("receiverConnectivity")) {
-			if (intent.getStringExtra("isOnline").toString().equals("1")) {
+			Log.e("RECEIVER CONNECTIVITY","RECEIVER CONNECTIVITY");
+			tracker = Integer.parseInt(intent.getStringExtra("tracker")
+					.toString());
+			Log.e("IS ONLINE?", ""+intent.getCharExtra("isOnline", '0'));
+			if (intent.getCharExtra("isOnline", '9')=='1') {
 				receiverIsOnline = true;
 				if (isOnline(this)) {
+					
 					currentChannel = 2;
 					handler.post(new Runnable() {
 
@@ -376,9 +382,11 @@ public class SenderActivity extends Activity {
 							txtCurrentChannel.setText("3G");
 						}
 					});
-
-					//sendBy3G("dummy19x@gmail.com", tracker);
+					Log.e("SHIFT TO 3G","SHIFT TO 3G");
+				
+					sendBy3G("dummy19x@gmail.com", tracker);
 				}
+				
 
 			} else {
 				receiverIsOnline = false;
@@ -389,8 +397,8 @@ public class SenderActivity extends Activity {
 						txtCurrentChannel.setText("MMS");
 					}
 				});
-
-				//sendViaMms(tracker);
+				Log.e("SHIFT TO MMS","SHIFT TO MMS");
+				sendViaMms(tracker);
 			}
 		}
 	}
@@ -561,7 +569,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 
-				Log.i("SUBMESSAGE", msg);
+				//Log.i("SUBMESSAGE", msg);
 			}
 
 			Log.i("parser", "before mms sending");
@@ -680,7 +688,7 @@ public class SenderActivity extends Activity {
 	}
 
 	public void sendBy3G(String to, int startIndex) {
-
+		timer.cancel();
 		logIn();
 		while (getConnection() == null) {
 			// do nothing
