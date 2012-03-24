@@ -50,6 +50,7 @@ public class SenderActivity extends Activity {
 	private BroadcastReceiver threeGMonitorBroadcastReceiver;
 	SenderActivity senderact;
 	//private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
+	private Boolean is3g; // true if sending via three g, false if via mms
 	private int packetCount;
 	private int headtracker = 0, tailtracker = 0; // current packet number
 	private Boolean done = false; // to check for end of file sharing
@@ -177,7 +178,7 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("3G");
 								}
 							});
-
+							is3g = true;
 							Thread threegthread = new threeGThread();
 							threegthread.start();
 						
@@ -189,6 +190,7 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("MMS");
 								}
 							});
+							is3g = false;
 							Thread mmsthread = new mmsThread();
 							mmsthread.start();
 							
@@ -209,8 +211,9 @@ public class SenderActivity extends Activity {
 							txtCurrentChannel.setText("MMS");
 						}
 					});
-
-					sendViaMms(headtracker);
+					is3g = false;
+					Thread mmsthread = new mmsThread();
+					mmsthread.start();
 					// send sms na di connected
 				}
 
@@ -224,8 +227,12 @@ public class SenderActivity extends Activity {
 	class smsThread extends Thread {
 		// This method is called when the thread runs
 		public void run() {
-			
-
+			try {
+				sendViaSms(phoneNum, headtracker);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -267,8 +274,9 @@ public class SenderActivity extends Activity {
 						txtCurrentChannel.setText("3G");
 					}
 				});
-
-				sendBy3G("dummy19x@gmail.com", headtracker);
+				is3g = true;
+				Thread threegthread = new mmsThread();
+				threegthread.start();
 			} else {
 				handler.post(new Runnable() {
 
@@ -276,8 +284,9 @@ public class SenderActivity extends Activity {
 						txtCurrentChannel.setText("MMS");
 					}
 				});
-
-				sendViaMms(headtracker);
+				is3g = false;
+				Thread mmsthread = new mmsThread();
+				mmsthread.start();
 			}
 			started = true;
 			registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
@@ -365,7 +374,7 @@ public class SenderActivity extends Activity {
 			Log.e("MMS", "SEND ANOTHER MMS");
 			mmsReceived = true;
 			try {
-				if (headtracker < packetCount && currentChannel == 1) {
+				if (headtracker < packetCount && !is3g) {
 					handler.post(new Runnable() {
 
 						public void run() {
@@ -628,23 +637,16 @@ public class SenderActivity extends Activity {
 			if (mmsReceived || done == true) {
 				// do nothing
 			} else {
-				Log.i("shift to sms", "shift to sms");
+				Log.i("MMS FAIL", "MMS FAIL WAIT");
 				headtracker = headtracker - packetstobesent;
-				try {
-					handler.post(new Runnable() {
-
-						public void run() {
-							txtCurrentChannel.setText("SMS");
-						}
-					});
-
-					sendViaSms(phoneNum, headtracker);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(!is3g){
+					try {
+						send1mms(phoneNum);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				// SHIFT TO SMS
-
 			}
 
 		}
@@ -659,11 +661,11 @@ public class SenderActivity extends Activity {
 		return this.packetList;
 	}
 
-	public Integer getheadtracker() {
+	public Integer getTracker() {
 		return this.headtracker;
 	}
 
-	public void setheadtracker(int track) {
+	public void setTracker(int track) {
 		this.headtracker = track;
 	}
 

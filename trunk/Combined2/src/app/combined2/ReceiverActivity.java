@@ -119,7 +119,7 @@ public class ReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Debug.startMethodTracing("receiver");
+		//Debug.startMethodTracing("receiver");
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
@@ -181,6 +181,11 @@ public class ReceiverActivity extends Activity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d("app", "Network connectivity change");
+				int tracker=0;
+				while(al.containsKey(tracker)) {
+					tracker++;
+				}
+				
 				if (intent.getExtras() != null) {
 					NetworkInfo ni = (NetworkInfo) intent.getExtras().get(
 							ConnectivityManager.EXTRA_NETWORK_INFO);
@@ -189,8 +194,8 @@ public class ReceiverActivity extends Activity {
 							&& !ni.getTypeName().equals("mobile_mms")) {
 						Log.i("app", "Network " + ni.getTypeName()
 								+ " connected");
-
-						sendSMS(phoneNo, "%& receiverConnectivity 1");
+						
+						sendSMS(phoneNo, "%& receiverConnectivity 1 "+tracker);
 						logIn();
 						// send sms na connected
 					}
@@ -199,7 +204,7 @@ public class ReceiverActivity extends Activity {
 						ConnectivityManager.EXTRA_NO_CONNECTIVITY,
 						Boolean.FALSE)) {
 					Log.e("app", "There's no network connectivity");
-					sendSMS(phoneNo, "%& receiverConnectivity 0");
+					sendSMS(phoneNo, "%& receiverConnectivity 0 "+tracker);
 					// send sms na di connected
 				}
 
@@ -233,7 +238,6 @@ public class ReceiverActivity extends Activity {
 	}
 
 	// FOR SMS
-	@Override
 	public void onNewIntent(Intent intent) {
 		Log.i("INTENT", intent.getStringExtra("start?").toString());
 		if ((intent.getStringExtra("start?").toString()).equals("getConfirm")) {
@@ -456,7 +460,7 @@ public class ReceiverActivity extends Activity {
 
 	public void receiveFile() {
 
-		if (al.size() == size) {
+		if (al.size() >= size) {
 			time.setToNow();
 			t2 = time.toMillis(true);
 			try {
@@ -488,7 +492,7 @@ public class ReceiverActivity extends Activity {
 				
 				
 				sendSMS(phoneNo, "%& done");
-				Debug.stopMethodTracing();
+				//Debug.stopMethodTracing();
 				Log.e("DONE","DONE");
 				this.finish();
 
@@ -577,7 +581,7 @@ public class ReceiverActivity extends Activity {
 	}
 
 	public boolean isOnline(Context ctx) {
-		NetworkInfo info = ((ConnectivityManager) ctx
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx
 				.getSystemService(Context.CONNECTIVITY_SERVICE))
 				.getActiveNetworkInfo();
 
@@ -620,7 +624,6 @@ public class ReceiverActivity extends Activity {
 		startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
 	}
 
-	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
@@ -697,7 +700,6 @@ public class ReceiverActivity extends Activity {
 		} while ((t1 - t0) < (n * 1000));
 	}
 
-	@Override
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
@@ -721,7 +723,6 @@ public class ReceiverActivity extends Activity {
 
 	// FOR SIGNAL STRENGTH
 
-	@Override
 	protected void onPause() {
 		
 		super.onPause();
