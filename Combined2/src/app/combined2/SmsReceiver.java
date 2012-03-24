@@ -40,11 +40,13 @@ public class SmsReceiver extends BroadcastReceiver {
 			//DONE RECEIVING
 			
 			if(msgs[0].getMessageBody().toString().equals("%& done")){
+				Log.e("DONE NA PO","DONE");
             	this.abortBroadcast();
             	Intent i = new Intent(context, SenderActivity.class);
             	i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK   );
             	i.putExtra("start?", "done receiving");
                 context.startActivity(i);
+                
             }
 
 			// SENDER SIDE
