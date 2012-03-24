@@ -27,6 +27,7 @@ import android.widget.Toast;
 public class SenderInitial extends Activity {
 	private SenderActivity Sender;
 	private String phoneNo = new String();
+	String tempAddress= "", tempAddress2= "";
 	private Button btnSendSMS;
 	private EditText txtPhoneNo;
 	private EditText txtMessage;
@@ -77,7 +78,10 @@ public class SenderInitial extends Activity {
 					Intent intent = new Intent(SenderInitial.this,
 							SenderActivity.class);
 					intent.putExtra("phoneNum", phoneNo);
-					intent.putStringArrayListExtra("arraylist", packetList);
+					Log.e("SENDER INITIAL PACKETLIST",Integer.toString(packetList.size()));
+					//intent.putStringArrayListExtra("arraylist", packetList);
+					intent.putExtra("tempAddress", tempAddress);
+					intent.putExtra("tempAddress2", tempAddress2);
 					intent.putExtra("packetCount", packetCount);
 					intent.putExtra("start?", "fromInitial");
 					intent.putExtra("temp1", temp1);
@@ -95,7 +99,6 @@ public class SenderInitial extends Activity {
 
 	}
 	
-	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
@@ -163,23 +166,28 @@ public class SenderInitial extends Activity {
 				time.setToNow();
 		
 				Log.i("Base 64", "Before Base 64");
-				try {
+				
 					Log.i("FILE", data.getExtras().getString("filePath") + "/"
 							+ data.getExtras().getString("fileName") + ".gz");
+					
+					tempAddress= data.getExtras().getString("filePath") + "/" + data.getExtras().getString("fileName") + ".gz";
+					tempAddress2= data.getExtras().getString("filePath") + "/"+ "encodedFile.txt"; 
+				try {
 					packetList = Base64FileEncoder.encodeFile(data.getExtras()
 							.getString("filePath")
 							+ "/"
 							+ data.getExtras().getString("fileName") + ".gz",
 							data.getExtras().getString("filePath") + "/"
 									+ "encodedFile.txt");
-					Log.i("Base 64", "After Base 64");
-					
-
-					packetCount = packetList.size();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+					Log.i("Base 64", "After Base 64");
+					
+
+					packetCount = packetList.size();
+				
 				time.setToNow();
 				temp2 = time.toMillis(true);
 				
@@ -228,7 +236,7 @@ public class SenderInitial extends Activity {
 
 	
 	public boolean isOnline(Context ctx) {
-		NetworkInfo info = ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		NetworkInfo info = (NetworkInfo) ((ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
 	    if (info == null || !info.isConnected()) {
 	        return false;
