@@ -393,7 +393,7 @@ public class SenderActivity extends Activity {
 		if ((intent.getStringExtra("start?").toString())
 				.equals("receiverConnectivity")) {
 			Log.e("RECEIVER CONNECTIVITY","RECEIVER CONNECTIVITY");
-			headtracker = Integer.parseInt(intent.getStringExtra("headtracker")
+			headtracker = Integer.parseInt(intent.getStringExtra("tracker")
 					.toString());
 			Log.e("IS ONLINE?", ""+intent.getCharExtra("isOnline", '0'));
 			if (intent.getCharExtra("isOnline", '9')=='1') {
@@ -408,7 +408,9 @@ public class SenderActivity extends Activity {
 					});
 					Log.e("SHIFT TO 3G","SHIFT TO 3G");
 				
-					sendBy3G("dummy19x@gmail.com", headtracker);
+					is3g = false;
+					Thread threegthread = new threeGThread();
+					threegthread.start();
 				}
 				
 
@@ -421,7 +423,9 @@ public class SenderActivity extends Activity {
 					}
 				});
 				Log.e("SHIFT TO MMS","SHIFT TO MMS");
-				sendViaMms(headtracker);
+				is3g = false;
+				Thread mmsthread = new mmsThread();
+				mmsthread.start();
 			}
 		}
 	}
@@ -454,7 +458,7 @@ public class SenderActivity extends Activity {
 		timer.cancel();
 
 		// dialog.show(SmsMessagingActivity.this, "Sending SMS", "Please Wait");
-		for (int counter = 0; counter < 10; counter++) {
+		for (int counter = 0; counter < 10 && tailtracker > headtracker ; counter++) {
 			Log.i("send10", "inside send10 for loop");
 			headerBegin = "&% " + tailtracker + " ";
 			submessage = headerBegin + packetList.get(tailtracker);
