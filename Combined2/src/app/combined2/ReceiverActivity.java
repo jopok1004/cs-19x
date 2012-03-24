@@ -253,7 +253,7 @@ public class ReceiverActivity extends Activity {
 			fileT = intent.getStringExtra("fileType");
 			// reply on button click
 		}
-		if ((intent.getStringExtra("start?").toString()).equals("check10")) {
+		if ((intent.getStringExtra("start?").toString()).equals("check10") && !received) {
 			Boolean okay = true;
 			Log.i("check10", "check for missing packets");
 			waiting(30);
