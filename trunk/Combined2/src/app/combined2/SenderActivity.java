@@ -275,7 +275,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 				is3g = true;
-				Thread threegthread = new mmsThread();
+				Thread threegthread = new threeGThread();
 				threegthread.start();
 			} else {
 				handler.post(new Runnable() {
