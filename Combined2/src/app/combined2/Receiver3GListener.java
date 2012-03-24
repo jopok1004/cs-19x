@@ -110,7 +110,7 @@ public class Receiver3GListener implements PacketListener{
 			if (receiver.al.size() >= receiver.size) {
 					
 				Log.i("XMPPReceiver:File", "Finished");
-				//reply.setBody("%&DONE");
+				reply.setBody("%&DONE");
 				Log.e("XMPPReceiver:Sending", "Sending text [" + reply.getBody() + "]");
 				//receiver.getConnection().sendPacket(reply);
 				receiver.receiveFile();

@@ -60,7 +60,7 @@ public class Sender3GListener implements MessageListener{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}*/
-			sender.finish();
+			//sender.finish();
 			
 		}else if (message.getBody().equals("%&CONTINUE")) {
 			sender.setTracker(getCurrentPacket());
