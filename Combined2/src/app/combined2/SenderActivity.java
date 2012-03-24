@@ -469,8 +469,8 @@ public class SenderActivity extends Activity {
 
 		}
 		check10Received = false;
-		sendSMS(phoneNo, "%& check10 " + (tailtracker + 9));
-		Log.i("After send tailtracker", "tailtracker" + (tailtracker+9));
+		sendSMS(phoneNo, "%& check10 " + (tailtracker + 10));
+		Log.i("After send tailtracker", "tailtracker" + (tailtracker+10));
 		timer.start();
 		Thread thread = new smsWaitThread();
 		thread.start();

@@ -145,6 +145,10 @@ public class ReceiverActivity extends Activity {
 					time.setToNow();
 					t1 = time.toMillis(true);
 					logbw.write(time.toString() + "RECEIVER START\n");
+					if(logbw1==null){
+						
+						Log.e("START", "bw1 is null");
+					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
