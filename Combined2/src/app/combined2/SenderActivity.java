@@ -439,12 +439,7 @@ public class SenderActivity extends Activity {
 
 		sendSMS(phoneNum, "%& sendViaSms" + startIndex);
 		
-		handler.post(new Runnable() {
-
-			public void run() {
-				txtCurrentChannel.setText("SMS");
-			}
-		});
+	
 
 		send10(phoneNo);
 		
