@@ -395,6 +395,7 @@ public class SenderActivity extends Activity {
 			Log.e("RECEIVER CONNECTIVITY","RECEIVER CONNECTIVITY");
 			headtracker = Integer.parseInt(intent.getStringExtra("tracker")
 					.toString());
+			Log.e("HEAD TRACKER", ""+headtracker);
 			Log.e("IS ONLINE?", ""+intent.getCharExtra("isOnline", '0'));
 			if (intent.getCharExtra("isOnline", '9')=='1') {
 				receiverIsOnline = true;

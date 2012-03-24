@@ -12,7 +12,6 @@ public class SmsReceiver extends BroadcastReceiver {
 
 	String str = "";
 
-	@Override
 	public void onReceive(Context context, Intent intent) {
 
 		// ---get the SMS message passed in---
@@ -89,16 +88,18 @@ public class SmsReceiver extends BroadcastReceiver {
 			}
 			
 			if (msgs[0].getMessageBody().toString().startsWith("%& receiverConnectivity")) {
+				Log.e("SMS NA NARECEIVE",msgs[0].getMessageBody().toString());
 				Intent i = new Intent(context, SenderActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION
 						| Intent.FLAG_ACTIVITY_NEW_TASK);
 				i.putExtra("start?", "receiverConnectivity");
 				i.putExtra("phoneNum", msgs[0].getOriginatingAddress()
 						.toString());
-				String sub = msgs[0].getMessageBody().substring(24);
-
+				//String sub = msgs[0].getMessageBody().substring(24,24);
+				char sub = msgs[0].getMessageBody().charAt(24);
+				String sub2 = msgs[0].getMessageBody().substring(26);
 				i.putExtra("isOnline", sub);
-
+				i.putExtra("tracker", sub2);
 				context.startActivity(i);
 			}
 			//MMS
