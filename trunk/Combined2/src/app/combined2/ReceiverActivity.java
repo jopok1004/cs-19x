@@ -294,7 +294,7 @@ public class ReceiverActivity extends Activity {
 				.equals("start receiving")) {
 			if (received) {
 				// do nothing
-			} else {
+			} else if(!received && al !=null) {
 
 				int pn;
 				pn = intent.getIntExtra("packetNum", 1000);
@@ -499,7 +499,7 @@ public class ReceiverActivity extends Activity {
 				//Debug.stopMethodTracing();
 				Log.e("DONE","DONE");
 				this.finish();
-
+				al = null;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
