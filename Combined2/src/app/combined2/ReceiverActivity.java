@@ -270,7 +270,7 @@ public class ReceiverActivity extends Activity {
 					okay = false;
 				}
 
-			}
+			}/*
 			if (al.size() < currentp) {
 				for (int k = 0; k < currentp - 1; k++) {
 					if (!al.containsKey(k)) {
@@ -282,7 +282,7 @@ public class ReceiverActivity extends Activity {
 						okay = false;
 					}
 				}
-			}
+			}*/
 			if (okay == true) {
 				sendSMS(phoneNo, "%& resend none");
 			} else {
