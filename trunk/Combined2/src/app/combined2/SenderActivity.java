@@ -263,24 +263,21 @@ public class SenderActivity extends Activity {
 			Thread smsthread = new smsThread();
 			smsthread.start();
 			
-			if (intent.getStringExtra("isOnline").equals("1")) {
-				receiverIsOnline = true;
-			} else {
-				receiverIsOnline = false;
-			}
 
 			if (isOnline(getBaseContext())
 					&& intent.getStringExtra("isOnline").equals("1")) {
+				receiverIsOnline = true;
 				handler.post(new Runnable() {
-
+				
 					public void run() {
 						txtCurrentChannel.setText("3G");
 					}
 				});
-				is3g = true;
-				Thread threegthread = new threeGThread();
-				threegthread.start();
+				//is3g = true;
+				//Thread threegthread = new threeGThread();
+				//threegthread.start();
 			} else {
+				receiverIsOnline = false;
 				handler.post(new Runnable() {
 
 					public void run() {
