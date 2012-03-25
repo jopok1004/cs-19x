@@ -229,6 +229,7 @@ public class SenderActivity extends Activity {
 		public void run() {
 			try {
 				sendViaSms(phoneNum, headtracker);
+				Log.e("smsThread","Inside smsThread");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -240,12 +241,14 @@ public class SenderActivity extends Activity {
 		// This method is called when the thread runs
 		public void run() {
 			sendViaMms(headtracker);
+			Log.e("mmsThread","Inside mmsThread");
 		}
 
 	}
 	class threeGThread extends Thread{
 		public void run(){
 			sendBy3G("dummy19x@gmail.com", headtracker);
+			Log.e("threegThread","Inside threegThread");
 		}
 	}
 	public void onNewIntent(Intent intent) {
@@ -409,7 +412,7 @@ public class SenderActivity extends Activity {
 					});
 					Log.e("SHIFT TO 3G","SHIFT TO 3G");
 				
-					is3g = false;
+					is3g = true;
 					Thread threegthread = new threeGThread();
 					threegthread.start();
 				}
