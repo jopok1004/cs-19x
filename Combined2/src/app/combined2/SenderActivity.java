@@ -408,7 +408,7 @@ public class SenderActivity extends Activity {
 					});
 					Log.e("SHIFT TO 3G","SHIFT TO 3G");
 				
-					//sendBy3G("dummy19x@gmail.com", headtracker);
+					sendBy3G("dummy19x@gmail.com", headtracker);
 				}
 				
 
