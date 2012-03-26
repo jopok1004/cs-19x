@@ -178,9 +178,7 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("3G");
 								}
 							});
-							is3g = true;
-							Thread threegthread = new threeGThread();
-							threegthread.start();
+							sendBy3G("dummy19x@gmail.com", headtracker);
 						
 						} else {
 							Log.e("BRECEIVER", "I AM AT BRECEIVER");
@@ -190,10 +188,8 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("MMS");
 								}
 							});
-							Log.e("BRECEIVER MMSTHREAD", "I AM AT BRECEIVER");
-							is3g = false;
-							Thread mmsthread = new mmsThread();
-							mmsthread.start();
+							Log.e("BRECEIVER MMS", "I AM AT BRECEIVER");
+							sendViaMms(headtracker);
 							
 						}
 
@@ -205,17 +201,15 @@ public class SenderActivity extends Activity {
 						Boolean.FALSE)) {
 					Log.e("app", "There's no network connectivity");
 
-					Log.e("BRECEIVER", "I AM AT BRECEIVER");
+					Log.e("BRECEIVER OFFLINE", "I AM AT BRECEIVER");
 					handler.post(new Runnable() {
 
 						public void run() {
 							txtCurrentChannel.setText("MMS");
 						}
 					});
-					Log.e("BRECEIVER DISCONNECTED MMSTHREAD", "I AM AT BRECEIVER");
-					is3g = false;
-					Thread mmsthread = new mmsThread();
-					mmsthread.start();
+					Log.e("BRECEIVER DISCONNECTED MMS", "I AM AT BRECEIVER");
+					sendViaMms(headtracker);
 					// send sms na di connected
 				}
 
@@ -239,7 +233,7 @@ public class SenderActivity extends Activity {
 		}
 
 	}
-	class mmsThread extends Thread {
+	/*class mmsThread extends Thread {
 		// This method is called when the thread runs
 		public void run() {
 			sendViaMms(headtracker);
@@ -252,7 +246,7 @@ public class SenderActivity extends Activity {
 			sendBy3G("dummy19x@gmail.com", headtracker);
 			Log.e("threegThread","Inside threegThread");
 		}
-	}
+	}*/
 	public void onNewIntent(Intent intent) {
 		// SMS
 		Log.e("NEW", "NEW INTENT");
@@ -287,9 +281,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 				Log.e("INITIAL MMSTHREAD", "I AM AT BRECEIVER");
-				is3g = false;
-				Thread mmsthread = new mmsThread();
-				mmsthread.start();
+				sendViaMms(headtracker);
 			}
 			started = true;
 			registerReceiver(threeGMonitorBroadcastReceiver, gIntentFilter);
@@ -412,9 +404,7 @@ public class SenderActivity extends Activity {
 					});
 					Log.e("SHIFT TO 3G","SHIFT TO 3G");
 				
-					is3g = true;
-					Thread threegthread = new threeGThread();
-					threegthread.start();
+					//sendBy3G("dummy19x@gmail.com", headtracker);
 				}
 				
 
@@ -427,9 +417,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 				Log.e("SHIFT TO MMS","SHIFT TO MMS");
-				is3g = false;
-				Thread mmsthread = new mmsThread();
-				mmsthread.start();
+				//sendViaMms(headtracker);
 			}
 		}
 	}
