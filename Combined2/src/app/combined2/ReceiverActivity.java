@@ -300,8 +300,11 @@ public class ReceiverActivity extends Activity {
 				pn = intent.getIntExtra("packetNum", 1000);
 
 				try {
-					logbw1.write(time.toString() + " : Message " + pn
-							+ " Received\n");
+					if(al !=null){
+						logbw1.write(time.toString() + " : Message " + pn
+								+ " Received\n");
+					}
+					
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
