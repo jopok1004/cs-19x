@@ -421,7 +421,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 				Log.e("SHIFT TO MMS","SHIFT TO MMS");
-				//sendViaMms(headtracker);
+				sendViaMms(headtracker);
 			}
 		}
 	}
