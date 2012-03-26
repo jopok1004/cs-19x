@@ -119,7 +119,7 @@ public class ReceiverActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		//Debug.startMethodTracing("receiver");
+		// Debug.startMethodTracing("receiver");
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
 		super.onCreate(savedInstanceState);
 		getContentResolver().delete(Uri.parse("content://mms"), null, null);
@@ -138,13 +138,13 @@ public class ReceiverActivity extends Activity {
 			public void onClick(View v) {
 				// get starting time
 				try {
-					//logfw = new FileWriter(receiverLog);
-					//logbw = new BufferedWriter(logfw);
+					// logfw = new FileWriter(receiverLog);
+					// logbw = new BufferedWriter(logfw);
 					logfw1 = new FileWriter(receiverSignal);
 					logbw1 = new BufferedWriter(logfw1);
-					
-					if(logbw1==null){
-						
+
+					if (logbw1 == null) {
+
 						Log.e("START", "bw1 is null");
 					}
 				} catch (IOException e) {
@@ -183,11 +183,11 @@ public class ReceiverActivity extends Activity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d("app", "Network connectivity change");
-				int tracker=0;
-				while(al.containsKey(tracker)) {
+				int tracker = 0;
+				while (al.containsKey(tracker)) {
 					tracker++;
 				}
-				
+
 				if (intent.getExtras() != null) {
 					NetworkInfo ni = (NetworkInfo) intent.getExtras().get(
 							ConnectivityManager.EXTRA_NETWORK_INFO);
@@ -196,8 +196,8 @@ public class ReceiverActivity extends Activity {
 							&& !ni.getTypeName().equals("mobile_mms")) {
 						Log.i("app", "Network " + ni.getTypeName()
 								+ " connected");
-						
-						sendSMS(phoneNo, "%& receiverConnectivity 1 "+tracker);
+
+						sendSMS(phoneNo, "%& receiverConnectivity 1 " + tracker);
 						logIn();
 						// send sms na connected
 					}
@@ -206,7 +206,7 @@ public class ReceiverActivity extends Activity {
 						ConnectivityManager.EXTRA_NO_CONNECTIVITY,
 						Boolean.FALSE)) {
 					Log.e("app", "There's no network connectivity");
-					sendSMS(phoneNo, "%& receiverConnectivity 0 "+tracker);
+					sendSMS(phoneNo, "%& receiverConnectivity 0 " + tracker);
 					// send sms na di connected
 				}
 
@@ -259,10 +259,11 @@ public class ReceiverActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			// reply on button click
 		}
-		if ((intent.getStringExtra("start?").toString()).equals("check10") && !received) {
+		if ((intent.getStringExtra("start?").toString()).equals("check10")
+				&& !received) {
 			Boolean okay = true;
 			Log.i("check10", "check for missing packets");
 			waiting(30);
@@ -280,18 +281,12 @@ public class ReceiverActivity extends Activity {
 				}
 
 			}/*
-			if (al.size() < currentp) {
-				for (int k = 0; k < currentp - 1; k++) {
-					if (!al.containsKey(k)) {
-						resend = resend + k + " ";
-						Log.i("if not containskey",
-								"checking for missing packets");
-
-						Log.i("resend", resend);
-						okay = false;
-					}
-				}
-			}*/
+			 * if (al.size() < currentp) { for (int k = 0; k < currentp - 1;
+			 * k++) { if (!al.containsKey(k)) { resend = resend + k + " ";
+			 * Log.i("if not containskey", "checking for missing packets");
+			 * 
+			 * Log.i("resend", resend); okay = false; } } }
+			 */
 			if (okay == true) {
 				sendSMS(phoneNo, "%& resend none");
 			} else {
@@ -303,17 +298,17 @@ public class ReceiverActivity extends Activity {
 				.equals("start receiving")) {
 			if (received) {
 				// do nothing
-			} else if(!received && al !=null) {
+			} else if (!received && al != null) {
 
 				int pn;
 				pn = intent.getIntExtra("packetNum", 1000);
 
 				try {
-					if(al !=null){
+					if (al != null) {
 						logbw1.write(time.toString() + " : Message " + pn
 								+ " Received\n");
 					}
-					
+
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -499,17 +494,16 @@ public class ReceiverActivity extends Activity {
 				time.setToNow();
 				t3 = time.toMillis(true);
 				Log.i("DONE!!!", "DONE");
+				if (logbw != null) {
+					logbw.write("Receiving time:" + (t2 - t1) + "\n");
+					logbw.write("Processing time:" + (t3 - t2) + "\n");
+					logbw.write("Total time:" + (t3 - t1) + "\n");
+				}
+				Log.e("LOG", "DONE LOGGING");
 
-				logbw.write("Receiving time:" + (t2 - t1) + "\n");
-				logbw.write("Processing time:" + (t3 - t2) + "\n");
-				logbw.write("Total time:" + (t3 - t1) + "\n");
-				
-				Log.e("LOG","DONE LOGGING");
-				
-				
 				sendSMS(phoneNo, "%& done");
-				//Debug.stopMethodTracing();
-				Log.e("DONE","DONE");
+				// Debug.stopMethodTracing();
+				Log.e("DONE", "DONE");
 				this.finish();
 				al = null;
 			} catch (IOException e) {
@@ -719,10 +713,10 @@ public class ReceiverActivity extends Activity {
 	public void onDestroy() {
 		unregisterReceiver(mmsMonitorBroadcastReceiver);
 		unregisterReceiver(threeGMonitorBroadcastReceiver);
-		
+
 		try {
-			logbw.write("\nSMS Count: "+smsCount);
-			logbw.write("\n3G Count: "+threeGCount);	
+			logbw.write("\nSMS Count: " + smsCount);
+			logbw.write("\n3G Count: " + threeGCount);
 			logbw.close();
 			logbw1.close();
 			logfw.close();
@@ -731,16 +725,16 @@ public class ReceiverActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		logOut();
 		super.onDestroy();
-		
+
 	}
 
 	// FOR SIGNAL STRENGTH
 
 	protected void onPause() {
-		
+
 		super.onPause();
 		Tel.listen(MyListener, PhoneStateListener.LISTEN_NONE);
 	}
