@@ -190,6 +190,7 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("MMS");
 								}
 							});
+							Log.e("BRECEIVER MMSTHREAD", "I AM AT BRECEIVER");
 							is3g = false;
 							Thread mmsthread = new mmsThread();
 							mmsthread.start();
@@ -211,6 +212,7 @@ public class SenderActivity extends Activity {
 							txtCurrentChannel.setText("MMS");
 						}
 					});
+					Log.e("BRECEIVER DISCONNECTED MMSTHREAD", "I AM AT BRECEIVER");
 					is3g = false;
 					Thread mmsthread = new mmsThread();
 					mmsthread.start();
@@ -284,6 +286,7 @@ public class SenderActivity extends Activity {
 						txtCurrentChannel.setText("MMS");
 					}
 				});
+				Log.e("INITIAL MMSTHREAD", "I AM AT BRECEIVER");
 				is3g = false;
 				Thread mmsthread = new mmsThread();
 				mmsthread.start();
@@ -575,7 +578,7 @@ public class SenderActivity extends Activity {
 			// temp3= 0;
 			// temp3 = headtracker;
 			packetstobesent = 0;
-			for (int i = 0; i < 100 && headtracker < packetCount; i++) {
+			for (int i = 0; i < 100 && headtracker < packetCount && headtracker <= tailtracker; i++) {
 				msg = msg + "&% " + headtracker + " " + packetList.get(headtracker)
 						+ "\n";
 				headtracker++;
