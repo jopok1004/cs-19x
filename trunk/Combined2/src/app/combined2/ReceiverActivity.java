@@ -142,9 +142,7 @@ public class ReceiverActivity extends Activity {
 					//logbw = new BufferedWriter(logfw);
 					logfw1 = new FileWriter(receiverSignal);
 					logbw1 = new BufferedWriter(logfw1);
-					time.setToNow();
-					t1 = time.toMillis(true);
-					logbw.write(time.toString() + "RECEIVER START\n");
+					
 					if(logbw1==null){
 						
 						Log.e("START", "bw1 is null");
@@ -254,6 +252,9 @@ public class ReceiverActivity extends Activity {
 			try {
 				logfw = new FileWriter(receiverLog);
 				logbw = new BufferedWriter(logfw);
+				time.setToNow();
+				t1 = time.toMillis(true);
+				logbw.write(time.toString() + "RECEIVER START\n");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
