@@ -486,8 +486,8 @@ public class SenderActivity extends Activity {
 			if (check10Received || done == true) {
 				//do nothing
 			} else {
-				Log.i("resend check10", "tailtracker" + (tailtracker+9));
-				sendSMS(phoneNum, "%& check10 " + (tailtracker+9));
+				Log.i("resend check10", "tailtracker" + (tailtracker+10));
+				sendSMS(phoneNum, "%& check10 " + (tailtracker+10));
 				//resend check10
 			}
 
@@ -557,18 +557,13 @@ public class SenderActivity extends Activity {
 
 	private void send1mms(String phoneNum) throws IOException {
 
-		// dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		// dialog.setMessage("Sending MMS...");
-		// dialog.setCancelable(false);
-		// dialog.show();
+		
 		Log.i("CHLOE", "I AM AT PARSER NOW");
 		try {
 			// dialog.show(Mms2Activity.this, "Sending SMS", "Please Wait");
 			// 1024b * 300kb = 307200/160 char = 1920 packets
 
 			String msg = "";
-			// temp3= 0;
-			// temp3 = headtracker;
 			packetstobesent = 0;
 			for (int i = 0; i < 100 && headtracker < packetCount && headtracker <= tailtracker; i++) {
 				msg = msg + "&% " + headtracker + " " + packetList.get(headtracker)
