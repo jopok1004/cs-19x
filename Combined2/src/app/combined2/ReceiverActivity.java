@@ -138,8 +138,8 @@ public class ReceiverActivity extends Activity {
 			public void onClick(View v) {
 				// get starting time
 				try {
-					logfw = new FileWriter(receiverLog);
-					logbw = new BufferedWriter(logfw);
+					//logfw = new FileWriter(receiverLog);
+					//logbw = new BufferedWriter(logfw);
 					logfw1 = new FileWriter(receiverSignal);
 					logbw1 = new BufferedWriter(logfw1);
 					time.setToNow();
@@ -251,6 +251,14 @@ public class ReceiverActivity extends Activity {
 			size = intent.getIntExtra("size", 10);
 			Log.e("SIZE", Integer.toString(size));
 			fileT = intent.getStringExtra("fileType");
+			try {
+				logfw = new FileWriter(receiverLog);
+				logbw = new BufferedWriter(logfw);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			// reply on button click
 		}
 		if ((intent.getStringExtra("start?").toString()).equals("check10") && !received) {
