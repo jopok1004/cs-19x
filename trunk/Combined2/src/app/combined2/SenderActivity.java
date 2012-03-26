@@ -369,7 +369,7 @@ public class SenderActivity extends Activity {
 			Log.e("MMS", "SEND ANOTHER MMS");
 			mmsReceived = true;
 			try {
-				if (headtracker < packetCount && !is3g) {
+				if (headtracker < packetCount && !is3g && headtracker <= tailtracker) {
 					handler.post(new Runnable() {
 
 						public void run() {
