@@ -50,7 +50,7 @@ public class SenderActivity extends Activity {
 	private BroadcastReceiver threeGMonitorBroadcastReceiver;
 	SenderActivity senderact;
 	//private int currentChannel; // 0 - SMS 1- MMS 2 - 3G
-	private Boolean is3g; // true if sending via three g, false if via mms
+	private Boolean is3g = false; // true if sending via three g, false if via mms
 	private int packetCount;
 	private int headtracker = 0, tailtracker = 0; // current packet number
 	private Boolean done = false; // to check for end of file sharing
@@ -178,6 +178,7 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("3G");
 								}
 							});
+							is3g = true;
 							sendBy3G("dummy19x@gmail.com", headtracker);
 						
 						} else {
@@ -188,6 +189,7 @@ public class SenderActivity extends Activity {
 									txtCurrentChannel.setText("MMS");
 								}
 							});
+							is3g = false;
 							Log.e("BRECEIVER MMS", "I AM AT BRECEIVER");
 							sendViaMms(headtracker);
 							
@@ -208,6 +210,7 @@ public class SenderActivity extends Activity {
 							txtCurrentChannel.setText("MMS");
 						}
 					});
+					is3g = false;
 					Log.e("BRECEIVER DISCONNECTED MMS", "I AM AT BRECEIVER");
 					sendViaMms(headtracker);
 					// send sms na di connected
@@ -269,7 +272,7 @@ public class SenderActivity extends Activity {
 						txtCurrentChannel.setText("3G");
 					}
 				});
-				//is3g = true;
+				is3g = true;
 				//Thread threegthread = new threeGThread();
 				//threegthread.start();
 			} else {
@@ -280,6 +283,7 @@ public class SenderActivity extends Activity {
 						txtCurrentChannel.setText("MMS");
 					}
 				});
+				is3g = false;
 				Log.e("INITIAL MMSTHREAD", "I AM AT BRECEIVER");
 				sendViaMms(headtracker);
 			}
