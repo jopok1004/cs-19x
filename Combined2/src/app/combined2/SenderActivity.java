@@ -236,20 +236,7 @@ public class SenderActivity extends Activity {
 		}
 
 	}
-	/*class mmsThread extends Thread {
-		// This method is called when the thread runs
-		public void run() {
-			sendViaMms(headtracker);
-			Log.e("mmsThread","Inside mmsThread");
-		}
-
-	}
-	class threeGThread extends Thread{
-		public void run(){
-			sendBy3G("dummy19x@gmail.com", headtracker);
-			Log.e("threegThread","Inside threegThread");
-		}
-	}*/
+	
 	public void onNewIntent(Intent intent) {
 		// SMS
 		Log.e("NEW", "NEW INTENT");
@@ -408,7 +395,7 @@ public class SenderActivity extends Activity {
 					});
 					Log.e("SHIFT TO 3G","SHIFT TO 3G");
 				
-					//sendBy3G("dummy19x@gmail.com", headtracker);
+					sendBy3G("dummy19x@gmail.com", headtracker);
 				}
 				
 
@@ -421,7 +408,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 				Log.e("SHIFT TO MMS","SHIFT TO MMS");
-				//sendViaMms(headtracker);
+				sendViaMms(headtracker);
 			}
 		}
 	}
