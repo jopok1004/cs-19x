@@ -815,7 +815,9 @@ public class SenderActivity extends Activity {
 	public BufferedWriter getWriter() {
 		return logbw;
 	}
-
+	public void finishAct(){
+		finish();
+	}
 	public void finish() {
 		Intent data = new Intent();
 
