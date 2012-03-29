@@ -146,10 +146,10 @@
             android:text="Disconnect" 
             android:onClick ="disconnectWifi"/>
         <Button
-            android:id="@+id/btnClose"
+            android:id="@+id/btnDC"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Close App" 
-            android:onClick ="finishAct"/>
+            android:onClick ="finish"/>
         
     </TableLayout>
