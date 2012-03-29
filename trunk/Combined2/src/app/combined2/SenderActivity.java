@@ -408,7 +408,7 @@ public class SenderActivity extends Activity {
 					});
 					Log.e("SHIFT TO 3G","SHIFT TO 3G");
 				
-					sendBy3G("dummy19x@gmail.com", headtracker);
+					//sendBy3G("dummy19x@gmail.com", headtracker);
 				}
 				
 
@@ -421,7 +421,7 @@ public class SenderActivity extends Activity {
 					}
 				});
 				Log.e("SHIFT TO MMS","SHIFT TO MMS");
-				sendViaMms(headtracker);
+				//sendViaMms(headtracker);
 			}
 		}
 	}
@@ -815,11 +815,7 @@ public class SenderActivity extends Activity {
 	public BufferedWriter getWriter() {
 		return logbw;
 	}
-	
-	public void finishAct() {
-		this.finish();
-	}
-	
+
 	public void finish() {
 		Intent data = new Intent();
 
