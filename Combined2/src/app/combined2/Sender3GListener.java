@@ -10,15 +10,25 @@ import org.jivesoftware.smack.packet.Message;
 import android.text.format.Time;
 import android.util.Log;
 
+/**
+ * A listener for 3G messages received by the sender
+ *
+ */
+
 public class Sender3GListener implements MessageListener{
 	private SenderActivity sender;
 	private Integer currentPacket;
 	private int threeGCount=0;
-	//private long t;
 	
 	public Sender3GListener (SenderActivity sender) {
 		this.sender = sender;
 	}
+	
+	/**
+	 * A waiting function
+	 * 
+	 * @param n Time in seconds
+	 */
 	
 	public void waiting (int n){
         long t0, t1;
@@ -30,6 +40,12 @@ public class Sender3GListener implements MessageListener{
         while ((t1 - t0) < (n * 1000));
     }
 	
+	/**
+	 * Function that processes the messages received
+	 * 
+	 * @param chat The chat it would listen to
+	 * @param message The message received
+	 */
 	public void processMessage(Chat chat, Message message) {
 		Log.e("XMPPSender:Receiving", "Received text [" + message.getBody() + "]");
 		Time time = new Time();
@@ -73,6 +89,12 @@ public class Sender3GListener implements MessageListener{
 		
 	}
 	
+	/**
+	 * Function that sends a message containing 40 packets
+	 * 
+	 * @param chat The chat session where it would send the message
+	 * @param time The current time
+	 */
 	private void sendPackets (Chat chat, Time time) {
 		try {
 			int counter = 0;
@@ -98,16 +120,8 @@ public class Sender3GListener implements MessageListener{
 				Message reply = new Message();
 				reply.setType(Message.Type.chat);
 				reply.setBody(packet);
-				
-				/*try {
-					time.setToNow();
-					sender.getWriter().write(time.toString() + " : Packet " + getCurrentPacket() +  "Sending\n");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}*/
-				
+
 				chat.sendMessage(reply);
-				//
 				sender.threeGCount++;
 				
 				
@@ -132,13 +146,5 @@ public class Sender3GListener implements MessageListener{
 	public void setCurrentPacket(Integer currentPacket) {
 		this.currentPacket = currentPacket;
 	}
-
-	/*public Integer getCurrentPacket() {
-		return currentPacket;
-	}
-
-	public void setCurrentPacket(Integer currentPacket) {
-		this.currentPacket = currentPacket;
-	}*/
 	
 }

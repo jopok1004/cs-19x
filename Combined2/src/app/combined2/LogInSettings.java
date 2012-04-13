@@ -6,6 +6,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * Dialog box responsible for getting information required for logging in an account to google talk
+ *
+ */
+
 public class LogInSettings extends Dialog implements android.view.View.OnClickListener{
 	private ReceiverActivity receiver;
 	private SenderActivity sender;

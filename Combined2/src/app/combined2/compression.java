@@ -8,7 +8,17 @@ import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * Class responsible for the gzip compression algorithm
+ */
 public class compression {
+	
+	/**
+	 * Function that compresses the given file via gzip algorithm
+	 * @param filePath The file path where the file is located
+	 * @param fileName The name of the file
+	 */
+	
 	public static void compressGzip(String filePath, String fileName) {
 		try {
 			File file = new File(filePath+"/"+fileName);
@@ -35,6 +45,12 @@ public class compression {
 			System.out.println("Exception is" + e);
 		}
 	}
+	
+	/**
+	 * Function that decompresses the given gzip file
+	 * 
+	 * @param filename The file to be decompressed
+	 */
 	
 	public static void decompressGzip(String filename){
 		try{
